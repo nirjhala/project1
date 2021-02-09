@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use Route;
 use App\Model\Session;
+use App\Model\School;
 
 class SessionController extends Controller
 {
@@ -42,7 +43,7 @@ class SessionController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Session::where('session_name', 'LIKE', $input['session_name'])->where('session_is_deleted', 'N')->where('session_school', auth()->user()->school)->count();
+            $is_exists = Session::where('session_name', 'LIKE', $input['session_name'])->where('session_school', auth()->user()->school)->count();
 
             if(!$is_exists) {
                 $arr = [
@@ -90,7 +91,7 @@ class SessionController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Session::where('session_name', 'LIKE', $input['session_name'])->where('session_is_deleted', 'N')->where('session_school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
+            $is_exists = Session::where('session_name', 'LIKE', $input['session_name'])->where('session_school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
 
             if(!$is_exists) {
                 $obj                        = Session::findOrFail($input['id']);
@@ -122,7 +123,7 @@ class SessionController extends Controller
         $user       = auth()->user();
         $school_id  = $user->school;
 
-        $data = Session::where('session_is_deleted', 'N')->where('session_school', $school_id)->latest()->paginate(20);
+        $data = Session::where('session_school', $school_id)->latest()->paginate(20);
 
         foreach ($data as $i => $d) {
             $data[$i]->session_start_month = date("F", mktime(0, 0, 0, $d->session_start_month, 10));
@@ -143,9 +144,22 @@ class SessionController extends Controller
 
         return response()->json($re, 200);
     }
-    public function searchData(Request $request)
+    public function all(Request $request) {
+        $query = Session::where('session_school', auth()->user()->school);
+        if(!empty($request->type) && $request->type == 'all')
+        {
+            $lists = $query->select('id', 'session_name AS name')->latest()->pluck('name', 'id');
+        }
+        else
+        {
+            $lists = $query->get()->toArray();
+        }
+
+        return response()->json( $lists );
+    }
+    public function searchData(Request $request, School $school)
     {
-        $query = Session::where('session_is_deleted', 'N');
+        $query = Session::where('session_school', $school->uid);
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -178,7 +192,7 @@ class SessionController extends Controller
     }
     public function removeData(Request $request)
     {
-        Session::whereIn('id', $request->check)->update(['session_is_deleted' => 'Y']);
+        Session::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

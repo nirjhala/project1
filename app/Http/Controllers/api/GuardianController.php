@@ -26,7 +26,7 @@ class GuardianController extends Controller
      * type = mother | father | other
      */
     public function index($subdomain) {
-        $query = User::has('roleName')->where('deleted', 'N');
+        $query = User::with('guardian_info', 'roleName')->has('roleName')->has('guardian_info');
 
         $query->whereHas('roleName', function($q) {
             $q->where('name', 'LIKE', 'Parents');
@@ -38,7 +38,9 @@ class GuardianController extends Controller
         if(!$users->isEmpty()) {
             foreach ($users as $key => $u) {
                 $userArr['all'][] = $u;
-                $userArr[$u->guardian_info->relation][] = $u;
+                if(!empty($u->guardian_info->relation)) {
+                    $userArr[$u->guardian_info->relation][] = $u;
+                }
             }
         }
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use Route;
 use App\Model\Timeslot;
+use App\Model\School;
 use App\Model\SubjectClass;
 
 class TimeslotController extends Controller
@@ -44,7 +45,10 @@ class TimeslotController extends Controller
             ];
             $responseCode = 200;
         } else {
-            $is_exists = Timeslot::where('name', 'LIKE', $input['name'])->where('shift', $input['shift'])->where('school', auth()->user()->school)->where('deleted', 'N')->count();
+            $is_exists = Timeslot::where('name', 'LIKE', $input['name'])
+                ->where('shift', $input['shift'])
+                ->where('school', auth()->user()->school)
+                ->count();
 
             if(!$is_exists):
                 $obj                = new Timeslot;
@@ -96,7 +100,7 @@ class TimeslotController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Timeslot::where('name', 'LIKE', $input['name'])->where('shift', $input['shift'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->where('deleted', 'N')->count();
+            $is_exists = Timeslot::where('name', 'LIKE', $input['name'])->where('shift', $input['shift'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
 
             if(!$is_exists):
                 $obj                = Timeslot::findOrFail($input['id']);
@@ -127,7 +131,7 @@ class TimeslotController extends Controller
 
     public function getData()
     {
-        $data = Timeslot::with(['shift'])->where('deleted', 'N')->latest()->paginate(20);
+        $data = Timeslot::with(['shift'])->latest()->paginate(20);
 
         if ($data->isEmpty()) {
             foreach ($data as $i => $d) {
@@ -150,7 +154,7 @@ class TimeslotController extends Controller
     }
     public function searchData(Request $request)
     {
-        $query = Timeslot::with('shift')->where('deleted', 'N');
+        $query = Timeslot::with('shift');
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -215,7 +219,7 @@ class TimeslotController extends Controller
     public function getDataByShift($weburl, $shift_id)
     {
         $user = auth()->user();
-        $lists = Timeslot::where('school', $user->school)->where('deleted', 'N')->where('shift', $shift_id)->get()->toArray();
+        $lists = Timeslot::where('school', $user->school)->where('shift', $shift_id)->get()->toArray();
 
         return response()->json($lists, 200);
     }

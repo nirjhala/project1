@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use Route;
 use App\Model\Shift;
+use App\Model\School;
 
 class ShiftController extends Controller
 {
@@ -25,7 +26,7 @@ class ShiftController extends Controller
     public function add(Request $request, $schoolName)
     {
         $rules = [
-            'shift_name'            => 'required',
+            'shift_name'           => 'required',
             'shift_opening_time'   => 'required',
             'shift_closing_time'   => 'required',
         ];
@@ -43,7 +44,7 @@ class ShiftController extends Controller
             ];
             $responseCode = 200;
         } else {
-            $is_exists = Shift::where('shift_name', 'LIKE', $input['shift_name'])->where('shift_school', auth()->user()->school)->where('shift_is_deleted', 'N')->count();
+            $is_exists = Shift::where('shift_name', 'LIKE', $input['shift_name'])->where('shift_school', auth()->user()->school)->count();
 
             if(!$is_exists) :
                 $obj = new Shift;
@@ -92,7 +93,7 @@ class ShiftController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Shift::where('shift_name', 'LIKE', $input['shift_name'])->where('shift_school', auth()->user()->school)->where('shift_is_deleted', 'N')->where('id', '!=', $input['id'])->count();
+            $is_exists = Shift::where('shift_name', 'LIKE', $input['shift_name'])->where('shift_school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
             
             if(!$is_exists) :
                 $obj                      = Shift::findOrFail($input['id']);
@@ -121,9 +122,7 @@ class ShiftController extends Controller
     }
     public function getData()
     {
-        $data = Shift::withCount(['timeslots' => function ($q) {
-            $q->where('deleted', 'N');
-        }])->where('shift_is_deleted', 'N')->latest()->paginate(20);
+        $data = Shift::withCount(['timeslots'])->latest()->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -144,17 +143,15 @@ class ShiftController extends Controller
 
         return response()->json($re, 200);
     }
-    public function getAllList()
+    public function getAllList(School $school)
     {
-        $data = Shift::where('shift_is_deleted', 'N')->latest()->get()->toArray();
+        $data = Shift::where('shift_school', $school->uid)->latest()->get()->toArray();
 
         return $data;
     }
     public function searchData(Request $request)
     {
-        $query = Shift::withCount(['timeslots' => function ($q) {
-            $q->where('deleted', 'N');
-        }])->where('shift_is_deleted', 'N');
+        $query = Shift::withCount(['timeslots']);
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -187,7 +184,7 @@ class ShiftController extends Controller
     }
     public function removeData(Request $request)
     {
-        Shift::whereIn('id', $request->check)->update(['shift_is_deleted' => 'Y']);
+        Shift::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

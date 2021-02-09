@@ -135,7 +135,7 @@ h6 {
   background-color: initial;
 }
 .card-body {
-  padding: 15px 30px 30px;
+  /* padding: 15px 30px 30px; */
   background-color: #ffffff;
   border-radius: 4px;
   -webkit-box-shadow: 0px 10px 20px 0px rgba(229, 229, 229, 0.75);
@@ -2290,6 +2290,7 @@ ul {
 }
 .sidebar-main {
   left: -27rem;
+  min-height: calc( 100vh - 70px );
 }
 @media only screen and (min-width: 768px) {
   .sidebar-expand-md {
@@ -5155,4 +5156,27 @@ label.custom-radio {
 .custom-radio input[type=radio]:checked+span:after {
     background: #ffae01;
     transform: translateY(-50%) scale(0.6);
+}
+
+.cart-input {
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.cart-input input {
+  width: 50px;
+  text-align: center;
+}
+.cart-input button, .cart-input input {
+  background-color: transparent;
+  color: inherit;
+  border: none;
+  flex-grow: 1;
+}
+.cart-input input:focus,.cart-input button {
+  border: none;
+  outline: none;
+}
+.cart-input button {
+  padding: 0 5px;
 }

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use Route;
 use App\Model\Routes;
+use App\Model\School;
 use App\Model\RoutePoint;
 
 class RouteController extends Controller
@@ -170,6 +171,13 @@ class RouteController extends Controller
         }
 
         return response()->json($re, 200);
+    }
+    public function driver (Request $request) {
+        $data = Routes::with(['points', 'vehicleInfo', 'vehicleInfo.driverName'])->where('school', auth()->user()->school)->whereHas('vehicleInfo', function ($q) {
+            $q->where('driver', auth()->user()->id);
+        })->latest()->first();
+
+        return response()->json($data, 200);
     }
     public function removeData(Request $request)
     {

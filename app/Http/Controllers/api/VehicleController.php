@@ -31,7 +31,8 @@ class VehicleController extends Controller
             'vehicle_rc'    => 'required'
         ];
 
-        $input      = $request->all();
+        $input                  = $request->all();
+        $input['vehicle_no']    = str_replace([" ","-","(",")"], "", $input['vehicle_no']);
 
         $validator  = Validator::make($input, $rules);
 
@@ -104,26 +105,28 @@ class VehicleController extends Controller
     }
     public function getAllList(Request $request, $weburl)
     {
-        $data = Vehicle::where('school', auth()->user()->school)->latest()->get();
+        $query = Vehicle::where('school', auth()->user()->school);
+        if(!empty($request->type) && $request->type == 'exclude-routes') {
+            $query->whereDoesntHave('routes');
+        }
+        $data = $query->latest()->get();
 
         return response()->json($data, 200);
     }
     public function getData(Request $request)
     {
-        $data = Vehicle::with(['driverName'])->withCount('routes')->where('school', auth()->user()->school)->latest()->paginate(20);
+        $data = Vehicle::with(['driverName'])
+            ->withCount('routes')
+            ->where('school', auth()->user()->school)
+            ->latest()
+            ->paginate(20);
 
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
-        }
+        
+        $re = [
+            'status'    => true,
+            'message'   => $data->count().' record(s) found.',
+            'data'      => $data,
+        ];
 
         return response()->json($re, 200);
     }

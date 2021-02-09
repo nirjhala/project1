@@ -11,6 +11,11 @@ use App\Model\Religion;
 
 class ReligionController extends Controller
 {
+    public function index()
+    {
+        $religions = Religion::orderBy('name', 'ASC')->pluck('name','id');
+        return response()->json($religions);
+    }
     public function getInfo($subdomain, $id = null)
     {
         $info = Religion::findOrFail($id);
@@ -89,7 +94,9 @@ class ReligionController extends Controller
     }
     public function getData()
     {
-        $data = Religion::withCount('students')->latest()->paginate(20);
+        $data = Religion::withCount(['students' => function ($q) {
+            $q->has('user');
+        }])->latest()->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [

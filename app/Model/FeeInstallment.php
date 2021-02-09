@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class FeeInstallment extends Model
 {
-    protected $table = "fee_installments";
+    protected $guarded = [];
+
+    public function structure() {
+        return $this->hasOne('App\Model\FeeStructure', 'id', 'fee_structure_id');
+    }
 }

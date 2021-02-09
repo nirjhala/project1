@@ -15,23 +15,139 @@ use Illuminate\Validation\Rule;
 
 // Load Models
 use App\Model\User;
+use App\Model\Student;
 use App\Model\Role;
 use App\Model\Setting;
+use App\Model\School;
 
 class UserController extends Controller
 {
-    public function getInfo($subdomain, $id = null)
+    public function teachers(Request $request, School $school)
     {
-        $info = User::with(['media', 'pincodeData', 'cityData'])->findOrFail($id);
+        $query = User::where('school', $school->uid)->whereHas('roleName', function ($q) {
+            $q->where('name', 'Teacher');
+        });
+
+        if(!empty($request->class_id))
+        {
+            $query->whereHas('teacher_timetable', function ($q) use($request) {
+                $q->whereHas('section_info', function ($q1) use ($request) {
+                    $q1->where('class', $request->class_id);
+                });
+            });
+        }
+        if (!empty($request->subject_id))
+        {
+            $query->whereHas('teacher_timetable', function ($q) use ($request) {
+                $q->where('subject', $request->subject_id);
+            });
+        }
+
+        $teachers = $query->selectRaw("CONCAT(name, ' (', mobile, ')' ) AS name, id")->pluck('name', 'id');
+
+        return response()->json($teachers);
+    }
+
+    public function index(Request $request)
+    {
+        $withArr = ['media', 'cityData', 'cityData.stateName', 'roleName'];
+
+        $query = User::with($withArr)->whereHas('roleName', function ($q) {
+            $q->whereNotIn('name', ['Student', 'Admin', 'School']);
+        })->where('school', auth()->user()->school);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%'.$request->s.'%')
+                ->orWhere('mobile', 'LIKE', '%'.$request->s.'%');
+            });
+        }
+        if(!empty($request->role)) {
+            $query->whereHas('roleName', function ($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+        if(!empty($request->state_id))
+        {
+            $query->whereHas('cityData', function ($q) use ($request) {
+                $q->where('state', $request->state_id);
+            });
+        }
+        if(!empty($request->city_id))
+        {
+            $query->where('city_id', $request->city_id);
+        }
+        if(!empty($request->gender))
+        {
+            $query->where('gender', $request->gender);
+        }
+
+        if(!empty($request->custom_field))
+        {
+            // $request->custom_field = json_decode($request->custom_field);
+
+            foreach($request->custom_field as $cf_id => $cf) {
+                if(!empty($cf))
+                {
+                    $query->whereHas('direct_custom_fields', function ($q) use ($cf, $cf_id) {
+                        $q->where('value', $cf)->where('custom_field_id', $cf_id);
+                    });
+                }
+            }
+        }
+
+        if(empty($request->type) || $request->type != 'all')
+        {
+            $data = $query->latest()->paginate(20);
+    
+            if (!$data->isEmpty()) {
+                foreach ($data as $i => $d) {
+                    if (!empty($data[$i]->media)) {
+                        $data[$i]->media->large_image   = !empty($d->media->image) ? url('uploads/large/'.$d->media->image) : url('img/default.jpg');
+                        $data[$i]->media->medium_image  = !empty($d->media->image) ? url('uploads/medium/'.$d->media->image) : url('img/default.jpg');
+                        $data[$i]->media->thumb_image   = !empty($d->media->image) ? url('uploads/thumb/'.$d->media->image) : url('img/default.jpg');
+                    }
+                    $data[$i]->children_count = 0;
+                    if(!empty($request->role) && $request->role == 'Parents') {
+                        $data[$i]->children_count = Student::where('father', $d->id)->orWhere('mother', $d->id)->orWhere('guardian', $d->id)->has('user')->count();
+                    }
+                }
+            }
+        }
+        else
+        {
+            $query->select(
+                \DB::raw("CONCAT(name, ' (', mobile, ')') AS name"),
+                'id'
+            );
+            $data = $query->pluck('name', 'id');
+        }
+
+        return response()->json($data, 200);
+    }
+    public function show($subdomain, $id = null)
+    {
+        $info = User::with(['media', 'pincodeData', 'cityData', 'documents', 'custom_fields'])->findOrFail($id);
+
+        if(!empty($info->custom_fields)) {
+            foreach($info->custom_fields as $key => $cf) {
+                if($cf->type == 'relation') {
+                    $relationInfo = \DB::table($cf->relative_table)->find($cf->pivot->value);
+                    $info->custom_fields[$key]->valueText = !empty($relationInfo->name) ? $relationInfo->name : '';
+                } else {
+                    $info->custom_fields[$key]->valueText = $cf->pivot->value;
+                }
+            }
+        }
+
         $re = [
             'status'    => true,
             'data'      => $info
         ];
         return response()->json($re, 200);
     }
-    public function userLogin(Request $request)
+    public function userLogin(Request $request, $schoolName)
     {
-        $schoolName = Route::input('subdomain');
         $schoolInfo = User::whereHas('schoolData', function ($q) use ($schoolName) {
             $q->where('weburl', $schoolName);
         })->firstOrFail();
@@ -114,12 +230,12 @@ class UserController extends Controller
             $otp_code = rand(100000, 999999); // Generate 6 digit autogenerate
             $settings = Setting::find(1);
             // Send SMS
-            $mobileNo = str_replace(["+", " ", "(", ")"], "", $user->mobile);
-            $mobileNo = substr($mobileNo, -10);
-            $senderId = "SCHERP";
-            $message  = urlencode("Your One Time Password is {$otp_code} for recover password from {$settings->name}");
-            $smsApiUrl = str_replace(["[SENDER]", "[MOBILE]", "[MESSAGE]"], [$senderId, $mobileNo, $message], $settings->sms_gateway);
-            $sms = file_get_contents($smsApiUrl);
+            $mobileNo   = str_replace(["+", " ", "(", ")"], "", $user->mobile);
+            $mobileNo   = substr($mobileNo, -10);
+            $senderId   = "SCHERP";
+            $message    = urlencode("Your One Time Password is {$otp_code} for recover password from {$settings->name}");
+            $smsApiUrl  = str_replace(["[SENDER]", "[MOBILE]", "[MESSAGE]"], [$senderId, $mobileNo, $message], $settings->sms_gateway);
+            $sms        = file_get_contents($smsApiUrl);
             $re = [
                 'status'    => true,
                 'message'   => 'OTP sent to your mobile no. '.$user->mobile,
@@ -147,24 +263,25 @@ class UserController extends Controller
         ];
         return response()->json($re, 200);
     }
-    public function add(Request $request, $schoolName)
+    public function store(Request $request, $schoolName)
     {
         $rules = [
-            // 'login'     => 'required|unique:users,login,NULL,id,school,'.auth()->user()->school.',deleted,N',
             'login'     => [
                 'required',
                 Rule::unique('users')
-                    ->where('deleted', 'N')
                     ->where('school', auth()->user()->school)
             ],
             'password'  => 'required',
             'fname'     => 'required|alpha',
             'title'     => 'required',
             'gender'    => 'required',
-            'mobile'    => 'required|numeric',
-            'role'      => 'required|numeric'
+            'mobile'    => 'required|numeric'
+            // 'role'      => 'required|numeric'
         ];
+        // $role = Role::where('name', 'LIKE', $request->role)->first();
         $input      = $request->all();
+        // $input['role'] = $role->id;
+
         $validator  = Validator::make($input, $rules);
         if ($validator->fails()) {
             $re = [
@@ -175,75 +292,58 @@ class UserController extends Controller
             ];
             $responseCode = 200;
         } else {
-            $obj = new User;
-            $obj->login         = $input['login'];
-            $obj->password      = Hash::make($input['password']);
-            $obj->title         = $input['title'];
-            $obj->fname         = $input['fname'];
-            $obj->lname         = $input['lname'];
-            $obj->name          = trim($input['title'].' '.$input['fname'].' '.$input['lname']);
-            $obj->email         = $input['email'];
-            $obj->mobile        = $input['mobile'];
-            $obj->dob           = $input['dob'];
-            $obj->gender        = $input['gender'];
-            $obj->address1      = $input['address1'];
-            $obj->address2      = $input['address2'];
-            $obj->city_id       = $input['city_id'];
-            $obj->pin_code      = $input['pin_code'];
-            $obj->image         = $input['image'];
-            $obj->role          = $input['role'];
-            $obj->school        = auth()->user()->school;
-            $obj->save();
+            $role = Role::where('name', 'LIKE', $input['role'])->firstOrFail();
+
+            $user = new User;
+            $user->login         = $input['login'];
+            $user->password      = Hash::make($input['password']);
+            $user->title         = $input['title'];
+            $user->fname         = $input['fname'];
+            $user->lname         = $input['lname'];
+            $user->name          = trim($input['title'].' '.$input['fname'].' '.$input['lname']);
+            $user->email         = $input['email'];
+            $user->mobile        = $input['mobile'];
+            $user->dob           = $input['dob'];
+            $user->gender        = $input['gender'];
+            $user->address1      = $input['address1'];
+            $user->address2      = $input['address2'];
+            $user->city_id       = $input['city_id'];
+            $user->pin_code      = $input['pin_code'];
+            $user->image         = $input['image'];
+            $user->role          = $role->id;
+            $user->school        = auth()->user()->school;
+            $user->save();
+
+            $customFields = [];
+            if(!empty($request->custom_field)) {
+                foreach($request->custom_field as $id => $cf)
+                {
+                    $customFields[$id] = [
+                        'value' => $cf
+                    ];
+                }
+    
+                $user->custom_fields()->sync($customFields);
+            }
+
             $re = [
                 'status'    => true,
                 'message'   => 'Success! Record has been added.',
+                'user'      => $user
             ];
             $responseCode = 200;
         }
         return response()->json($re, $responseCode);
     }
-    // public function addParent(Request $request)
-    // {
-    //     $input = [
-    //         'login'     => $request->mobile,
-    //     ];
-    //     $request->merge($input);
-    //     $rules = [
-    //         'id'            => 'required|numeric',
-    //         'login'         => 'required|unique:users',
-    //         'password'      => 'required',
-    //         'mobile'        => 'required',
-    //         'name'          => 'required|regex:/[A-Za-z ]+/',
-    //     ];
-    //     $validator  = Validator::make($input, $rules);
-    //     $input      = $request->all();
-    //     $roleInfo   = Role::where('name', 'LIKE', 'Parents')->select('id')->first();
-    //     $obj = new User;
-    //     $obj->login     = $input['login'];
-    //     $obj->password  = Hash::make($input['password']);
-    //     $obj->mobile    = $input['mobile'];
-    //     $obj->name      = $input['name'];
-    //     $obj->role      = $roleInfo->id;
-    //     $obj->school    = auth()->user()->school;
-    //     $obj->save();
-    //     $lists = User::where('role', $roleInfo->id)->get()->toArray();
-    //     $re = [
-    //         'id'    => $obj->id,
-    //         'lists' => $lists
-    //     ];
-    //     return response()->json($re, 200);
-    // }
-    public function updateData(Request $request)
+    public function update(Request $request, $subdomain, User $user)
     {
-        $schoolName = Route::input('subdomain');
         $input      = $request->all();
         $rules = [
-            'login'     => 'required|unique:users,id,'.$input['id'],
+            'login'     => 'required|unique:users,id,'.$user->id,
             'fname'     => 'required|alpha',
             'title'     => 'required',
             'gender'    => 'required',
-            'mobile'    => 'required|numeric',
-            'role'      => 'required|numeric'
+            'mobile'    => 'required|numeric'
         ];
         $validator  = Validator::make($input, $rules);
         if ($validator->fails()) {
@@ -255,27 +355,41 @@ class UserController extends Controller
             ];
             $responseCode = 200;
         } else {
-            $obj = User::findOrFail($input['id']);
-            $obj->login         = $input['login'];
+            $role = Role::where('name', 'LIKE', $input['role'])->firstOrFail();
+            
+            $user->login         = $input['login'];
             if (!empty($input['password'])) {
-                $obj->password      = Hash::make($input['password']);
+                $user->password      = Hash::make($input['password']);
             }
-            $obj->title         = $input['title'];
-            $obj->fname         = $input['fname'];
-            $obj->lname         = $input['lname'];
-            $obj->name          = trim($input['title'].' '.$input['fname'].' '.$input['lname']);
-            $obj->email         = $input['email'];
-            $obj->mobile        = $input['mobile'];
-            $obj->dob           = $input['dob'];
-            $obj->gender        = $input['gender'];
-            $obj->address1      = $input['address1'];
-            $obj->address2      = $input['address2'];
-            $obj->city_id       = $input['city_id'];
-            $obj->pin_code      = $input['pin_code'];
-            $obj->image         = $input['image'];
-            $obj->role          = $input['role'];
-            $obj->school        = auth()->user()->school;
-            $obj->save();
+            $user->title         = $input['title'];
+            $user->fname         = $input['fname'];
+            $user->lname         = $input['lname'];
+            $user->name          = trim($input['title'].' '.$input['fname'].' '.$input['lname']);
+            $user->email         = $input['email'];
+            $user->mobile        = $input['mobile'];
+            $user->dob           = $input['dob'];
+            $user->gender        = $input['gender'];
+            $user->address1      = $input['address1'];
+            $user->address2      = $input['address2'];
+            $user->city_id       = $input['city_id'];
+            $user->pin_code      = $input['pin_code'];
+            $user->image         = $input['image'];
+            $user->role          = $role->id;
+            $user->school        = auth()->user()->school;
+            $user->save();
+
+            $customFields = [];
+            if(!empty($request->custom_field)) {
+                foreach($request->custom_field as $id => $cf)
+                {
+                    $customFields[$id] = [
+                        'value' => $cf
+                    ];
+                }
+    
+                $user->custom_fields()->sync($customFields);
+            }
+
             $re = [
                 'status'    => true,
                 'message'   => 'Success! Record has been updated.',
@@ -288,70 +402,12 @@ class UserController extends Controller
     {
         $data = User::whereHas('roleName', function ($q) use ($request) {
             $q->where('name', 'LIKE', $request->role);
-        })->where('deleted', 'N')->get()->toArray();
+        })->get()->toArray();
         return response()->json($data, 200);
     }
-    public function getData()
+    public function remove(Request $request)
     {
-        $data = User::with(['media', 'cityData', 'cityData.stateName', 'roleName'])->whereHas('roleName', function ($q) {
-            $q->whereNotIn('name', ['Student', 'Admin', 'School']);
-        })->where('school', auth()->user()->school)->where('deleted', 'N')->latest()->paginate(20);
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            foreach ($data as $i => $d) {
-                if (!empty($d->media->image)) {
-                    $data[$i]->media->large_image   = url('uploads/large/'.$d->media->image);
-                    $data[$i]->media->medium_image  = url('uploads/medium/'.$d->media->image);
-                    $data[$i]->media->thumb_image   = url('uploads/thumb/'.$d->media->image);
-                }
-            }
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
-        }
-        return response()->json($re, 200);
-    }
-    public function searchData(Request $request)
-    {
-        $query = User::with(['media', 'cityData', 'cityData.stateName', 'roleName'])->whereHas('roleName', function ($q) {
-            $q->whereNotIn('name', ['Student', 'Admin', 'School']);
-        })->where('school', auth()->user()->school)->where('deleted', 'N');
-        if (!empty($request->s)) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'LIKE', '%'.$request->s.'%');
-            });
-        }
-        $data = $query->latest()->paginate(20);
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            foreach ($data as $i => $d) {
-                if (!empty($data[$i]->media)) {
-                    $data[$i]->media->large_image   = !empty($d->media->image) ? url('uploads/large/'.$d->media->image) : url('img/default.jpg');
-                    $data[$i]->media->medium_image  = !empty($d->media->image) ? url('uploads/medium/'.$d->media->image) : url('img/default.jpg');
-                    $data[$i]->media->thumb_image   = !empty($d->media->image) ? url('uploads/thumb/'.$d->media->image) : url('img/default.jpg');
-                }
-            }
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
-        }
-        return response()->json($re, 200);
-    }
-    public function removeData(Request $request)
-    {
-        User::whereIn('id', $request->check)->update(['deleted' => 'Y']);
+        User::whereIn('id', $request->check)->delete();
         $re = [
             'status'    => true,
             'message'   => 'Selected record(s) has been deleted.'
@@ -362,7 +418,7 @@ class UserController extends Controller
     {
         $lists = User::whereHas('roleName', function ($q) {
             $q->where('name', 'LIKE', 'Driver');
-        })->where('deleted', 'N')->where("school", auth()->user()->school)->get()->toArray();
+        })->where("school", auth()->user()->school)->get()->toArray();
         return response()->json($lists, 200);
     }
     public function getTeachers()
@@ -370,7 +426,7 @@ class UserController extends Controller
         $data = User::with(['media', 'cityData', 'cityData.stateName', 'roleName', 'parent_school', 'parent_school.schoolData'])
         ->whereHas('roleName', function ($q) {
             $q->where('name', 'LIKE', 'Teacher');
-        })->where('deleted', 'N')->where("school", auth()->user()->school)->get();
+        })->where("school", auth()->user()->school)->get();
 
         if (!$data->isEmpty()) {
             foreach ($data as $i => $d) {
@@ -409,7 +465,7 @@ class UserController extends Controller
         $data = User::with(['media', 'cityData', 'cityData.stateName', 'roleName', 'parent_school', 'parent_school.schoolData'])
         ->whereHas('roleName', function ($q) {
             $q->where('name', 'LIKE', 'Staff');
-        })->where('deleted', 'N')->where("school", auth()->user()->school)->get();
+        })->where("school", auth()->user()->school)->get();
 
         if (!$data->isEmpty()) {
             foreach ($data as $i => $d) {

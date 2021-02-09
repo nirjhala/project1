@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
 use Route;
+use App\Model\School;
 use App\Model\Department;
 
 class DepartmentController extends Controller
@@ -39,7 +40,7 @@ class DepartmentController extends Controller
                 'errors'    => $validator->errors()->all()
             ];
         } else {
-            $is_exists = Department::where('dept_name', 'LIKE', $input['dept_name'])->where('dept_school', auth()->user()->school)->where('dept_is_deleted', 'N')->count();
+            $is_exists = Department::where('dept_name', 'LIKE', $input['dept_name'])->where('dept_school', auth()->user()->school)->count();
 
             if(!$is_exists) :
                 $obj = new Department;
@@ -85,7 +86,7 @@ class DepartmentController extends Controller
             ];
             $responseCode = 200;
         } else {
-            $is_exists = Department::where('dept_name', 'LIKE', $input['dept_name'])->where('dept_school', auth()->user()->school)->where('dept_is_deleted', 'N')->where('id','!=', $input['id'])->count();
+            $is_exists = Department::where('dept_name', 'LIKE', $input['dept_name'])->where('dept_school', auth()->user()->school)->where('id','!=', $input['id'])->count();
 
             if(!$is_exists) :
                 $obj                = Department::findOrFail($input['id']);
@@ -112,9 +113,10 @@ class DepartmentController extends Controller
     }
     public function getData()
     {
-        $data = Department::withCount(['classes' => function ($wq) {
-            $wq->where('deleted', 'N');
-        }])->where('dept_is_deleted', 'N')->where('dept_school', auth()->user()->school)->latest()->paginate(20);
+        $data = Department::withCount(['classes'])
+        ->where('dept_school', auth()->user()->school)
+        ->latest()
+        ->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -133,9 +135,7 @@ class DepartmentController extends Controller
     }
     public function getList(Request $request)
     {
-        $lists = Department::withCount(['classes' => function ($wq) {
-            $wq->where('deleted', 'N');
-        }])->where('dept_is_deleted', 'N')->where('dept_school', auth()->user()->id)->get();
+        $lists = Department::withCount(['classes'])->where('dept_school', auth()->user()->id)->get();
 
         $re = [
             'status'    => true,
@@ -144,19 +144,22 @@ class DepartmentController extends Controller
         ];
         return response()->json($re, 200);
     }
+    public function all(Request $request, School $school)
+    {
+        $departments = Department::where('dept_school', $school->uid)->pluck('dept_name', 'id');
+
+        return response()->json($departments);
+    }
     public function getAllList(Request $request)
     {
         $lists = Department::with(['classes' => function ($q) {
-            $q->where('deleted', 'N');
             $q->orderBy('sort', 'ASC');
-        }])->has('classes')->where('dept_is_deleted', 'N')->where('dept_school', auth()->user()->school)->get()->toArray();
+        }])->has('classes')->where('dept_school', auth()->user()->school)->get()->toArray();
         return response()->json($lists, 200);
     }
     public function searchData(Request $request)
     {
-        $query = Department::withCount(['classes' => function ($wq) {
-            $wq->where('deleted', 'N');
-        }])->where('dept_is_deleted', 'N')->where('dept_school', auth()->user()->school);
+        $query = Department::withCount(['classes'])->where('dept_school', auth()->user()->school);
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -183,7 +186,7 @@ class DepartmentController extends Controller
     }
     public function removeData(Request $request)
     {
-        Department::whereIn('id', $request->check)->update(['dept_is_deleted' => 'Y']);
+        Department::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

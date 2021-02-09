@@ -13,6 +13,7 @@ use App\Model\Weekday;
 use App\Model\Timeslot;
 use App\Model\Timetable;
 use App\Model\Section;
+use App\Model\Student;
 
 class TimetableController extends Controller
 {
@@ -246,6 +247,127 @@ class TimetableController extends Controller
         }
 
         $re = compact('departments', 'shifts', 'teachers', 'weekdays', 'subjects');
+        return response()->json($re, 200);
+    }
+
+    public function student(Request $request)
+    {
+        $studentInfo = Student::where('uid', auth()->user()->id)->firstOrFail();
+        $section_id = $studentInfo->section;
+        
+        $sectionInfo = Section::with('cls', 'cls.dept')->findOrFail($section_id);
+
+        $data = Timetable::where('department', $sectionInfo->cls->dept->id)->where('section', $section_id)->get();
+        $timeslots = Timeslot::where('shift', @$data[0]->shift)->where('school', auth()->user()->school)->get();
+        $weekday = Weekday::where('school', auth()->user()->school)->first();
+
+        $weekArr = [];
+        if ($weekday->Monday == "Y") {
+            $weekArr[] = "Monday";
+        }
+        if ($weekday->Tuesday == "Y") {
+            $weekArr[] = "Tuesday";
+        }
+        if ($weekday->Wednesday == "Y") {
+            $weekArr[] = "Wednesday";
+        }
+        if ($weekday->Thursday == "Y") {
+            $weekArr[] = "Thursday";
+        }
+        if ($weekday->Friday == "Y") {
+            $weekArr[] = "Friday";
+        }
+        if ($weekday->Saturday == "Y") {
+            $weekArr[] = "Saturday";
+        }
+        if ($weekday->Sunday == "Y") {
+            $weekArr[] = "Sunday";
+        }
+        $timetables = [];
+        $i = 0;
+        foreach ($timeslots as $key => $tslot) {
+            $timetables[$key]['timeslot_id'] = $tslot->id;
+            $timetables[$key]['timeslot'] = $tslot->name;
+            $timetables[$key]['timeslot_time'] = date("h:i A", strtotime($tslot->time_start))." ".date("h:i A", strtotime($tslot->time_end));
+            foreach ($weekArr as $wday) {
+                $timetable_data = Timetable::with(['subject_info', 'teacher_info', 'timeslot_info'])->where('section', $section_id)->where('weekday', $wday)->where('timeslot', $tslot->id)->first();
+                $timetables[$key][$wday] = $timetable_data;
+                $i++;
+            }
+        }
+
+        if ($data->isEmpty()) {
+            $re = [
+                'status'    => false,
+                'message'   => 'No record(s) found.'
+            ];
+        } else {
+            $re = [
+                'status'    => true,
+                'message'   => $data->count().' record(s) found.',
+                'data'      => $timetables,
+                'timeslots' => $timeslots,
+                'weekdays'  => $weekArr,
+                'class_full_name' => $sectionInfo->cls->name . ' - ' . $sectionInfo->name . ' (' . $sectionInfo->cls->dept->dept_name . ')',
+            ];
+        }
+        return response()->json($re, 200);
+    }
+    public function teacher(Request $request)
+    {
+        $teacher = User::find(auth()->user()->id);
+        $data = Timetable::where('teacher', auth()->user()->id)->get();
+        $timeslots = Timeslot::where('school', auth()->user()->school)->get();
+        $weekday = Weekday::where('school', auth()->user()->school)->first();
+        $weekArr = [];
+        if ($weekday->Monday == "Y") {
+            $weekArr[] = "Monday";
+        }
+        if ($weekday->Tuesday == "Y") {
+            $weekArr[] = "Tuesday";
+        }
+        if ($weekday->Wednesday == "Y") {
+            $weekArr[] = "Wednesday";
+        }
+        if ($weekday->Thursday == "Y") {
+            $weekArr[] = "Thursday";
+        }
+        if ($weekday->Friday == "Y") {
+            $weekArr[] = "Friday";
+        }
+        if ($weekday->Saturday == "Y") {
+            $weekArr[] = "Saturday";
+        }
+        if ($weekday->Sunday == "Y") {
+            $weekArr[] = "Sunday";
+        }
+        $timetables = [];
+        $i = 0;
+        foreach ($timeslots as $key => $tslot) {
+            foreach ($weekArr as $wday) {
+                $timetable_data = Timetable::with(['subject_info', 'section_info', 'section_info.cls'])->where('teacher', auth()->user()->id)->where('weekday', $wday)->where('timeslot', $tslot->id)->first();
+                $timetables[$key]['timeslot_id'] = $tslot->id;
+                $timetables[$key]['timeslot'] = $tslot->name;
+                $timetables[$key]['timeslot_time'] = date("h:i A", strtotime($tslot->time_start))." ".date("h:i A", strtotime($tslot->time_end));
+                $timetables[$key][$wday] = $timetable_data;
+                $i++;
+            }
+        }
+        if ($data->isEmpty()) {
+            $re = [
+                'status'    => false,
+                'message'   => 'No record(s) found.'
+            ];
+        } else {
+            $re = [
+                'status'    => true,
+                'message'   => $data->count().' record(s) found.',
+                'data'      => $timetables,
+                'timeslots' => $timeslots,
+                'weekdays'  => $weekArr,
+                'teacher_name' => $teacher->name
+            ];
+        }
         return response()->json($re, 200);
     }
 }

@@ -44,6 +44,18 @@
 </div>
 <!-- Login Page End Here -->
 </template>
+<style>
+@import '../../../public/css/normalize.css';
+@import '../../../public/css/main.css';
+@import '../../../public/css/all.min.css';
+/* @import '../../../public/css/flaticon.css'; */
+@import '../../../public/css/fullcalendar.min.css';
+@import '../../../public/css/bootstrap.min.css';
+@import '../../../public/css/animate.min.css';
+@import '../../../public/css/style.css';
+@import '../../../public/admin/css/style.min.css';
+@import '../../../public/icomoon/style.min.css';
+</style>
 <script>
 const token = localStorage.getItem('token');
 export default {
@@ -82,11 +94,13 @@ export default {
                         this.alert_class = 'alert alert-success';
                         this.login_msg = 'Login success! Redirecting, please wait...';
                         this.loading = 1;
+                        
                         localStorage.setItem('token', res.data.token);
                         localStorage.setItem('user_info', JSON.stringify(res.data.data));
 
                         setTimeout(() => {
                             this.$emit('loginauth', res.data.data.id);
+
                             this.$router.push({
                                     name: 'dashboard'
                                 })

@@ -6,115 +6,14 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
+use Illuminate\Validation\Rule;
+
 use Route;
 use App\Model\FeeType;
 
 class FeeTypeController extends Controller
 {
-    public function getInfo($subdomain, $id = null)
-    {
-        $info = FeeType::find($id);
-
-        $re = [
-            'status'    => true,
-            'data'      => $info
-        ];
-
-        return response()->json($re, 200);
-    }
-    public function add(Request $request, $schoolName)
-    {
-        $rules = [
-            'name'      => 'required',
-        ];
-
-        $input      = $request->all();
-
-        $validator  = Validator::make($input, $rules);
-
-        if ($validator->fails()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'Validation Error!',
-                'errors'    => $validator->errors()->all(),
-                'input'     => $input
-            ];
-            $responseCode = 200;
-        } else {
-            $obj            = new FeeType;
-            $obj->name      = $input['name'];
-            $obj->save();
-
-            $re = [
-                'status'    => true,
-                'message'   => 'Success! Record has been added.',
-            ];
-            $responseCode = 200;
-        }
-
-        return response()->json($re, $responseCode);
-    }
-    public function updateData(Request $request)
-    {
-        $schoolName = Route::input('subdomain');
-
-        $rules = [
-            'name'      => 'required'
-        ];
-
-        $input      = $request->all();
-
-        $validator  = Validator::make($input, $rules);
-
-        if ($validator->fails()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'Validation Error!',
-                'errors'    => $validator->errors()->all(),
-                'input'     => $input
-            ];
-            $responseCode = 200;
-        } else {
-            $obj            = FeeType::findOrFail($input['id']);
-            $obj->name      = $input['name'];
-            $obj->school    = auth()->user()->school;
-            $obj->save();
-
-            $re = [
-                'status'    => true,
-                'message'   => 'Success! Record has been updated.',
-            ];
-            $responseCode = 200;
-        }
-
-        return response()->json($re, $responseCode);
-    }
-
-    public function getData(Request $request)
-    {
-        $data = FeeType::where('school', auth()->user()->school)->latest()->paginate(20);
-
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
-        }
-
-        return response()->json($re, 200);
-    }
-    public function getAllList(Request $request)
-    {
-        $lists = FeeType::where('school', auth()->user()->school)->get()->toArray();
-        return response()->json($lists, 200);
-    }
-    public function searchData(Request $request)
+    public function index(Request $request)
     {
         $query = FeeType::where('school', auth()->user()->school);
 
@@ -141,9 +40,94 @@ class FeeTypeController extends Controller
 
         return response()->json($re, 200);
     }
-    public function removeData(Request $request)
+    public function show($subdomain, FeeType $fees_type)
     {
-        FeeType::whereIn('id', $request->check)->update(['session_is_deleted' => 'Y']);
+        return response()->json($fees_type, 200);
+    }
+    public function store(Request $request, $schoolName)
+    {
+        $input      = $request->get('record');
+
+        $rules = [
+            'name'   => [
+                'required',
+                Rule::unique('fee_types')
+                    ->where('name', $input['name'])
+                    ->where('school', auth()->user()->school)
+            ],
+        ];
+
+        $validator  = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            $re = [
+                'status'    => false,
+                'message'   => 'Validation Error!',
+                'errors'    => $validator->errors()->all(),
+                'input'     => $input
+            ];
+            $responseCode = 200;
+        } else {
+            $obj            = new FeeType;
+            $obj->fill($input);
+            $obj->school = auth()->user()->school;
+            $obj->save();
+
+            $re = [
+                'status'    => true,
+                'message'   => 'Success! Record has been added.',
+            ];
+            $responseCode = 200;
+        }
+
+        return response()->json($re, $responseCode);
+    }
+    public function update(Request $request, $subdomain, $id)
+    {
+        $input      = $request->get('record');
+
+        $rules = [
+            'name'      => 'required',
+            Rule::unique('fee_types')
+                    ->where('name', $input['name'])
+                    ->where('id', $id)
+                    ->where('school', auth()->user()->school)
+        ];
+
+
+        $validator  = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            $re = [
+                'status'    => false,
+                'message'   => 'Validation Error!',
+                'errors'    => $validator->errors()->all(),
+                'input'     => $input
+            ];
+            $responseCode = 200;
+        } else {
+            $obj            = FeeType::findOrFail($id);
+            $obj->fill($input);
+            $obj->school    = auth()->user()->school;
+            $obj->save();
+
+            $re = [
+                'status'    => true,
+                'message'   => 'Success! Record has been updated.',
+            ];
+            $responseCode = 200;
+        }
+
+        return response()->json($re, $responseCode);
+    }
+    public function getAllList(Request $request)
+    {
+        $lists = FeeType::where('school', auth()->user()->school)->get()->toArray();
+        return response()->json($lists, 200);
+    }
+    public function remove(Request $request)
+    {
+        FeeType::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

@@ -148,7 +148,7 @@ class FeeInstallmentController extends Controller
     }
     public function removeData(Request $request)
     {
-        FeeInstallment::whereIn('id', $request->check)->update(['session_is_deleted' => 'Y']);
+        FeeInstallment::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Kolkata',
 
     /*
     |--------------------------------------------------------------------------
@@ -182,6 +182,8 @@ return [
 
         // Barcode
         Milon\Barcode\BarcodeServiceProvider::class,
+        // Generate PDF
+        Barryvdh\DomPDF\ServiceProvider::class,
     ],
 
     /*
@@ -239,6 +241,8 @@ return [
         // Barcode
         'DNS1D' => Milon\Barcode\Facades\DNS1DFacade::class,
         'DNS2D' => Milon\Barcode\Facades\DNS2DFacade::class,
+        // Generate PDF
+        'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

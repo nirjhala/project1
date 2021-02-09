@@ -1,16 +1,14 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[39],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/lms/book/view.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/lms/book/view.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/lms/category.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/lms/category.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -109,50 +107,64 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      errors: 0,
+      id: '',
+      record: {
+        name: ''
+      },
       lists: {},
-      allSelected: 0,
+      allSelected: false,
       check: [],
-      s: '',
-      allClasses: [],
-      classes: [],
+      errors: [],
       loaded: 0,
-      bookId: '',
       token: localStorage.getItem('token')
     };
   },
   mounted: function mounted() {
-    this.getRecords();
-    this.getAllClasses();
+    var params = this.$route.params;
+    this.getData();
+
+    if (params.id != undefined && params.id != '') {
+      this.getInfo(params.id);
+    }
   },
   methods: {
-    searchAfterDebounce: lodash__WEBPACK_IMPORTED_MODULE_0___default.a.debounce(function () {
-      this.searchData();
-    }, 500),
+    rerenderSelf: function rerenderSelf() {
+      console.log("reload");
+      this.$emit('rerender', 1);
+    },
     checkAll: function checkAll() {
       var self = this;
       self.check = [];
 
       if (!self.allSelected) {
         $.each(self.lists.data, function (i, row) {
+          // if(row.classes_count == 0)
           self.check.push(row.id);
         });
       }
     },
-    assignClass: function assignClass() {
+    getInfo: function getInfo(id) {
       var _this = this;
 
-      var classes = this.classes,
-          book = this.bookId;
-      this.loaded = 0;
-      var params = {
-        classes: classes,
-        bookId: book
-      };
       var instance = axios.create({
         baseURL: this.apiBaseUrl,
         headers: {
@@ -160,69 +172,86 @@ __webpack_require__.r(__webpack_exports__);
           'Accept': 'application/json'
         }
       });
-      instance.post('assign-book-class', params).then(function (res) {
+      instance.get('book/category/info/' + id).then(function (res) {
+        _this.id = res.data.id;
+        _this.record.name = res.data.name;
         _this.loaded = 1;
-        $('#classModal').modal('hide');
-
-        _this.getRecords(1);
+        $('.select2').each(function () {
+          $(this).trigger('change');
+        });
       });
     },
-    showClassPop: function showClassPop(id, classes) {
-      this.bookId = id;
-      var classArr = [];
-      $(classes).each(function (i, row) {
-        classArr.push(row["class"]);
-      });
-      this.classes = classArr;
-      $('#classModal').modal('show');
-    },
-    getAllClasses: function getAllClasses() {
+    addData: function addData() {
       var _this2 = this;
 
-      this.loaded = 0;
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.get('get-all-classes').then(function (res) {
-        _this2.loaded = 1;
-        _this2.allClasses = res.data;
-      });
+      var params = this.record,
+          is_valid = $('#addCategoryForm').is_valid();
+
+      if (is_valid) {
+        this.loaded = 0;
+        this.errors = [];
+        var instance = axios.create({
+          baseURL: this.apiBaseUrl,
+          headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Accept': 'application/json'
+          }
+        });
+        instance.post('book/category', params).then(function (res) {
+          _this2.loaded = 1;
+
+          if (res.data.status) {
+            _this2.$toast.success(res.data.message);
+
+            _this2.getData(1);
+          } else {
+            _this2.errors = res.data.errors;
+          }
+        })["catch"](function (error) {
+          _this2.loaded = 1;
+          console.log(error);
+        });
+      }
     },
-    searchData: function searchData(page) {
+    updateData: function updateData(id) {
       var _this3 = this;
 
-      var s = this.s;
+      var params = this.record,
+          is_valid = $('#addCategoryForm').is_valid();
 
-      if (typeof page === 'undefined') {
-        page = 1;
+      if (is_valid) {
+        this.loaded = 0;
+        this.errors = [];
+        var instance = axios.create({
+          baseURL: this.apiBaseUrl,
+          headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Accept': 'application/json'
+          }
+        });
+        instance.post('book/category/edit/' + id, params).then(function (res) {
+          _this3.loaded = 1;
+
+          if (res.data.status) {
+            _this3.record = {
+              name: ''
+            };
+
+            _this3.$toast.success(res.data.message);
+
+            _this3.$router.push({
+              name: 'book-category'
+            });
+          } else {
+            _this3.errors = res.data.errors;
+          }
+        })["catch"](function (error) {
+          _this3.loaded = 1;
+          console.log(error);
+        });
       }
-
-      this.loaded = 0;
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.get('book/search/?page=' + page + '&s=' + s).then(function (res) {
-        _this3.loaded = 1;
-
-        if (res.status) {
-          _this3.lists = res.data.data;
-        } else {
-          _this3.errors = 1;
-        }
-      })["catch"](function (err) {
-        _this3.loaded = 1;
-        console.log(err);
-      });
     },
-    getRecords: function getRecords(page) {
+    getData: function getData(page) {
       var _this4 = this;
 
       if (typeof page === 'undefined') {
@@ -236,17 +265,11 @@ __webpack_require__.r(__webpack_exports__);
           'Accept': 'application/json'
         }
       });
-      instance.get('book/?page=' + page).then(function (res) {
+      instance.get('book/category/?page=' + page).then(function (res) {
         _this4.loaded = 1;
-
-        if (res.status) {
-          _this4.lists = res.data;
-        } else {
-          _this4.errors = 1;
-        }
-      })["catch"](function (err) {
+        _this4.lists = res.data;
+      })["catch"](function (error) {
         _this4.loaded = 1;
-        console.log(err);
       });
     },
     deleteRecord: function deleteRecord() {
@@ -274,9 +297,9 @@ __webpack_require__.r(__webpack_exports__);
                 'Accept': 'application/json'
               }
             });
-            instance.post('remove-book', params).then(function (res) {
+            instance.post('book/category/remove', params).then(function (res) {
               if (res.status) {
-                _this5.getRecords();
+                _this5.getData();
 
                 _this5.$toast.success('Selected record(s) has been deleted.');
               } else {
@@ -298,18 +321,25 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   watch: {
-    s: function s(val) {
-      this.searchAfterDebounce();
+    // call again the method if the route changes
+    '$route': function $route(to, from) {
+      var params = this.$route.params;
+      this.loaded = 0;
+      this.getData();
+
+      if (params.id != undefined && params.id != '') {
+        this.getInfo(params.id);
+      }
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/lms/book/view.vue?vue&type=template&id=88530fda&":
-/*!****************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/lms/book/view.vue?vue&type=template&id=88530fda& ***!
-  \****************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/lms/category.vue?vue&type=template&id=14a0c578&":
+/*!****************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/lms/category.vue?vue&type=template&id=14a0c578& ***!
+  \****************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -323,23 +353,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "dashboard-content-one" }, [
     _c("div", { staticClass: "breadcrumbs-area" }, [
-      _c(
-        "div",
-        { staticClass: "float-right" },
-        [
-          _c(
-            "router-link",
-            {
-              staticClass: "fw-btn-fill btn-gradient-yellow text-white",
-              attrs: { to: { name: "add-book" } }
-            },
-            [_vm._v("Add New")]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c("h3", [_vm._v("Book")]),
+      _c("h3", [_vm._v("Book Category")]),
       _vm._v(" "),
       _c("ul", [
         _c(
@@ -352,328 +366,502 @@ var render = function() {
           1
         ),
         _vm._v(" "),
-        _c("li", [_vm._v("Book")])
+        _c("li", [_vm._v("Book Category")])
       ])
     ]),
     _vm._v(" "),
-    _c("div", { staticClass: "mg-b-20" }, [
-      _c("div", { staticClass: "row gutters-8" }, [
-        _c(
-          "div",
-          { staticClass: "col-4-xxxl col-xl-4 col-lg-3 col-12 form-group" },
-          [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.s,
-                  expression: "s"
-                }
-              ],
-              staticClass: "form-control bg-white",
-              attrs: { type: "text", placeholder: "Search ..." },
-              domProps: { value: _vm.s },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+    _vm.loaded
+      ? _c("div", [
+          !_vm.loaded
+            ? _c("div", { staticClass: "text-center" }, [
+                _c("img", {
+                  staticStyle: { "max-width": "100%" },
+                  attrs: {
+                    src: _vm.baseURL + "img/preloader.gif",
+                    alt: "Loading"
                   }
-                  _vm.s = $event.target.value
-                }
-              }
-            })
-          ]
-        )
-      ])
-    ]),
-    _vm._v(" "),
-    _c(
-      "form",
-      {
-        attrs: { method: "post" },
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            return _vm.deleteRecord()
-          }
-        }
-      },
-      [
-        _c("div", { staticClass: "card height-auto" }, [
-          _c("div", { staticClass: "card-body" }, [
-            !_vm.loaded
-              ? _c("div", { staticClass: "text-center" }, [
-                  _c("img", {
-                    staticStyle: { "max-width": "100%" },
-                    attrs: { src: "img/preloader.gif", alt: "" }
-                  })
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.loaded
-              ? _c("div", [
-                  _vm._m(0),
-                  _vm._v(" "),
-                  !_vm.lists
-                    ? _c("div", { staticClass: "alert alert-warning" }, [
-                        _c("i", { staticClass: "fa fa-exclamation-circle" }),
-                        _vm._v(
-                          "\n                        No record(s) found.\n                    "
+                })
+              ])
+            : _vm._e(),
+          _vm._v(" "),
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col-sm-4" }, [
+              _c(
+                "form",
+                {
+                  staticClass: "new-added-form",
+                  attrs: { id: "addCategoryForm" },
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      _vm.id ? _vm.updateData(_vm.id) : _vm.addData()
+                    }
+                  }
+                },
+                [
+                  _vm.errors.length
+                    ? _c("div", { staticClass: "alert alert-danger" }, [
+                        _c(
+                          "ul",
+                          { staticClass: "mb-0" },
+                          _vm._l(_vm.errors, function(error, index) {
+                            return _c("li", { key: index }, [
+                              _vm._v(_vm._s(error))
+                            ])
+                          }),
+                          0
                         )
                       ])
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.lists
-                    ? _c(
-                        "div",
-                        { staticClass: "table-responsive" },
-                        [
-                          _c(
-                            "table",
+                  _c("div", { staticClass: "card height-auto" }, [
+                    _c("div", { staticClass: "card-body" }, [
+                      _c("div", { staticClass: "heading-layout1" }, [
+                        _c("div", { staticClass: "item-title" }, [
+                          _c("h3", [
+                            _vm._v(
+                              _vm._s(!_vm.id ? "Add New" : "Edit") + " Category"
+                            )
+                          ])
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.id,
+                            expression: "id"
+                          }
+                        ],
+                        attrs: { type: "hidden", value: "" },
+                        domProps: { value: _vm.id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.id = $event.target.value
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", [_vm._v("Name *")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
                             {
-                              staticClass:
-                                "table display data-table text-nowrap"
-                            },
-                            [
-                              _c("thead", [
-                                _c("tr", [
-                                  _c("th", [
-                                    _c("div", { staticClass: "form-check" }, [
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.allSelected,
-                                            expression: "allSelected"
-                                          }
-                                        ],
-                                        staticClass: "form-check-input",
-                                        attrs: { type: "checkbox" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            _vm.allSelected
-                                          )
-                                            ? _vm._i(_vm.allSelected, null) > -1
-                                            : _vm.allSelected
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.checkAll()
-                                          },
-                                          change: function($event) {
-                                            var $$a = _vm.allSelected,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = null,
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (_vm.allSelected = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (_vm.allSelected = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.allSelected = $$c
-                                            }
-                                          }
-                                        }
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.record.name,
+                              expression: "record.name"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            value: "",
+                            placeholder: "Name",
+                            required: ""
+                          },
+                          domProps: { value: _vm.record.name },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.record, "name", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _vm._m(0)
+                    ])
+                  ])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-sm-8" }, [
+              _c(
+                "form",
+                {
+                  attrs: { method: "post" },
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.deleteRecord()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "card height-auto" }, [
+                    _c("div", { staticClass: "card-body" }, [
+                      _c("div", [
+                        _vm._m(1),
+                        _vm._v(" "),
+                        !_vm.loaded
+                          ? _c("div", { staticClass: "text-center" }, [
+                              _c("img", {
+                                staticStyle: { "max-width": "100%" },
+                                attrs: { src: "img/preloader.gif", alt: "" }
+                              })
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.loaded
+                          ? _c("div", [
+                              !_vm.lists
+                                ? _c(
+                                    "div",
+                                    { staticClass: "alert alert-warning" },
+                                    [
+                                      _c("i", {
+                                        staticClass: "fa fa-exclamation-circle"
                                       }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "label",
-                                        { staticClass: "form-check-label" },
-                                        [_vm._v("Sr. No.")]
+                                      _vm._v(
+                                        "\r\n                                      No record(s) found.\r\n                                  "
                                       )
-                                    ])
-                                  ]),
-                                  _vm._v(" "),
-                                  _c("th", [_vm._v("Title")]),
-                                  _vm._v(" "),
-                                  _c("th", [_vm._v("Author")]),
-                                  _vm._v(" "),
-                                  _c("th", [_vm._v("Publisher")]),
-                                  _vm._v(" "),
-                                  _c("th", [_vm._v("Price")]),
-                                  _vm._v(" "),
-                                  _c("th", [_vm._v("Barcode")])
-                                ])
-                              ]),
+                                    ]
+                                  )
+                                : _vm._e(),
                               _vm._v(" "),
-                              _c(
-                                "tbody",
-                                _vm._l(_vm.lists.data, function(list, i) {
-                                  return _c("tr", { key: i }, [
-                                    _c("td", [
-                                      _c("div", { staticClass: "form-check" }, [
-                                        _c("input", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: _vm.check,
-                                              expression: "check"
-                                            }
-                                          ],
-                                          key: _vm.lists.from + i,
-                                          staticClass: "form-check-input",
-                                          attrs: { type: "checkbox" },
-                                          domProps: {
-                                            value: list.id,
-                                            checked: Array.isArray(_vm.check)
-                                              ? _vm._i(_vm.check, list.id) > -1
-                                              : _vm.check
-                                          },
-                                          on: {
-                                            change: function($event) {
-                                              var $$a = _vm.check,
-                                                $$el = $event.target,
-                                                $$c = $$el.checked
-                                                  ? true
-                                                  : false
-                                              if (Array.isArray($$a)) {
-                                                var $$v = list.id,
-                                                  $$i = _vm._i($$a, $$v)
-                                                if ($$el.checked) {
-                                                  $$i < 0 &&
-                                                    (_vm.check = $$a.concat([
-                                                      $$v
-                                                    ]))
-                                                } else {
-                                                  $$i > -1 &&
-                                                    (_vm.check = $$a
-                                                      .slice(0, $$i)
-                                                      .concat(
-                                                        $$a.slice($$i + 1)
-                                                      ))
-                                                }
-                                              } else {
-                                                _vm.check = $$c
-                                              }
-                                            }
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _c(
-                                          "label",
-                                          { staticClass: "form-check-label" },
-                                          [
-                                            _vm._v(
-                                              _vm._s(_vm.lists.from + i) + "."
-                                            )
-                                          ]
-                                        )
-                                      ])
-                                    ]),
-                                    _vm._v(" "),
-                                    _c(
-                                      "td",
-                                      [
-                                        _c(
-                                          "router-link",
-                                          {
-                                            attrs: {
-                                              to: {
-                                                path: "book/edit/" + list.id,
-                                                params: list
-                                              },
-                                              "data-toggle": "tooltip",
-                                              title: "Edit"
-                                            }
-                                          },
-                                          [
-                                            _c("i", {
-                                              staticClass: "fa fa-edit"
-                                            }),
-                                            _vm._v(" " + _vm._s(list.title))
-                                          ]
-                                        ),
-                                        _c("br"),
-                                        _vm._v(" "),
-                                        list.subtitle
-                                          ? _c("small", [
-                                              _vm._v(
-                                                "(" +
-                                                  _vm._s(list.subtitle) +
-                                                  ")"
-                                              )
-                                            ])
-                                          : _vm._e()
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c("td", [_vm._v(_vm._s(list.author))]),
-                                    _vm._v(" "),
-                                    _c("td", [_vm._v(_vm._s(list.publisher))]),
-                                    _vm._v(" "),
-                                    _c("td", [_vm._v(_vm._s(list.price))]),
-                                    _vm._v(" "),
-                                    _c("td", [
+                              _vm.lists
+                                ? _c(
+                                    "div",
+                                    { staticClass: "table-responsive" },
+                                    [
                                       _c(
-                                        "div",
+                                        "table",
                                         {
                                           staticClass:
-                                            "d-inline-block text-center"
+                                            "table display data-table text-nowrap"
                                         },
                                         [
-                                          _c("div", [
-                                            _c("img", {
-                                              attrs: {
-                                                src: list.barcode_image,
-                                                alt: ""
-                                              }
-                                            })
+                                          _c("thead", [
+                                            _c("tr", [
+                                              _c("th", [
+                                                _c(
+                                                  "div",
+                                                  { staticClass: "form-check" },
+                                                  [
+                                                    _c("input", {
+                                                      directives: [
+                                                        {
+                                                          name: "model",
+                                                          rawName: "v-model",
+                                                          value:
+                                                            _vm.allSelected,
+                                                          expression:
+                                                            "allSelected"
+                                                        }
+                                                      ],
+                                                      staticClass:
+                                                        "form-check-input",
+                                                      attrs: {
+                                                        type: "checkbox"
+                                                      },
+                                                      domProps: {
+                                                        checked: Array.isArray(
+                                                          _vm.allSelected
+                                                        )
+                                                          ? _vm._i(
+                                                              _vm.allSelected,
+                                                              null
+                                                            ) > -1
+                                                          : _vm.allSelected
+                                                      },
+                                                      on: {
+                                                        click: _vm.checkAll,
+                                                        change: function(
+                                                          $event
+                                                        ) {
+                                                          var $$a =
+                                                              _vm.allSelected,
+                                                            $$el =
+                                                              $event.target,
+                                                            $$c = $$el.checked
+                                                              ? true
+                                                              : false
+                                                          if (
+                                                            Array.isArray($$a)
+                                                          ) {
+                                                            var $$v = null,
+                                                              $$i = _vm._i(
+                                                                $$a,
+                                                                $$v
+                                                              )
+                                                            if ($$el.checked) {
+                                                              $$i < 0 &&
+                                                                (_vm.allSelected = $$a.concat(
+                                                                  [$$v]
+                                                                ))
+                                                            } else {
+                                                              $$i > -1 &&
+                                                                (_vm.allSelected = $$a
+                                                                  .slice(0, $$i)
+                                                                  .concat(
+                                                                    $$a.slice(
+                                                                      $$i + 1
+                                                                    )
+                                                                  ))
+                                                            }
+                                                          } else {
+                                                            _vm.allSelected = $$c
+                                                          }
+                                                        }
+                                                      }
+                                                    }),
+                                                    _vm._v(" "),
+                                                    _c(
+                                                      "label",
+                                                      {
+                                                        staticClass:
+                                                          "form-check-label"
+                                                      },
+                                                      [_vm._v("Sr. No.")]
+                                                    )
+                                                  ]
+                                                )
+                                              ]),
+                                              _vm._v(" "),
+                                              _c("th", [_vm._v("Name")])
+                                            ])
                                           ]),
                                           _vm._v(" "),
                                           _c(
-                                            "div",
-                                            {
-                                              staticStyle: {
-                                                "letter-spacing": "5px",
-                                                "font-size": "8px",
-                                                margin: "2px 0"
-                                              }
-                                            },
-                                            [
-                                              _vm._v(
-                                                "\n                                          " +
-                                                  _vm._s(list.barcode) +
-                                                  "\n                                        "
-                                              )
-                                            ]
+                                            "tbody",
+                                            _vm._l(_vm.lists.data, function(
+                                              list,
+                                              i
+                                            ) {
+                                              return _c("tr", [
+                                                _c("td", [
+                                                  !list.classes_count
+                                                    ? _c(
+                                                        "div",
+                                                        {
+                                                          staticClass:
+                                                            "form-check"
+                                                        },
+                                                        [
+                                                          _c("input", {
+                                                            directives: [
+                                                              {
+                                                                name: "model",
+                                                                rawName:
+                                                                  "v-model",
+                                                                value:
+                                                                  _vm.check,
+                                                                expression:
+                                                                  "check"
+                                                              }
+                                                            ],
+                                                            key:
+                                                              _vm.lists.from +
+                                                              i,
+                                                            staticClass:
+                                                              "form-check-input",
+                                                            attrs: {
+                                                              type: "checkbox"
+                                                            },
+                                                            domProps: {
+                                                              value: list.id,
+                                                              checked: Array.isArray(
+                                                                _vm.check
+                                                              )
+                                                                ? _vm._i(
+                                                                    _vm.check,
+                                                                    list.id
+                                                                  ) > -1
+                                                                : _vm.check
+                                                            },
+                                                            on: {
+                                                              change: function(
+                                                                $event
+                                                              ) {
+                                                                var $$a =
+                                                                    _vm.check,
+                                                                  $$el =
+                                                                    $event.target,
+                                                                  $$c = $$el.checked
+                                                                    ? true
+                                                                    : false
+                                                                if (
+                                                                  Array.isArray(
+                                                                    $$a
+                                                                  )
+                                                                ) {
+                                                                  var $$v =
+                                                                      list.id,
+                                                                    $$i = _vm._i(
+                                                                      $$a,
+                                                                      $$v
+                                                                    )
+                                                                  if (
+                                                                    $$el.checked
+                                                                  ) {
+                                                                    $$i < 0 &&
+                                                                      (_vm.check = $$a.concat(
+                                                                        [$$v]
+                                                                      ))
+                                                                  } else {
+                                                                    $$i > -1 &&
+                                                                      (_vm.check = $$a
+                                                                        .slice(
+                                                                          0,
+                                                                          $$i
+                                                                        )
+                                                                        .concat(
+                                                                          $$a.slice(
+                                                                            $$i +
+                                                                              1
+                                                                          )
+                                                                        ))
+                                                                  }
+                                                                } else {
+                                                                  _vm.check = $$c
+                                                                }
+                                                              }
+                                                            }
+                                                          }),
+                                                          _vm._v(" "),
+                                                          _c(
+                                                            "label",
+                                                            {
+                                                              staticClass:
+                                                                "form-check-label"
+                                                            },
+                                                            [
+                                                              _vm._v(
+                                                                _vm._s(
+                                                                  _vm.lists
+                                                                    .from + i
+                                                                ) + "."
+                                                              )
+                                                            ]
+                                                          )
+                                                        ]
+                                                      )
+                                                    : _vm._e(),
+                                                  _vm._v(" "),
+                                                  list.classes_count
+                                                    ? _c(
+                                                        "div",
+                                                        {
+                                                          staticClass:
+                                                            "form-check"
+                                                        },
+                                                        [
+                                                          _c("input", {
+                                                            staticClass:
+                                                              "form-check-input",
+                                                            attrs: {
+                                                              type: "checkbox",
+                                                              disabled: ""
+                                                            }
+                                                          }),
+                                                          _vm._v(" "),
+                                                          _c(
+                                                            "label",
+                                                            {
+                                                              staticClass:
+                                                                "form-check-label"
+                                                            },
+                                                            [
+                                                              _vm._v(
+                                                                _vm._s(
+                                                                  _vm.lists
+                                                                    .from + i
+                                                                ) + "."
+                                                              )
+                                                            ]
+                                                          )
+                                                        ]
+                                                      )
+                                                    : _vm._e()
+                                                ]),
+                                                _vm._v(" "),
+                                                _c(
+                                                  "td",
+                                                  [
+                                                    _c(
+                                                      "router-link",
+                                                      {
+                                                        attrs: {
+                                                          to: {
+                                                            path:
+                                                              _vm.baseURL +
+                                                              "book-category/edit/" +
+                                                              list.id,
+                                                            params: list
+                                                          },
+                                                          "data-toggle":
+                                                            "tooltip",
+                                                          title: "Edit"
+                                                        },
+                                                        on: {
+                                                          click:
+                                                            _vm.rerenderSelf
+                                                        }
+                                                      },
+                                                      [
+                                                        _c("i", {
+                                                          staticClass:
+                                                            "fa fa-edit"
+                                                        }),
+                                                        _vm._v(
+                                                          " " +
+                                                            _vm._s(list.name)
+                                                        )
+                                                      ]
+                                                    ),
+                                                    _vm._v(" "),
+                                                    _c("div", [
+                                                      _c("small", [
+                                                        _vm._v(
+                                                          "(" +
+                                                            _vm._s(
+                                                              list.classes_count
+                                                            ) +
+                                                            " books)"
+                                                        )
+                                                      ])
+                                                    ])
+                                                  ],
+                                                  1
+                                                )
+                                              ])
+                                            }),
+                                            0
                                           )
                                         ]
-                                      )
-                                    ])
-                                  ])
-                                }),
-                                0
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c("pagination", {
-                            attrs: { data: _vm.lists },
-                            on: { "pagination-change-page": _vm.getRecords }
-                          })
-                        ],
-                        1
-                      )
-                    : _vm._e()
-                ])
-              : _vm._e()
+                                      ),
+                                      _vm._v(" "),
+                                      _c("pagination", {
+                                        attrs: { data: _vm.lists },
+                                        on: {
+                                          "pagination-change-page": _vm.getData
+                                        }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                : _vm._e()
+                            ])
+                          : _vm._e()
+                      ])
+                    ])
+                  ])
+                ]
+              )
+            ])
           ])
         ])
-      ]
-    )
+      : _vm._e()
   ])
 }
 var staticRenderFns = [
@@ -681,9 +869,25 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c(
+        "button",
+        {
+          staticClass:
+            "btn-fill-lg btn-gradient-yellow btn-hover-bluedark btn-block",
+          attrs: { type: "submit" }
+        },
+        [_vm._v("Save")]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "heading-layout1" }, [
       _c("div", { staticClass: "item-title" }, [
-        _c("h3", [_vm._v("All Book Data")])
+        _c("h3", [_vm._v("All Book Categories")])
       ]),
       _vm._v(" "),
       _c(
@@ -703,17 +907,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/lms/book/view.vue":
-/*!***************************************************!*\
-  !*** ./resources/js/components/lms/book/view.vue ***!
-  \***************************************************/
+/***/ "./resources/js/components/school-panel/lms/category.vue":
+/*!***************************************************************!*\
+  !*** ./resources/js/components/school-panel/lms/category.vue ***!
+  \***************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _view_vue_vue_type_template_id_88530fda___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./view.vue?vue&type=template&id=88530fda& */ "./resources/js/components/lms/book/view.vue?vue&type=template&id=88530fda&");
-/* harmony import */ var _view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./view.vue?vue&type=script&lang=js& */ "./resources/js/components/lms/book/view.vue?vue&type=script&lang=js&");
+/* harmony import */ var _category_vue_vue_type_template_id_14a0c578___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./category.vue?vue&type=template&id=14a0c578& */ "./resources/js/components/school-panel/lms/category.vue?vue&type=template&id=14a0c578&");
+/* harmony import */ var _category_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./category.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/lms/category.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -723,9 +927,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _view_vue_vue_type_template_id_88530fda___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _view_vue_vue_type_template_id_88530fda___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _category_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _category_vue_vue_type_template_id_14a0c578___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _category_vue_vue_type_template_id_14a0c578___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -735,38 +939,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/lms/book/view.vue"
+component.options.__file = "resources/js/components/school-panel/lms/category.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/lms/book/view.vue?vue&type=script&lang=js&":
-/*!****************************************************************************!*\
-  !*** ./resources/js/components/lms/book/view.vue?vue&type=script&lang=js& ***!
-  \****************************************************************************/
+/***/ "./resources/js/components/school-panel/lms/category.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/lms/category.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./view.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/lms/book/view.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_category_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./category.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/lms/category.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_category_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/lms/book/view.vue?vue&type=template&id=88530fda&":
-/*!**********************************************************************************!*\
-  !*** ./resources/js/components/lms/book/view.vue?vue&type=template&id=88530fda& ***!
-  \**********************************************************************************/
+/***/ "./resources/js/components/school-panel/lms/category.vue?vue&type=template&id=14a0c578&":
+/*!**********************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/lms/category.vue?vue&type=template&id=14a0c578& ***!
+  \**********************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_template_id_88530fda___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./view.vue?vue&type=template&id=88530fda& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/lms/book/view.vue?vue&type=template&id=88530fda&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_template_id_88530fda___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_category_vue_vue_type_template_id_14a0c578___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./category.vue?vue&type=template&id=14a0c578& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/lms/category.vue?vue&type=template&id=14a0c578&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_category_vue_vue_type_template_id_14a0c578___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_template_id_88530fda___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_category_vue_vue_type_template_id_14a0c578___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

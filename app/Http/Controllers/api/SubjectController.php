@@ -7,12 +7,45 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
 use Route;
+use App\Model\School;
 use App\Model\Subject;
 use App\Model\SubjectClass;
 use App\Model\Section;
 
 class SubjectController extends Controller
 {
+    public function fetchBySection(School $school, $section_id) {
+        $section = Section::findOrFail($section_id);
+        $subjects = Subject::whereHas('classes', function($q) use($section) {
+            $q->where('class', $section->class);
+        })->pluck('name', 'id');
+
+        return response()->json($subjects);
+    }
+    public function index (Request $request, School $school)
+    {
+        $limit = $request->limit ?: 10;
+        $query = Subject::where('school', $school->uid);
+
+        if(!empty($request->class_id))
+        {
+            $query->whereHas('classes', function ($q) use ($request) {
+                $q->where('class', $request->class_id);
+            });
+        }
+
+        if(!empty($request->type) && $request->type == 'all')
+        {
+            $subjects = $query->orderBy('name')->pluck('name', 'id');
+        }
+        else 
+        {
+            $subjects = $query->latest()->paginate($limit);
+        }
+
+        return response()->json($subjects);
+    }
+
     public function getInfo($subdomain, $id = null)
     {
         $info = Subject::findOrFail($id);
@@ -42,7 +75,7 @@ class SubjectController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Subject::where('name', 'LIKE', $input['name'])->where('school', auth()->user()->school)->where('deleted', 'N')->count();
+            $is_exists = Subject::where('name', 'LIKE', $input['name'])->where('school', auth()->user()->school)->count();
 
             if(!$is_exists) :
                 $obj            = new Subject;
@@ -87,7 +120,7 @@ class SubjectController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Subject::where('name', 'LIKE', $input['name'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->where('deleted', 'N')->count();
+            $is_exists = Subject::where('name', 'LIKE', $input['name'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
 
             if(!$is_exists) :
                 $obj            = Subject::findOrFail($input['id']);
@@ -120,7 +153,7 @@ class SubjectController extends Controller
      * 
     **/
     public function getListByClass($subdomain, Section $section) {
-        $data = Subject::where('deleted', 'N')->whereHas('classes', function($q) use($section) {
+        $data = Subject::whereHas('classes', function($q) use($section) {
             $q->where('class', $section->class);
         })->orderBy('name')->get();
 
@@ -128,7 +161,7 @@ class SubjectController extends Controller
     }
     public function getData()
     {
-        $data = Subject::with(['classes', 'classes.cls', 'classes.cls.dept'])->where('deleted', 'N')->latest()->paginate(20);
+        $data = Subject::with(['classes', 'classes.cls', 'classes.cls.dept'])->latest()->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -147,7 +180,7 @@ class SubjectController extends Controller
     }
     public function searchData(Request $request)
     {
-        $query = Subject::with(['classes', 'classes.cls', 'classes.cls.dept'])->where('deleted', 'N');
+        $query = Subject::with(['classes', 'classes.cls', 'classes.cls.dept']);
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -178,7 +211,7 @@ class SubjectController extends Controller
     }
     public function removeData(Request $request)
     {
-        Subject::whereIn('id', $request->check)->update(['deleted' => 'Y']);
+        Subject::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Route;
 use App\Model\Hostel;
+use App\Model\School;
 
 class HostelController extends Controller
 {
@@ -108,7 +109,7 @@ class HostelController extends Controller
     }
     public function getAllList()
     {
-        $data = Hostel::where('shift_is_deleted', 'N')->latest()->get()->toArray();
+        $data = Hostel::latest()->get()->toArray();
         return $data;
     }
     public function searchData(Request $request)

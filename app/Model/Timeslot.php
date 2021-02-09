@@ -3,16 +3,18 @@
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Timeslot extends Model {
-    protected $table 		= "class_timing";
+  use SoftDeletes;
+  protected $table 		= "class_timing";
 
-    protected $casts    = [
-      'time_start'    => 'date:h:i A',
-      'time_end'    => 'date:h:i A',
-    ];
+  protected $casts    = [
+    'time_start'    => 'date:h:i A',
+    'time_end'    => 'date:h:i A',
+  ];
 
-    public function shift() {
-        return $this->hasOne('App\Model\Shift', 'id', 'shift');
-    }
+  public function shift() {
+      return $this->hasOne(Shift::class, 'id', 'shift');
+  }
 }

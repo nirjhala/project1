@@ -8,10 +8,29 @@ use Illuminate\Http\Request;
 
 use Route;
 use App\Model\Section;
+use App\Model\School;
+use App\Model\ClassModel;
 use App\Model\Timetable;
 
 class SectionController extends Controller
 {
+    public function all(Request $request, School $school) {
+        if(empty($request->class_id)) {
+            $classes = ClassModel::with(['dept'])
+                ->has('sections')
+                ->where('school', $school->uid)
+                ->get()
+                ->pluck('full_class', 'id');
+            $resData = [];
+            foreach($classes as $id => $name) {
+                $sections = Section::where('class', $id)->get()->pluck('name', 'id');
+                $resData[$name] = $sections;
+            }
+        } else {
+            $resData = Section::where('school', $school->uid)->where('class', $request->class_id)->pluck('name', 'id');
+        }
+        return response()->json($resData);
+    }
     public function getInfo($subdomain, $id = null)
     {
         $info = Section::with('cls')->findOrFail($id);
@@ -43,7 +62,8 @@ class SectionController extends Controller
             ];
             $responseCode = 200;
         } else {
-            foreach ($input['names'] as $name) {
+            foreach ($input['names'] as $row) {
+                $name = $row['name'];
                 $conditionArr = [
                     'class' => $input['class'],
                     'name' => $name,
@@ -52,8 +72,7 @@ class SectionController extends Controller
                 $dataArr      = [
                     'class' => $input['class'],
                     'name' => $name,
-                    'school' => auth()->user()->school,
-                    'deleted' => 'N'
+                    'school' => auth()->user()->school
                 ];
                 Section::updateOrCreate($conditionArr, $dataArr);
             }
@@ -89,7 +108,7 @@ class SectionController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = Section::where('name', 'LIKE', $input['name'])->where('class', $input['class'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->where('deleted', 'N')->count();
+            $is_exists = Section::where('name', 'LIKE', $input['name'])->where('class', $input['class'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
 
             if(!$is_exists) :
                 $obj = Section::findOrFail($input['id']);
@@ -116,7 +135,7 @@ class SectionController extends Controller
         return response()->json($re, 200);
     }
     public function getListAll() {
-        $data = Section::with(['cls', 'cls.dept'])->where('school', auth()->user()->school)->where('deleted', 'N')->orderBy('name')->paginate(20);
+        $data = Section::with(['cls', 'cls.dept'])->where('school', auth()->user()->school)->orderBy('name')->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -152,7 +171,7 @@ class SectionController extends Controller
     }
     public function getData()
     {
-        $data = Section::with(['cls', 'cls.dept'])->where('school', auth()->user()->school)->where('deleted', 'N')->latest()->paginate(20);
+        $data = Section::with(['cls', 'cls.dept'])->has('cls')->where('school', auth()->user()->school)->latest()->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -172,7 +191,7 @@ class SectionController extends Controller
     }
     public function searchData(Request $request)
     {
-        $query = Section::with(['cls', 'cls.dept'])->where('deleted', 'N');
+        $query = Section::with(['cls', 'cls.dept'])->has('cls')->where('school', auth()->user()->school);
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -209,7 +228,7 @@ class SectionController extends Controller
     }
     public function removeData(Request $request)
     {
-        Section::whereIn('id', $request->check)->update(['deleted' => 'Y']);
+        Section::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,
@@ -220,7 +239,7 @@ class SectionController extends Controller
     }
     public function getListByClass(Request $request, $weburl, $classId = null)
     {
-        $lists  = Section::where('deleted', 'N')->where('class', $classId)->get();
+        $lists  = Section::where('class', $classId)->get();
         $re     = $lists;
         return response()->json($re, 200);
     }

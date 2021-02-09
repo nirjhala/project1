@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
 use Route;
+use App\Model\School;
 use App\Model\ClassModel;
 
 class ClassController extends Controller
@@ -41,7 +42,10 @@ class ClassController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = ClassModel::where('name', 'LIKE', $input['name'])->where('department', $input['department'])->where('school', auth()->user()->school)->where('deleted', 'N')->count();
+            $is_exists = ClassModel::where('name', 'LIKE', $input['name'])
+                ->where('department', $input['department'])
+                ->where('school', auth()->user()->school)
+                ->count();
 
             if(!$is_exists) :
                 $obj              = new ClassModel;
@@ -88,7 +92,7 @@ class ClassController extends Controller
                 'input'     => $input
             ];
         } else {
-            $is_exists = ClassModel::where('name', 'LIKE', $input['name'])->where('department', $input['department'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->where('deleted', 'N')->count();
+            $is_exists = ClassModel::where('name', 'LIKE', $input['name'])->where('department', $input['department'])->where('school', auth()->user()->school)->where('id', '!=', $input['id'])->count();
 
             if(!$is_exists) :
                 $obj              = ClassModel::findOrFail($input['id']);
@@ -116,7 +120,13 @@ class ClassController extends Controller
     }
     public function getData()
     {
-        $data = ClassModel::withCount(['sections'])->with('dept')->where('school', auth()->user()->school)->where('deleted', 'N')->latest()->paginate(20);
+        $data = ClassModel::withCount(['sections' => function ($q) {
+            $q;
+        }])
+        ->with('dept')
+        ->where('school', auth()->user()->school)
+        
+        ->latest()->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -133,23 +143,52 @@ class ClassController extends Controller
 
         return response()->json($re, 200);
     }
-    public function getAllList()
+    public function all(Request $request, School $school)
     {
-        $data = ClassModel::with('dept')->where('deleted', 'N')->where('school', auth()->user()->school)->latest()->get();
+        $query = ClassModel::with(['dept', 'sections'])->where('school', $school->uid);
+        if(!empty($request->department_id))
+        {
+            $query->where('department', $request->department_id);
+        }
+        $classes = $query->pluck('name', 'id');
+        return response()->json($classes);
+    }
+    public function getAllList(Request $request)
+    {
+        $data = ClassModel::with(['dept', 'sections'])->has('sections')->where('school', auth()->user()->school)->latest()->get();
+        if($request->type && $request->type == 'all') {
+            $data = $data->append('full_class')->pluck('full_class', 'id');
+        }
 
         return response()->json($data, 200);
     }
     public function getListByDept($schoolName, $deptId)
     {
         $lists  = ClassModel::with(['sections' => function ($q) {
-            $q->where('deleted', 'N');
-        }])->where('deleted', 'N')->where('department', $deptId)->where('school', auth()->user()->school)->get();
+            $q;
+        }])->where('department', $deptId)->where('school', auth()->user()->school)->get();
         $re     = $lists;
         return response()->json($re, 200);
     }
+    public function view_by_dept( $subdomain, $dept_id ) {
+        $lists  = ClassModel::with(['sections' => function ($q) {
+            $q;
+        }])->where('department', $dept_id)->where('school', auth()->user()->school)->get();
+        $resArr = [];
+        if(!$lists->isEmpty()) {
+            foreach($lists as $key => $list) :
+                $resArr[$key]['class']      = $list->name;
+                foreach($list->sections as $key2 => $sec) {
+                    $list->sections[$key2]->class_name = $list->name;
+                }
+                $resArr[$key]['sections']   = $list->sections;
+            endforeach;
+        }
+        return response()->json($resArr, 200);
+    }
     public function searchData(Request $request)
     {
-        $query = ClassModel::with('dept')->withCount(['sections'])->where('deleted', 'N')->where('school', auth()->user()->school);
+        $query = ClassModel::with('dept')->withCount(['sections'])->where('school', auth()->user()->school);
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
@@ -185,7 +224,7 @@ class ClassController extends Controller
     }
     public function removeData(Request $request)
     {
-        ClassModel::whereIn('id', $request->check)->update(['deleted' => 'Y']);
+        ClassModel::whereIn('id', $request->check)->delete();
 
         $re = [
             'status'    => true,

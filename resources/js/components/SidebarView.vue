@@ -11,91 +11,111 @@
             <li class="nav-item">
                 <router-link :to="{ name: 'dashboard' }" class="nav-link"><i class="icon-dashboard"></i> <span>Dashboard</span></router-link>
             </li>
-            <li class="nav-item sidebar-nav-item">
-                <a href="#" class="nav-link"><i class="icon-apps"></i><span>Master</span></a>
+            <!-- --------------------------------------------------------- 
+            | STUDENTS NAV MENU
+            ------------------------------------------------------------ -->
+            <li class="nav-item" v-if="role == 'Student'">
+                <router-link :to="{ name: 'student-timetable' }" class="nav-link"><i class="icon-calendar"></i> <span>Time Table</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'Student'">
+                <router-link :to="{ name: 'student_attendence' }" class="nav-link"><i class="icon-user-check1"></i> <span>Attendence</span></router-link>
+            </li>
+            <li class="nav-item sidebar-nav-item" v-if="role == 'Student'">
+                <a href="#" class="nav-link"><i class="icon-question_answer"></i><span>Complain Box</span></a>
                 <ul class="nav sub-group-menu">
                     <li class="nav-item">
-                        <router-link :to="{ name: 'session' }" class="nav-link"><i class="fas fa-angle-right"></i> Session</router-link>
+                        <router-link :to="{ name: 'add-complain' }" class="nav-link"><i class="fas fa-angle-right"></i> Raise Complain</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link :to="{ name: 'shift' }" class="nav-link"><i class="fas fa-angle-right"></i> Shifts</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'department' }" class="nav-link"><i class="fas fa-angle-right"></i> Department</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'class' }" class="nav-link"><i class="fas fa-angle-right"></i> Class</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'section' }" class="nav-link"><i class="fas fa-angle-right"></i> Section</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'subject' }" class="nav-link"><i class="fas fa-angle-right"></i> Subject</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'timeslot' }" class="nav-link"><i class="fas fa-angle-right"></i> Timeslot</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'religion' }" class="nav-link"><i class="fas fa-angle-right"></i> Religion</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'hostel' }" class="nav-link"><i class="fas fa-angle-right"></i> Hostel</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'vehicle' }" class="nav-link"><i class="fas fa-angle-right"></i> Vehicles</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'route' }" class="nav-link"><i class="fas fa-angle-right"></i> Route</router-link>
+                        <router-link :to="{ name: 'view-complain' }" class="nav-link"><i class="fas fa-angle-right"></i> Your Complains</router-link>
                     </li>
                 </ul>
             </li>
-            <li class="nav-item sidebar-nav-item">
-                <a href="#" class="nav-link"><i class="icon-users2"></i><span>Users</span></a>
-                <ul class="nav sub-group-menu">
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'add-user' }" class="nav-link"><i class="fas fa-angle-right"></i> Add User</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'user' }" class="nav-link"><i class="fas fa-angle-right"></i> View User</router-link>
-                    </li>
-                </ul>
+            <!-- --------------------------------------------------------- 
+            | TEACHER NAV MENU
+            ------------------------------------------------------------ -->
+            <li class="nav-item" v-if="role == 'Teacher'">
+                <router-link :to="{ name: 'teacher-timetable' }" class="nav-link"><i class="icon-calendar"></i> <span>Time Table</span></router-link>
             </li>
-            <li class="nav-item sidebar-nav-item">
-                <a href="#" class="nav-link"><i class="icon-graduation-cap"></i><span>Students</span></a>
-                <ul class="nav sub-group-menu">
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'add-student' }" class="nav-link"><i class="fas fa-angle-right"></i> Admission</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'student' }" class="nav-link"><i class="fas fa-angle-right"></i> Student Lists</router-link>
-                    </li>
-                    <!-- <li class="nav-item">
-                            <a href="" class="nav-link"><i class="fas fa-angle-right"></i>Student Details</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" class="nav-link"><i class="fas fa-angle-right"></i>Student Promotion</a>
-                        </li> -->
-                </ul>
+            <li class="nav-item" v-if="role == 'Teacher'">
+                <router-link :to="{ name: 'teacher_attendence' }" class="nav-link"><i class="icon-user-check1"></i> <span>Attendence</span></router-link>
             </li>
-            <li class="nav-item sidebar-nav-item">
-                <a href="#" class="nav-link"><i class="icon-rupee"></i><span>Fees Management</span></a>
-                <ul class="nav sub-group-menu">
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'fees-type' }" class="nav-link"><i class="fas fa-angle-right"></i> Fees Type</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'fees-installment' }" class="nav-link"><i class="fas fa-angle-right"></i> Fees Installment</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'fees' }" class="nav-link"><i class="fas fa-angle-right"></i> Fees</router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{ name: 'due-fees' }" class="nav-link"><i class="fas fa-angle-right"></i> Due Fees</router-link>
-                    </li>
-                </ul>
+            <!-- --------------------------------------------------------- 
+            | PARENTS NAV MENU
+            ------------------------------------------------------------ -->
+            <li class="nav-item" v-if="role == 'Parents'">
+                <router-link :to="{ name: 'parent-children' }" class="nav-link"><i class="icon-users"></i> <span>Children</span></router-link>
             </li>
-
-            <li class="nav-item sidebar-nav-item">
+            <li class="nav-item" v-if="role == 'Parents'">
+                <router-link :to="{ name: 'parent-complain-box' }" class="nav-link"><i class="icon-question_answer"></i> <span>Complain Box</span></router-link>
+            </li>
+            <!-- --------------------------------------------------------- 
+            | DRIVER NAV MENU
+            ------------------------------------------------------------ -->
+            <li class="nav-item" v-if="role == 'Driver'">
+                <router-link :to="{ name: 'driver-routes' }" class="nav-link"><i class="icon-map"></i> <span>Routes</span></router-link>
+            </li>
+            <!-- --------------------------------------------------------- 
+            | SCHOOL NAV MENU
+            ------------------------------------------------------------ -->
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'master' }" class="nav-link"><i class="icon-apps"></i><span>Master</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'SchoolMaster' }" class="nav-link"><i class="icon-university"></i><span>School</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'UserMaster' }" class="nav-link"><i class="icon-users2"></i><span>Users</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'StudentMaster' }" class="nav-link"><i class="icon-graduation-cap"></i><span>Students</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'AssignmentMaster' }" class="nav-link"><i class="icon-file_present"></i><span>Assignment</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'FeeMaster' }" class="nav-link">
+                    <i class="icon-rupee"></i>
+                    <span>Fees Management</span>
+                </router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'CertificateMaster' }" class="nav-link">
+                    <i class="icon-certificate"></i>
+                    <span>Certificates</span>
+                </router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'ExamMaster' }" class="nav-link">
+                    <i class="icon-forum"></i>
+                    <span>Examination</span>
+                </router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'OnlineClassMaster' }" class="nav-link">
+                    <i class="icon-laptop"></i>
+                    <span>Online Class</span>
+                </router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'PayrollMaster' }" class="nav-link">
+                    <i class="icon-money1"></i>
+                    <span>Payroll System</span>
+                </router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'InventoryMaster' }" class="nav-link">
+                    <i class="icon-show_chart"></i>
+                    <span>Inventory</span>
+                </router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'OnlineExamMaster' }" class="nav-link">
+                    <i class="icon-mouse"></i>
+                    <span>Online Exam</span>
+                </router-link>
+            </li>
+            <li class="nav-item sidebar-nav-item" v-if="role == 'School'">
                 <a href="#" class="nav-link"><i class="icon-calendar2"></i><span>Time Table</span></a>
                 <ul class="nav sub-group-menu">
                     <li class="nav-item">
@@ -112,11 +132,11 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item sidebar-nav-item">
+            <li class="nav-item sidebar-nav-item" v-if="role == 'School'">
                 <a href="#" class="nav-link"><i class="icon-id-badge"></i><span>ID-Card</span></a>
                 <ul class="nav sub-group-menu">
                     <li class="nav-item">
-                        <router-link :to="{ name: 'student-id-card', query: { v: getNow } }" class="nav-link"><i class="fas fa-angle-right"></i> Student</router-link>
+                        <router-link :to="{ name: 'student-id-card' }" class="nav-link"><i class="fas fa-angle-right"></i> Student</router-link>
                     </li>
                     <li class="nav-item">
                         <router-link :to="{ name: 'teacher-id-card' }" class="nav-link"><i class="fas fa-angle-right"></i> Teacher</router-link>
@@ -126,11 +146,11 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item sidebar-nav-item">
+            <li class="nav-item sidebar-nav-item" v-if="role == 'School'">
                 <a href="#" class="nav-link"><i class="icon-user-check1"></i><span>Attendence</span></a>
                 <ul class="nav sub-group-menu">
                     <li class="nav-item">
-                        <router-link :to="{ name: 'student-attendence', query: { v: getNow } }" class="nav-link"><i class="fas fa-angle-right"></i> Student Attendence</router-link>
+                        <router-link :to="{ name: 'student-attendence' }" class="nav-link"><i class="fas fa-angle-right"></i> Student Attendence</router-link>
                     </li>
                     <li class="nav-item">
                         <router-link :to="{ name: 'teacher-attendence' }" class="nav-link"><i class="fas fa-angle-right"></i> Teacher Attendence</router-link>
@@ -140,10 +160,10 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="role == 'School'">
                 <router-link :to="{ name: 'class-teacher-allocation' }" class="nav-link"><i class="icon-clipboard"></i> <span>Class Teacher Allocation</span></router-link>
             </li>
-            <li class="nav-item sidebar-nav-item">
+            <li class="nav-item sidebar-nav-item" v-if="role == 'School'">
                 <a href="#" class="nav-link"><i class="icon-books"></i><span>LMS</span></a>
                 <ul class="nav sub-group-menu">
                     <li class="nav-item">
@@ -169,105 +189,20 @@
                     </li>
                 </ul>
             </li>
-            <li class="nav-item sidebar-nav-item">
-                <a href="#" class="nav-link"><i class="icon-calculator1"></i><span>Acconunt</span></a>
-                <ul class="nav sub-group-menu">
-                    <li class="nav-item">
-                        <a href="" class="nav-link"><i class="fas fa-angle-right"></i> All Fees Collection</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="" class="nav-link"><i class="fas fa-angle-right"></i> Expenses</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="" class="nav-link"><i class="fas fa-angle-right"></i> Add Expenses</a>
-                    </li>
-                </ul>
-            </li>
-            <!-- <li class="nav-item sidebar-nav-item">
-                    <a href="#" class="nav-link"><i
-                            class="flaticon-maths-class-materials-cross-of-a-pencil-and-a-ruler"></i><span>Class</span></a>
-                    <ul class="nav sub-group-menu">
-                        <li class="nav-item">
-                            <a href="" class="nav-link"><i class="fas fa-angle-right"></i>All
-                                Classes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" class="nav-link"><i class="fas fa-angle-right"></i>Add New
-                                Class</a>
-                        </li>
-                    </ul>
-                </li> -->
-            <!-- <li class="nav-item">
-                    <a href="" class="nav-link"><i
-                            class="flaticon-open-book"></i><span>Subject</span></a>
-                </li>
-                <li class="nav-item">
-                    <a href="" class="nav-link"><i class="flaticon-calendar"></i><span>Class
-                            Routine</span></a>
-                </li> -->
-            <!-- <li class="nav-item">
-                <a href="" class="nav-link"><i class="icon-user-check1"></i><span>Attendence</span></a>
-            </li> -->
-            <li class="nav-item sidebar-nav-item">
-                <a href="#" class="nav-link"><i class="flaticon-shopping-list"></i><span>Exam</span></a>
-                <ul class="nav sub-group-menu">
-                    <li class="nav-item">
-                        <a href="" class="nav-link"><i class="fas fa-angle-right"></i>Exam
-                            Schedule</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="" class="nav-link"><i class="fas fa-angle-right"></i>Exam
-                            Grades</a>
-                    </li>
-                </ul>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'view-complain' }" class="nav-link"><i class="icon-question_answer"></i> <span>Complains / Sugeestion</span></router-link>
             </li>
             <li class="nav-item">
-                <a href="" class="nav-link"><i class="flaticon-bus-side-view"></i><span>Transport</span></a>
+                <router-link :to="{ name: 'edit-profile', params: {} }" class="nav-link"><i class="icon-pencil"></i> <span>Edit Profile</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'School'">
+                <router-link :to="{ name: 'settings', params: {} }" class="nav-link"><i class="icon-settings1"></i> <span>Settings</span></router-link>
             </li>
             <li class="nav-item">
-                <a href="" class="nav-link"><i class="flaticon-bed"></i><span>Hostel</span></a>
+                <router-link :to="{ name: 'change-password', params: {} }" class="nav-link"><i class="icon-lock3"></i> <span>Change Password</span></router-link>
             </li>
-            <!-- <li class="nav-item">
-                    <a href="notice-board.html" class="nav-link"><i
-                            class="flaticon-script"></i><span>Notice</span></a>
-                </li>
-                <li class="nav-item">
-                    <a href="messaging.html" class="nav-link"><i
-                            class="flaticon-chat"></i><span>Messeage</span></a>
-                </li> -->
-            <!-- <li class="nav-item sidebar-nav-item">
-                    <a href="#" class="nav-link"><i class="flaticon-menu-1"></i><span>UI Elements</span></a>
-                    <ul class="nav sub-group-menu">
-                        <li class="nav-item">
-                            <a href="notification-alart.html" class="nav-link"><i class="fas fa-angle-right"></i>Alart</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="button.html" class="nav-link"><i class="fas fa-angle-right"></i>Button</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="grid.html" class="nav-link"><i class="fas fa-angle-right"></i>Grid</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="modal.html" class="nav-link"><i class="fas fa-angle-right"></i>Modal</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="progress-bar.html" class="nav-link"><i class="fas fa-angle-right"></i>Progress Bar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="ui-tab.html" class="nav-link"><i class="fas fa-angle-right"></i>Tab</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="ui-widget.html" class="nav-link"><i
-                                    class="fas fa-angle-right"></i>Widget</a>
-                        </li>
-                    </ul>
-                </li> -->
-            <!-- <li class="nav-item">
-                    <a href="map.html" class="nav-link"><i
-                            class="flaticon-planet-earth"></i><span>Map</span></a>
-                </li> -->
             <li class="nav-item">
-                <a href="#" class="nav-link"><i class="flaticon-settings"></i><span>Account</span></a>
+                <a href="javascript: return void(0)" v-on:click="logOut()" class="nav-link"><i class="icon-power2"></i> <span>Log Out</span></a>
             </li>
         </ul>
     </div>
@@ -276,24 +211,19 @@
 </template>
 
 <script>
+
 export default {
     name: 'Sidebar',
-    computed: {
-        getNow() {
-            const today = new Date();
-            return today.getTime();
+    data () {
+        return {
+            role: ''
         }
     },
-    watch: {
-        getNow() {
-            let current = this.getNow;
-            if (current == "") {
-                const today = new Date();
-                this.getNow = today.getTime();
-            } else {
-                const today = new Date();
-                this.getNow = "";
-            }
+    mounted () {
+        let user_info = localStorage.getItem('user_info')
+        if(user_info) {
+            user_info = JSON.parse(user_info)
+            this.role = user_info.role_name.name
         }
     }
 }

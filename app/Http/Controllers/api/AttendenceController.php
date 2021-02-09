@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 
 use App\Model\Attendence;
 use App\Model\User;
+use App\Model\Session;
+use App\Model\Weekday;
 
 class AttendenceController extends Controller
 {
@@ -33,7 +35,7 @@ class AttendenceController extends Controller
             $attendees = $input['attendence'];
             $role = $request->role ?? "student";
             if ($role != "student") {
-                Attendence::where('school', auth()->user()->school)->where('role', $role)->delete();
+                Attendence::where('school', auth()->user()->school)->where('attd_date', $input['date'])->where('role', $role)->delete();
             }
             if (!empty($input['section'])) {
                 Attendence::where('section_id', $input['section'])->delete();
@@ -72,7 +74,6 @@ class AttendenceController extends Controller
         ->whereHas("roleName", function ($q) {
             $q->where('name', 'Student');
         })
-        ->where('deleted', 'N')
         ->where("school", auth()->user()->school)
         ->get();
         
@@ -105,7 +106,6 @@ class AttendenceController extends Controller
         ->whereHas("roleName", function ($q) use ($role) {
             $q->where('name', $role);
         })
-        ->where('deleted', 'N')
         ->where("school", auth()->user()->school)
         ->get();
 
@@ -126,5 +126,148 @@ class AttendenceController extends Controller
         ];
 
         return response()->json($re, 200);
+    }
+    public function student() {
+        $lists      = Attendence::where('attendee', auth()->user()->id)->get();
+        $data       = Weekday::where('school', auth()->user()->school);
+        $weekday    = $data->count() ? $data->first()->toArray() : [];
+
+        $session    = date('n') > 3 ? date('Y').'-'.(date('y') + 1) : (date('Y') - 1).'-'.date('y');
+        $startYear  = substr($session, 0, 4);
+        $session_exists = Session::where('session_start_year', $startYear)->where('session_school', auth()->user()->school)->where('session_is_deleted', 'N');
+        if($session_exists->count() == 0) {
+            $sess = Session::create([
+                'session_name'          => $session,
+                'session_start_year'    => $startYear,
+                'session_start_month'   => 4,
+                'session_school'        => auth()->user()->school
+            ]);
+        } else {
+            $sess = $session_exists->first();
+        }
+
+        $year  = $sess->session_start_year;
+        $month = $sess->session_start_month;
+        $startDate = "{$year}-{$month}-01";
+
+        $dataArr = [];
+        for( $i = 0; $i < 12; $i++ ) {
+            $firstDate = date("Y-m-d", strtotime("+{$i} months", strtotime($startDate)));
+            $totalMonthDays = date('t', strtotime($firstDate)); // Returns total no. of days in month
+            $firstWeek = date('w', strtotime($firstDate)); // Returns total no. of days in month
+
+            $currentTime = strtotime( date("Y-m-d") );
+
+            $daysArr = [];
+            for( $j = 0; $j < $totalMonthDays; $j++ ) {
+                $dateTime = strtotime($firstDate . " + {$j} days");
+                $date = date("d", $dateTime);
+
+                $status = "-";
+                $className = "";
+                
+                if($weekday[date('l', $dateTime)] == 'N') {
+                    $status = "H";
+                    $className = "bg-primary text-white";
+                } elseif($currentTime > $dateTime) {
+                    $attd = Attendence::where('attendee', auth()->user()->id)->where('attd_date', date('Y-m-d', $dateTime));
+
+                    $status = $attd->count() ? "PP" : "AA";
+                    $className = $attd->count() ? "bg-success text-white" : "bg-danger text-white";
+                }
+
+                if(date("Y-m-d") == date("Y-m-d", $dateTime)) {
+                    $className  = "bg-secondary text-white";
+                } 
+                
+                $daysArr[] = [
+                    'date'      => $date,
+                    'status'    => $status,
+                    "class_name"    => $className,
+                ];
+            }
+            $leftCount = intval(35 - count($daysArr) - $firstWeek) < 0 ? intval(42 - count($daysArr) - $firstWeek) : intval(35 - count($daysArr) - $firstWeek);
+            $dataArr[] = [
+                "month"         => date('F Y', strtotime($firstDate)),
+                "start_week"    => intval($firstWeek),
+                "left"          => $leftCount,
+                "days"          => $daysArr,
+                "weekdays"      => $weekday
+            ];
+        }
+
+        return response()->json( $dataArr );
+    }
+
+    public function studentById (Request $request, $weburl, $uid = null) {
+        $lists      = Attendence::where('attendee', $uid)->get();
+        $data       = Weekday::where('school', auth()->user()->school);
+        $weekday    = $data->count() ? $data->first()->toArray() : [];
+
+        $session    = date('n') > 3 ? date('Y').'-'.(date('y') + 1) : (date('Y') - 1).'-'.date('y');
+        $startYear  = substr($session, 0, 4);
+        $session_exists = Session::where('session_start_year', $startYear)->where('session_school', auth()->user()->school)->where('session_is_deleted', 'N');
+        if($session_exists->count() == 0) {
+            $sess = Session::create([
+                'session_name'          => $session,
+                'session_start_year'    => $startYear,
+                'session_start_month'   => 4,
+                'session_school'        => auth()->user()->school
+            ]);
+        } else {
+            $sess = $session_exists->first();
+        }
+
+        $year  = $sess->session_start_year;
+        $month = $sess->session_start_month;
+        $startDate = "{$year}-{$month}-01";
+
+        $dataArr = [];
+        for( $i = 0; $i < 12; $i++ ) {
+            $firstDate = date("Y-m-d", strtotime("+{$i} months", strtotime($startDate)));
+            $totalMonthDays = date('t', strtotime($firstDate)); // Returns total no. of days in month
+            $firstWeek = date('w', strtotime($firstDate)); // Returns total no. of days in month
+
+            $currentTime = strtotime( date("Y-m-d") );
+
+            $daysArr = [];
+            for( $j = 0; $j < $totalMonthDays; $j++ ) {
+                $dateTime = strtotime($firstDate . " + {$j} days");
+                $date = date("d", $dateTime);
+
+                $status = "-";
+                $className = "";
+                
+                if($weekday[date('l', $dateTime)] == 'N') {
+                    $status = "H";
+                    $className = "bg-primary text-white";
+                } elseif($currentTime > $dateTime) {
+                    $attd = Attendence::where('attendee', $uid)->where('attd_date', date('Y-m-d', $dateTime));
+
+                    $status = $attd->count() ? "PP" : "AA";
+                    $className = $attd->count() ? "bg-success text-white" : "bg-danger text-white";
+                }
+
+                if(date("Y-m-d") == date("Y-m-d", $dateTime)) {
+                    $className  = "bg-secondary text-white";
+                } 
+                
+                $daysArr[] = [
+                    'date'      => $date,
+                    'status'    => $status,
+                    "class_name"    => $className,
+                ];
+            }
+            $leftCount = intval(35 - count($daysArr) - $firstWeek) < 0 ? intval(42 - count($daysArr) - $firstWeek) : intval(35 - count($daysArr) - $firstWeek);
+            $dataArr[] = [
+                "month"         => date('F Y', strtotime($firstDate)),
+                "start_week"    => intval($firstWeek),
+                "left"          => $leftCount,
+                "days"          => $daysArr,
+                "weekdays"      => $weekday
+            ];
+        }
+
+        return response()->json( $dataArr );
     }
 }

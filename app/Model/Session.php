@@ -3,7 +3,11 @@
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Session extends Model {
-    protected $table 		= "session";
+    use SoftDeletes;
+    
+    protected $table    = "session";
+    protected $guarded  = [];
 }

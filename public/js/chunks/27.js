@@ -1,16 +1,14 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[27],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/attendence/teacher.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/attendence/teacher.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/fees-installment/add.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/fees-installment/add.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -85,44 +83,33 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
-var d = new Date(),
-    month = '' + (d.getMonth() + 1),
-    day = '' + d.getDate(),
-    year = d.getFullYear();
-if (month.length < 2) month = '0' + month;
-if (day.length < 2) day = '0' + day;
-var currentDate = [year, month, day].join('-');
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      errors: 0,
-      department: '',
-      section: '',
-      departments: [],
-      classes: [],
-      users: [],
-      attendence: [],
-      lists: [],
-      attd_date: currentDate,
-      maxDate: currentDate,
-      s: '',
+      id: '',
+      name: '',
+      start_month: '',
+      end_month: '',
+      months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      errors: [],
       loaded: 0,
       token: localStorage.getItem('token')
     };
   },
   mounted: function mounted() {
-    this.getTeachers();
+    var params = this.$route.params;
+
+    if (params.id != undefined && params.id != '') {
+      this.getInfo(params.id);
+    } else {
+      this.loaded = 1;
+    }
   },
   methods: {
-    saveAttendence: function saveAttendence() {
+    getInfo: function getInfo(id) {
       var _this = this;
 
-      var params = {
-        'attendence': this.attendence,
-        'date': this.attd_date,
-        'role': 'teacher'
-      };
       var instance = axios.create({
         baseURL: this.apiBaseUrl,
         headers: {
@@ -130,48 +117,101 @@ var currentDate = [year, month, day].join('-');
           'Accept': 'application/json'
         }
       });
-      instance.post('save-attendence', params).then(function (res) {
-        _this.$toast.success('Attendence saved.');
+      instance.get('get-fees-installment-info/' + id).then(function (res) {
+        var list = res.data.data;
+        _this.id = list.id;
+        _this.name = list.name;
+        _this.start_month = list.start_month;
+        _this.end_month = list.end_month;
+        _this.loaded = 1;
+        $('.select2').each(function () {
+          $(this).trigger('change');
+        });
       });
     },
-    getTeachers: function getTeachers() {
+    addData: function addData() {
       var _this2 = this;
 
-      if (this.attd_date) {
-        var params = {
-          date: this.attd_date
-        };
-        var instance = axios.create({
-          baseURL: this.apiBaseUrl,
-          headers: {
-            'Authorization': 'Bearer ' + this.token,
-            'Accept': 'application/json'
-          }
-        });
-        instance.post('attd-users/Teacher', params).then(function (res) {
-          _this2.loaded = 1;
+      var params = {
+        name: this.name,
+        start_month: this.start_month,
+        end_month: this.end_month
+      };
+      this.loaded = 0;
+      var instance = axios.create({
+        baseURL: this.apiBaseUrl,
+        headers: {
+          'Authorization': 'Bearer ' + this.token,
+          'Accept': 'application/json'
+        }
+      });
+      instance.post('add-fees-installment', params).then(function (res) {
+        if (res.data.status) {
+          _this2.$router.push({
+            name: 'fees-installment'
+          }).then(function (res) {
+            _this2.loaded = 1;
 
-          if (res.status) {
-            _this2.users = res.data.data;
-            _this2.attendence = res.data.attendees;
-          } else {
-            _this2.errors = 1;
-          }
-        })["catch"](function (err) {
+            _this2.$toast.success('Record saved.');
+          })["catch"](function (err) {
+            _this2.loaded = 1;
+            console.log(err);
+          });
+        } else {
           _this2.loaded = 1;
-          console.log(err);
-        });
-      }
+          _this2.errors = res.data.errors;
+        }
+      })["catch"](function (error) {
+        _this2.loaded = 1;
+        console.log(error);
+      });
+    },
+    updateData: function updateData() {
+      var _this3 = this;
+
+      var params = {
+        id: this.id,
+        name: this.name,
+        start_month: this.start_month,
+        end_month: this.end_month
+      };
+      this.loaded = 0;
+      var instance = axios.create({
+        baseURL: this.apiBaseUrl,
+        headers: {
+          'Authorization': 'Bearer ' + this.token,
+          'Accept': 'application/json'
+        }
+      });
+      instance.post('update-fees-installment', params).then(function (res) {
+        if (res.data.status) {
+          _this3.$router.push({
+            name: 'fees-installment'
+          }).then(function (res) {
+            _this3.loaded = 1;
+
+            _this3.$toast.success('Record saved.');
+          })["catch"](function (err) {
+            _this3.loaded = 1;
+            console.log(err);
+          });
+        } else {
+          _this3.loaded = 1;
+          _this3.errors = res.data.errors;
+        }
+      })["catch"](function (error) {
+        _this3.loaded = 1;
+      });
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/attendence/teacher.vue?vue&type=template&id=0b8a2c7a&":
-/*!*********************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/attendence/teacher.vue?vue&type=template&id=0b8a2c7a& ***!
-  \*********************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/fees-installment/add.vue?vue&type=template&id=47a077d4&":
+/*!************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/fees-installment/add.vue?vue&type=template&id=47a077d4& ***!
+  \************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -185,7 +225,25 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "dashboard-content-one" }, [
     _c("div", { staticClass: "breadcrumbs-area" }, [
-      _c("h3", [_vm._v("Teacher Attendence")]),
+      _c(
+        "div",
+        { staticClass: "float-right" },
+        [
+          _c(
+            "router-link",
+            {
+              staticClass: "fw-btn-fill btn-gradient-yellow text-white",
+              attrs: { to: { name: "fees-installment" } }
+            },
+            [_vm._v("View Fees Installment")]
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("h3", [
+        _vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Fees Installment")
+      ]),
       _vm._v(" "),
       _c("ul", [
         _c(
@@ -198,288 +256,296 @@ var render = function() {
           1
         ),
         _vm._v(" "),
-        _c("li", [_vm._v("Teacher Attendence")])
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "mg-b-20" }, [
-      _c("div", { staticClass: "row gutters-8" }, [
         _c(
-          "div",
-          { staticClass: "col-4-xxxl col-xl-4 col-lg-3 col-12 form-group" },
+          "li",
           [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.attd_date,
-                  expression: "attd_date"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "date",
-                max: _vm.maxDate,
-                placeholder: "Date",
-                value: ""
-              },
-              domProps: { value: _vm.attd_date },
-              on: {
-                change: function($event) {
-                  return _vm.getTeachers()
-                },
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.attd_date = $event.target.value
-                }
-              }
-            })
-          ]
-        )
+            _c("router-link", { attrs: { to: { name: "FeeMaster" } } }, [
+              _vm._v("Fees Management")
+            ])
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c(
+          "li",
+          [
+            _c("router-link", { attrs: { to: { name: "fees-installment" } } }, [
+              _vm._v("Fees Installment")
+            ])
+          ],
+          1
+        ),
+        _vm._v(" "),
+        _c("li", [
+          _vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Fees Installment")
+        ])
       ])
     ]),
     _vm._v(" "),
-    _c(
-      "form",
-      {
-        attrs: { method: "post" },
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            return _vm.saveAttendence()
-          }
-        }
-      },
-      [
-        _vm.attd_date
-          ? _c("div", { staticClass: "card height-auto" }, [
-              _c("div", { staticClass: "card-body" }, [
-                !_vm.loaded
-                  ? _c("div", { staticClass: "text-center" }, [
-                      _c("img", {
-                        staticStyle: { "max-width": "100%" },
-                        attrs: { src: "img/preloader.gif", alt: "" }
-                      })
-                    ])
-                  : _vm._e(),
-                _vm._v(" "),
-                _vm.loaded
-                  ? _c("div", [
-                      _c("div", { attrs: { id: "timetable" } }, [
-                        _vm.lists
-                          ? _c("div", { staticClass: "table-responsive" }, [
-                              _c(
-                                "table",
-                                {
-                                  staticClass:
-                                    "table display table-bordered table-sm text-nowrap"
-                                },
-                                [
-                                  _vm._m(0),
-                                  _vm._v(" "),
-                                  _c(
-                                    "tbody",
-                                    _vm._l(_vm.users, function(x, i) {
-                                      return _c("tr", [
-                                        _c(
-                                          "td",
-                                          { staticClass: "text-center" },
-                                          [
-                                            _vm._v(
-                                              "\n                                            " +
-                                                _vm._s(i + 1) +
-                                                "\n                                        "
-                                            )
-                                          ]
-                                        ),
-                                        _vm._v(" "),
-                                        _c(
-                                          "td",
-                                          { staticClass: "text-center" },
-                                          [_vm._v(_vm._s(x.name))]
-                                        ),
-                                        _vm._v(" "),
-                                        _c(
-                                          "td",
-                                          { staticClass: "text-center" },
-                                          [_vm._v(_vm._s(x.mobile))]
-                                        ),
-                                        _vm._v(" "),
-                                        _c(
-                                          "td",
-                                          { staticClass: "text-center" },
-                                          [
-                                            _c(
-                                              "div",
-                                              {
-                                                staticClass:
-                                                  "onoffswitch d-inline-block my-1"
-                                              },
-                                              [
-                                                _c("input", {
-                                                  directives: [
-                                                    {
-                                                      name: "model",
-                                                      rawName: "v-model",
-                                                      value: _vm.attendence,
-                                                      expression: "attendence"
-                                                    }
-                                                  ],
-                                                  key: i,
-                                                  staticClass:
-                                                    "onoffswitch-checkbox",
-                                                  attrs: {
-                                                    type: "checkbox",
-                                                    id: "attd_btn" + x.id,
-                                                    tabindex: i
-                                                  },
-                                                  domProps: {
-                                                    value: x.id,
-                                                    checked: x.attd_count,
-                                                    checked: Array.isArray(
-                                                      _vm.attendence
-                                                    )
-                                                      ? _vm._i(
-                                                          _vm.attendence,
-                                                          x.id
-                                                        ) > -1
-                                                      : _vm.attendence
-                                                  },
-                                                  on: {
-                                                    change: function($event) {
-                                                      var $$a = _vm.attendence,
-                                                        $$el = $event.target,
-                                                        $$c = $$el.checked
-                                                          ? true
-                                                          : false
-                                                      if (Array.isArray($$a)) {
-                                                        var $$v = x.id,
-                                                          $$i = _vm._i($$a, $$v)
-                                                        if ($$el.checked) {
-                                                          $$i < 0 &&
-                                                            (_vm.attendence = $$a.concat(
-                                                              [$$v]
-                                                            ))
-                                                        } else {
-                                                          $$i > -1 &&
-                                                            (_vm.attendence = $$a
-                                                              .slice(0, $$i)
-                                                              .concat(
-                                                                $$a.slice(
-                                                                  $$i + 1
-                                                                )
-                                                              ))
-                                                        }
-                                                      } else {
-                                                        _vm.attendence = $$c
-                                                      }
-                                                    }
-                                                  }
-                                                }),
-                                                _vm._v(" "),
-                                                _c(
-                                                  "label",
-                                                  {
-                                                    staticClass:
-                                                      "onoffswitch-label m-0 text-left",
-                                                    attrs: {
-                                                      for: "attd_btn" + x.id
-                                                    }
-                                                  },
-                                                  [
-                                                    _c("span", {
-                                                      staticClass:
-                                                        "onoffswitch-inner"
-                                                    }),
-                                                    _vm._v(" "),
-                                                    _c("span", {
-                                                      staticClass:
-                                                        "onoffswitch-switch"
-                                                    })
-                                                  ]
-                                                )
-                                              ]
-                                            )
-                                          ]
-                                        )
-                                      ])
-                                    }),
-                                    0
-                                  )
-                                ]
-                              )
+    _c("div", { staticClass: "card height-auto" }, [
+      _c("div", { staticClass: "card-body" }, [
+        !_vm.loaded
+          ? _c("div", { staticClass: "text-center" }, [
+              _c("img", {
+                staticStyle: { "max-width": "100%" },
+                attrs: { src: "img/preloader.gif", alt: "" }
+              })
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.loaded
+          ? _c("div", [
+              _c("div", { staticClass: "heading-layout1" }, [
+                _c("div", { staticClass: "item-title" }, [
+                  _c("h3", [
+                    _vm._v(
+                      _vm._s(!_vm.id ? "Add New" : "Edit") + " Fees Installment"
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "form",
+                {
+                  staticClass: "new-added-form",
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      _vm.id ? _vm.updateData() : _vm.addData()
+                    }
+                  }
+                },
+                [
+                  _vm.errors.length
+                    ? _c("div", { staticClass: "alert alert-danger" }, [
+                        _c(
+                          "ul",
+                          { staticClass: "mb-0" },
+                          _vm._l(_vm.errors, function(error, index) {
+                            return _c("li", { key: index }, [
+                              _vm._v(_vm._s(error))
                             ])
-                          : _vm._e()
-                      ]),
+                          }),
+                          0
+                        )
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.id,
+                        expression: "id"
+                      }
+                    ],
+                    attrs: { type: "hidden", value: "" },
+                    domProps: { value: _vm.id },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.id = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Name *")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.name,
+                              expression: "name"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            placeholder: "",
+                            value: "",
+                            required: ""
+                          },
+                          domProps: { value: _vm.name },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.name = $event.target.value
+                            }
+                          }
+                        })
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Start Month *")]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.start_month,
+                                expression: "start_month"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { required: "" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.start_month = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "" } }, [
+                              _vm._v("Select Month")
+                            ]),
+                            _vm._v(" "),
+                            _vm._l(_vm.months, function(m) {
+                              return _c(
+                                "option",
+                                { key: m, domProps: { value: m } },
+                                [_vm._v(_vm._s(m))]
+                              )
+                            })
+                          ],
+                          2
+                        )
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("End Month *")]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.end_month,
+                                expression: "end_month"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { required: "" },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.end_month = $event.target.multiple
+                                  ? $$selectedVal
+                                  : $$selectedVal[0]
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "" } }, [
+                              _vm._v("Select Month")
+                            ]),
+                            _vm._v(" "),
+                            _vm._l(_vm.months, function(m) {
+                              return _c(
+                                "option",
+                                { key: m, domProps: { value: m } },
+                                [_vm._v(_vm._s(m))]
+                              )
+                            })
+                          ],
+                          2
+                        )
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-12 form-group mg-t-8" }, [
+                      _c(
+                        "button",
+                        {
+                          staticClass:
+                            "btn-fill-lg btn-gradient-yellow btn-hover-bluedark",
+                          attrs: { type: "submit" }
+                        },
+                        [_vm._v(_vm._s(!_vm.id ? "Save" : "Update"))]
+                      ),
                       _vm._v(" "),
-                      _vm._m(1)
+                      _c(
+                        "button",
+                        {
+                          staticClass:
+                            "btn-fill-lg bg-blue-dark btn-hover-yellow",
+                          attrs: { type: "reset" }
+                        },
+                        [_vm._v("Reset")]
+                      )
                     ])
-                  : _vm._e()
-              ])
+                  ])
+                ]
+              )
             ])
           : _vm._e()
-      ]
-    )
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", { staticClass: "thead-dark" }, [
-      _c("tr", [
-        _c("th", { staticClass: "text-center" }, [
-          _vm._v(
-            "\n                                            #\n                                        "
-          )
-        ]),
-        _vm._v(" "),
-        _c("th", { staticClass: "text-center" }, [_vm._v("NAME")]),
-        _vm._v(" "),
-        _c("th", { staticClass: "text-center" }, [_vm._v("CONTACT")]),
-        _vm._v(" "),
-        _c("th", { staticClass: "text-center" }, [_vm._v("Attendence")])
       ])
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "text-center" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn-fill-lg btn-gradient-yellow btn-hover-bluedark",
-          attrs: { type: "submit" }
-        },
-        [_vm._v(" Save ")]
-      )
-    ])
-  }
-]
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 
 
 
 /***/ }),
 
-/***/ "./resources/js/components/attendence/teacher.vue":
-/*!********************************************************!*\
-  !*** ./resources/js/components/attendence/teacher.vue ***!
-  \********************************************************/
+/***/ "./resources/js/components/school-panel/fees-installment/add.vue":
+/*!***********************************************************************!*\
+  !*** ./resources/js/components/school-panel/fees-installment/add.vue ***!
+  \***********************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _teacher_vue_vue_type_template_id_0b8a2c7a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./teacher.vue?vue&type=template&id=0b8a2c7a& */ "./resources/js/components/attendence/teacher.vue?vue&type=template&id=0b8a2c7a&");
-/* harmony import */ var _teacher_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./teacher.vue?vue&type=script&lang=js& */ "./resources/js/components/attendence/teacher.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _add_vue_vue_type_template_id_47a077d4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add.vue?vue&type=template&id=47a077d4& */ "./resources/js/components/school-panel/fees-installment/add.vue?vue&type=template&id=47a077d4&");
+/* harmony import */ var _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./add.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/fees-installment/add.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -488,9 +554,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _teacher_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _teacher_vue_vue_type_template_id_0b8a2c7a___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _teacher_vue_vue_type_template_id_0b8a2c7a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _add_vue_vue_type_template_id_47a077d4___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _add_vue_vue_type_template_id_47a077d4___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -500,38 +566,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/attendence/teacher.vue"
+component.options.__file = "resources/js/components/school-panel/fees-installment/add.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/attendence/teacher.vue?vue&type=script&lang=js&":
-/*!*********************************************************************************!*\
-  !*** ./resources/js/components/attendence/teacher.vue?vue&type=script&lang=js& ***!
-  \*********************************************************************************/
+/***/ "./resources/js/components/school-panel/fees-installment/add.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/fees-installment/add.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_teacher_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib??ref--4-0!../../../../node_modules/vue-loader/lib??vue-loader-options!./teacher.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/attendence/teacher.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_teacher_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/fees-installment/add.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/attendence/teacher.vue?vue&type=template&id=0b8a2c7a&":
-/*!***************************************************************************************!*\
-  !*** ./resources/js/components/attendence/teacher.vue?vue&type=template&id=0b8a2c7a& ***!
-  \***************************************************************************************/
+/***/ "./resources/js/components/school-panel/fees-installment/add.vue?vue&type=template&id=47a077d4&":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/fees-installment/add.vue?vue&type=template&id=47a077d4& ***!
+  \******************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_teacher_vue_vue_type_template_id_0b8a2c7a___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../node_modules/vue-loader/lib??vue-loader-options!./teacher.vue?vue&type=template&id=0b8a2c7a& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/attendence/teacher.vue?vue&type=template&id=0b8a2c7a&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_teacher_vue_vue_type_template_id_0b8a2c7a___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_47a077d4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=template&id=47a077d4& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/fees-installment/add.vue?vue&type=template&id=47a077d4&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_47a077d4___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_teacher_vue_vue_type_template_id_0b8a2c7a___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_47a077d4___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

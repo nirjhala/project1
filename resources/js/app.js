@@ -6,19 +6,42 @@
 
 require('./bootstrap');
 
-window.Vue       = require('vue');
+window.Vue       = require('vue')
 
 import VueRouter from 'vue-router'
 import VueGlobalVariable from 'vue-global-var'
+import BootstrapVue from 'bootstrap-vue'
 import VueToast from 'vue-toast-notification'
+import Vuelidate from 'vuelidate'
+import moment from 'moment';
+
 // Import one of available themes
 import 'vue-toast-notification/dist/theme-default.css'
 
+// Bootstrap vue CSS
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue/dist/bootstrap-vue.css'
+
+Vue.use(BootstrapVue)
+Vue.use(Vuelidate)
 Vue.use(VueRouter)
+
 Vue.use(require('vue-resource'))
 Vue.use(VueToast, {
   position: 'top',
   dismissible: true
+})
+
+Vue.filter('formatDate', function(value) {
+    if (value) {
+        return moment(String(value)).format('MMMM DD, YYYY hh:mm A')
+    }
+})
+
+Vue.filter('formatDateOnly', function(value) {
+    if (value) {
+        return moment(String(value)).format('DD MMMM YYYY')
+    }
 })
 
 Vue.component('pagination', require('laravel-vue-pagination'));
@@ -36,7 +59,6 @@ import App from './App.vue';
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
 
-Vue.component('login-component', require('./components/LoginComponent.vue').default);
 Vue.component('app-component', require('./App.vue').default);
 
 /**
@@ -48,6 +70,24 @@ const router = new VueRouter({
     mode: 'history',
     base: 'school-management',
     routes
+});
+
+router.beforeEach((to, from, next) => {
+    let token    = localStorage.getItem('token'),
+        userInfo = localStorage.getItem('user_info')
+    userInfo = JSON.parse(userInfo)
+    
+    if (to.meta.requireAuth) {
+        if (!token || !userInfo) {
+            next("/login")
+        } else if(to.meta.role && !to.meta.role.includes(userInfo.role_name.name)) {
+            next('/505-forbidden')
+        } else {
+            next()
+        }
+    } else {
+        next()
+    }
 });
 
 Vue.use(VueGlobalVariable, {
