@@ -1,14 +1,16 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[51],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/student-panel/complain/add.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/student-panel/complain/add.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/vehicle/add.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/vehicle/add.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuelidate/lib/validators */ "./node_modules/vuelidate/lib/validators/index.js");
+/* harmony import */ var vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -96,27 +98,65 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      record: {
-        type: 'Complain',
-        against: '',
-        teacher_id: '',
-        subject: '',
-        remarks: ''
-      },
+      id: '',
+      vehicleRc: '',
+      vehicleNumber: '',
+      vechicleType: '',
+      driver: '',
+      drivers: [],
       errors: [],
-      teachers: [],
-      cities: [],
-      pincodes: [],
       loaded: 0,
       token: localStorage.getItem('token')
     };
   },
+  validations: {
+    vehicleRc: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    vehicleNumber: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    vechicleType: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    driver: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    }
+  },
   mounted: function mounted() {
     var params = this.$route.params;
-    this.getTeachers();
+    this.getDrivers();
 
     if (params.id != undefined && params.id != '') {
       this.getInfo(params.id);
@@ -125,7 +165,7 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   methods: {
-    getTeachers: function getTeachers() {
+    getDrivers: function getDrivers() {
       var _this = this;
 
       var instance = axios.create({
@@ -135,8 +175,8 @@ __webpack_require__.r(__webpack_exports__);
           'Accept': 'application/json'
         }
       });
-      instance.get('get-teachers').then(function (res) {
-        _this.teachers = res.data;
+      instance.get('get-all-drivers/').then(function (res) {
+        _this.drivers = res.data;
       });
     },
     getInfo: function getInfo(id) {
@@ -149,15 +189,13 @@ __webpack_require__.r(__webpack_exports__);
           'Accept': 'application/json'
         }
       });
-      instance.get('complain/' + id).then(function (res) {
-        var list = res.data;
+      instance.get('get-vehicle-info/' + id).then(function (res) {
+        var list = res.data.data;
         _this2.id = list.id;
-        _this2.record = list;
-
-        if (list.city_name) {
-          _this2.getCities(_this2.state);
-        }
-
+        _this2.vehicleNumber = list.vehicle_no;
+        _this2.vechicleType = list.type;
+        _this2.vehicleRc = list.vehicle_rc;
+        _this2.driver = list.driver;
         _this2.loaded = 1;
         $('.select2').each(function () {
           $(this).trigger('change');
@@ -167,82 +205,97 @@ __webpack_require__.r(__webpack_exports__);
     addData: function addData() {
       var _this3 = this;
 
-      var params = {
-        record: this.record
-      };
-      this.loaded = 0;
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.post('complain', params).then(function (res) {
-        if (res.data.status) {
-          _this3.$router.push({
-            name: 'view-complain'
-          }).then(function (res) {
-            _this3.loaded = 1;
+      this.$v.$touch();
 
-            _this3.$toast.success('Record saved.');
-          })["catch"](function (err) {
+      if (!this.$v.$anyError) {
+        var params = {
+          driver: this.driver,
+          type: this.vechicleType,
+          vehicle_no: this.vehicleNumber,
+          vehicle_rc: this.vehicleRc
+        };
+        this.loaded = 0;
+        var instance = axios.create({
+          baseURL: this.apiBaseUrl,
+          headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Accept': 'application/json'
+          }
+        });
+        instance.post('add-vehicle', params).then(function (res) {
+          if (res.data.status) {
+            _this3.$router.push({
+              name: 'vehicle'
+            }).then(function (res) {
+              _this3.loaded = 1;
+
+              _this3.$toast.success('Record saved.');
+            })["catch"](function (err) {
+              _this3.loaded = 1;
+              console.log(err);
+            });
+          } else {
             _this3.loaded = 1;
-            console.log(err);
-          });
-        } else {
+            _this3.errors = res.data.errors;
+          }
+        })["catch"](function (error) {
           _this3.loaded = 1;
-          _this3.errors = res.data.errors;
-        }
-      })["catch"](function (error) {
-        _this3.loaded = 1;
-        console.log(error);
-      });
+          console.log(error);
+        });
+      }
     },
     updateData: function updateData() {
       var _this4 = this;
 
-      var params = {
-        record: this.record
-      };
-      this.loaded = 0;
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.put('complain/' + this.id, params).then(function (res) {
-        if (res.data.status) {
-          _this4.$router.push({
-            name: 'view-complain'
-          }).then(function (res) {
-            _this4.loaded = 1;
+      this.$v.$touch();
 
-            _this4.$toast.success('Record saved.');
-          })["catch"](function (err) {
+      if (!this.$v.$anyError) {
+        var params = {
+          id: this.id,
+          driver: this.driver,
+          type: this.vechicleType,
+          vehicle_no: this.vehicleNumber,
+          vehicle_rc: this.vehicleRc
+        };
+        this.loaded = 0;
+        var instance = axios.create({
+          baseURL: this.apiBaseUrl,
+          headers: {
+            'Authorization': 'Bearer ' + this.token,
+            'Accept': 'application/json'
+          }
+        });
+        instance.post('update-vehicle', params).then(function (res) {
+          if (res.data.status) {
+            _this4.$router.push({
+              name: 'vehicle'
+            }).then(function (res) {
+              _this4.loaded = 1;
+
+              _this4.$toast.success('Record saved.');
+            })["catch"](function (err) {
+              _this4.loaded = 1;
+              console.log(err);
+            });
+          } else {
             _this4.loaded = 1;
-            console.log(err);
-          });
-        } else {
+            _this4.errors = res.data.errors;
+          }
+        })["catch"](function (error) {
           _this4.loaded = 1;
-          _this4.errors = res.data.errors;
-        }
-      })["catch"](function (error) {
-        _this4.loaded = 1;
-        console.log(error);
-      });
+          console.log(error);
+        });
+      }
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/student-panel/complain/add.vue?vue&type=template&id=36c5dc03&":
-/*!*****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/student-panel/complain/add.vue?vue&type=template&id=36c5dc03& ***!
-  \*****************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/vehicle/add.vue?vue&type=template&id=0260b3e5&":
+/*!***************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/vehicle/add.vue?vue&type=template&id=0260b3e5& ***!
+  \***************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -264,15 +317,15 @@ var render = function() {
             "router-link",
             {
               staticClass: "fw-btn-fill btn-gradient-yellow text-white",
-              attrs: { to: { name: "hostel" } }
+              attrs: { to: { name: "vehicle" } }
             },
-            [_vm._v("View Complain")]
+            [_vm._v("View Vehicle")]
           )
         ],
         1
       ),
       _vm._v(" "),
-      _c("h3", [_vm._v(_vm._s(!_vm.id ? "Raise" : "Edit") + " Complain")]),
+      _c("h3", [_vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Vehicle")]),
       _vm._v(" "),
       _c("ul", [
         _c(
@@ -288,14 +341,14 @@ var render = function() {
         _c(
           "li",
           [
-            _c("router-link", { attrs: { to: { name: "hostel" } } }, [
-              _vm._v("Complain")
+            _c("router-link", { attrs: { to: { name: "vehicle" } } }, [
+              _vm._v("Vehicle")
             ])
           ],
           1
         ),
         _vm._v(" "),
-        _c("li", [_vm._v(_vm._s(!_vm.id ? "Raise" : "Edit") + " Complain")])
+        _c("li", [_vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Vehicle")])
       ])
     ]),
     _vm._v(" "),
@@ -315,7 +368,7 @@ var render = function() {
               _c("div", { staticClass: "heading-layout1" }, [
                 _c("div", { staticClass: "item-title" }, [
                   _c("h3", [
-                    _vm._v(_vm._s(!_vm.id ? "Raise New" : "Edit") + " Complain")
+                    _vm._v(_vm._s(!_vm.id ? "Add New" : "Edit") + " Vehicle")
                   ])
                 ])
               ]),
@@ -323,7 +376,6 @@ var render = function() {
               _c(
                 "form",
                 {
-                  staticClass: "new-added-form",
                   on: {
                     submit: function($event) {
                       $event.preventDefault()
@@ -369,236 +421,244 @@ var render = function() {
                   }),
                   _vm._v(" "),
                   _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-lg-4 col-12 form-group" }, [
-                      _c("label", [_vm._v("Type *")]),
-                      _vm._v(" "),
-                      _c(
-                        "select",
-                        {
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Vehicle Number *")]),
+                        _vm._v(" "),
+                        _c("input", {
                           directives: [
                             {
                               name: "model",
-                              rawName: "v-model",
-                              value: _vm.record.type,
-                              expression: "record.type"
+                              rawName: "v-model.trim",
+                              value: _vm.$v.vehicleNumber.$model,
+                              expression: "$v.vehicleNumber.$model",
+                              modifiers: { trim: true }
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { required: "" },
+                          class: {
+                            "is-invalid": _vm.$v.vehicleNumber.$error
+                          },
+                          attrs: {
+                            type: "text",
+                            placeholder: "like RJ19 0392",
+                            value: ""
+                          },
+                          domProps: { value: _vm.$v.vehicleNumber.$model },
                           on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
                               _vm.$set(
-                                _vm.record,
-                                "type",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
+                                _vm.$v.vehicleNumber,
+                                "$model",
+                                $event.target.value.trim()
                               )
+                            },
+                            blur: function($event) {
+                              return _vm.$forceUpdate()
                             }
                           }
-                        },
-                        [
-                          _c("option", { attrs: { value: "Complain" } }, [
-                            _vm._v("Complain")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "Suggestion" } }, [
-                            _vm._v("Suggestion")
-                          ])
-                        ]
-                      )
-                    ]),
+                        }),
+                        _vm._v(" "),
+                        _c("b-form-invalid-feedback", [
+                          _vm._v("Please enter required field.")
+                        ])
+                      ],
+                      1
+                    ),
                     _vm._v(" "),
-                    _c("div", { staticClass: "col-lg-4 col-12 form-group" }, [
-                      _c("label", [
-                        _vm._v(
-                          _vm._s(
-                            _vm.record.type == "Complain" ? "Against" : "For"
-                          ) + " *"
-                        )
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.record.against,
-                              expression: "record.against"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          attrs: { required: "" },
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.record,
-                                "against",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
-                          }
-                        },
-                        [
-                          _c("option", { attrs: { value: "" } }, [
-                            _vm._v("Select Any Option")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "School" } }, [
-                            _vm._v("School")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "Principal" } }, [
-                            _vm._v("Principal")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "Head Master" } }, [
-                            _vm._v("Head Master")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "Teacher" } }, [
-                            _vm._v("Teacher")
-                          ]),
-                          _vm._v(" "),
-                          _c("option", { attrs: { value: "Other" } }, [
-                            _vm._v("Other")
-                          ])
-                        ]
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _vm.record.against == "Teacher"
-                      ? _c(
-                          "div",
-                          { staticClass: "col-lg-4 col-12 form-group" },
-                          [
-                            _c("label", [_vm._v("Select Teacher")]),
-                            _vm._v(" "),
-                            _c(
-                              "select",
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Type *")]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
                               {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.record.teacher_id,
-                                    expression: "record.teacher_id"
-                                  }
-                                ],
-                                staticClass: "form-control",
-                                attrs: { required: "" },
-                                on: {
-                                  change: function($event) {
-                                    var $$selectedVal = Array.prototype.filter
-                                      .call($event.target.options, function(o) {
-                                        return o.selected
-                                      })
-                                      .map(function(o) {
-                                        var val =
-                                          "_value" in o ? o._value : o.value
-                                        return val
-                                      })
-                                    _vm.$set(
-                                      _vm.record,
-                                      "teacher_id",
-                                      $event.target.multiple
-                                        ? $$selectedVal
-                                        : $$selectedVal[0]
-                                    )
-                                  }
-                                }
-                              },
-                              [
-                                _c("option", { attrs: { value: "" } }, [
-                                  _vm._v("Select Teacher")
-                                ]),
-                                _vm._v(" "),
-                                _vm._l(_vm.teachers, function(t, i) {
-                                  return _c(
-                                    "option",
-                                    { key: i, domProps: { value: t.id } },
-                                    [_vm._v(_vm._s(t.name))]
-                                  )
-                                })
-                              ],
-                              2
-                            )
+                                name: "model",
+                                rawName: "v-model.trim",
+                                value: _vm.$v.vechicleType.$model,
+                                expression: "$v.vechicleType.$model",
+                                modifiers: { trim: true }
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.$v.vechicleType.$error
+                            },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.$v.vechicleType,
+                                  "$model",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "" } }, [
+                              _vm._v("Select Type")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "bus" } }, [
+                              _vm._v("Bus")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "auto" } }, [
+                              _vm._v("Auto")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "taxi" } }, [
+                              _vm._v("Taxi")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "van" } }, [
+                              _vm._v("Van")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "cab" } }, [
+                              _vm._v("Cab")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "other" } }, [
+                              _vm._v("Other")
+                            ])
                           ]
-                        )
-                      : _vm._e()
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Subject")]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.record.subject,
-                          expression: "record.subject"
-                        }
+                        ),
+                        _vm._v(" "),
+                        _c("b-form-invalid-feedback", [
+                          _vm._v("Please enter required field.")
+                        ])
                       ],
-                      staticClass: "form-control",
-                      attrs: { type: "text", required: "" },
-                      domProps: { value: _vm.record.subject },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.record, "subject", $event.target.value)
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", [_vm._v("Complain / Suggestion")]),
+                      1
+                    ),
                     _vm._v(" "),
-                    _c("textarea", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.record.remarks,
-                          expression: "record.remarks"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      staticStyle: { height: "200px" },
-                      attrs: { rows: "8", required: "" },
-                      domProps: { value: _vm.record.remarks },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("RC Number *")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.$v.vehicleRc.$model,
+                              expression: "$v.vehicleRc.$model"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: {
+                            "is-invalid": _vm.$v.vehicleRc.$error
+                          },
+                          attrs: {
+                            type: "text",
+                            placeholder: "Vehicle Registration Certified Number"
+                          },
+                          domProps: { value: _vm.$v.vehicleRc.$model },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.$v.vehicleRc,
+                                "$model",
+                                $event.target.value
+                              )
+                            }
                           }
-                          _vm.$set(_vm.record, "remarks", $event.target.value)
-                        }
-                      }
-                    })
+                        }),
+                        _vm._v(" "),
+                        _c("b-form-invalid-feedback", [
+                          _vm._v("Please enter required field.")
+                        ])
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Driver *")]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.$v.driver.$model,
+                                expression: "$v.driver.$model"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            class: {
+                              "is-invalid": _vm.$v.driver.$error
+                            },
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.$v.driver,
+                                  "$model",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "" } }, [
+                              _vm._v("Select Driver")
+                            ]),
+                            _vm._v(" "),
+                            _vm._l(_vm.drivers, function(d) {
+                              return _c(
+                                "option",
+                                { key: d.id, domProps: { value: d.id } },
+                                [_vm._v(_vm._s(d.name))]
+                              )
+                            })
+                          ],
+                          2
+                        ),
+                        _vm._v(" "),
+                        _c("b-form-invalid-feedback", [
+                          _vm._v("Please enter required field.")
+                        ])
+                      ],
+                      1
+                    )
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "row" }, [
@@ -639,17 +699,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/student-panel/complain/add.vue":
-/*!****************************************************************!*\
-  !*** ./resources/js/components/student-panel/complain/add.vue ***!
-  \****************************************************************/
+/***/ "./resources/js/components/school-panel/vehicle/add.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/school-panel/vehicle/add.vue ***!
+  \**************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _add_vue_vue_type_template_id_36c5dc03___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add.vue?vue&type=template&id=36c5dc03& */ "./resources/js/components/student-panel/complain/add.vue?vue&type=template&id=36c5dc03&");
-/* harmony import */ var _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./add.vue?vue&type=script&lang=js& */ "./resources/js/components/student-panel/complain/add.vue?vue&type=script&lang=js&");
+/* harmony import */ var _add_vue_vue_type_template_id_0260b3e5___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add.vue?vue&type=template&id=0260b3e5& */ "./resources/js/components/school-panel/vehicle/add.vue?vue&type=template&id=0260b3e5&");
+/* harmony import */ var _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./add.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/vehicle/add.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -660,8 +720,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _add_vue_vue_type_template_id_36c5dc03___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _add_vue_vue_type_template_id_36c5dc03___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _add_vue_vue_type_template_id_0260b3e5___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _add_vue_vue_type_template_id_0260b3e5___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -671,38 +731,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/student-panel/complain/add.vue"
+component.options.__file = "resources/js/components/school-panel/vehicle/add.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/student-panel/complain/add.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************************!*\
-  !*** ./resources/js/components/student-panel/complain/add.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************************/
+/***/ "./resources/js/components/school-panel/vehicle/add.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/vehicle/add.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/student-panel/complain/add.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/vehicle/add.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/student-panel/complain/add.vue?vue&type=template&id=36c5dc03&":
-/*!***********************************************************************************************!*\
-  !*** ./resources/js/components/student-panel/complain/add.vue?vue&type=template&id=36c5dc03& ***!
-  \***********************************************************************************************/
+/***/ "./resources/js/components/school-panel/vehicle/add.vue?vue&type=template&id=0260b3e5&":
+/*!*********************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/vehicle/add.vue?vue&type=template&id=0260b3e5& ***!
+  \*********************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_36c5dc03___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=template&id=36c5dc03& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/student-panel/complain/add.vue?vue&type=template&id=36c5dc03&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_36c5dc03___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_0260b3e5___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=template&id=0260b3e5& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/vehicle/add.vue?vue&type=template&id=0260b3e5&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_0260b3e5___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_36c5dc03___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_0260b3e5___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

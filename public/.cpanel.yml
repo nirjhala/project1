@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/okremkk7s2ms/_wildcard_.suncitytechno.com/school-management/
+    - /bin/cp -R * $DEPLOYPATH

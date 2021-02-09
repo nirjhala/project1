@@ -60,26 +60,45 @@
                                 :key="id"
                             >{{ name }}</option>
                         </select>
-                        <b-form-invalid-feedback>Please select instruction</b-form-invalid-feedback>
+                        <b-form-invalid-feedback>Please select test</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
                         label="Class *"
                     >
                         <select
+                            v-model="$v.record.class_id.$model"
                             class="form-control"
+                            :class="{
+                                'is-invalid': $v.record.class_id.$error
+                            }"
                         >
                             <option value="">Select Class</option>
+                            <option
+                                :value="id"
+                                v-for="(name, id) in classes"
+                                :key="id"
+                            >{{ name }}</option>
                         </select>
+                        <b-form-invalid-feedback>Please selec class</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
                         label="Subject *"
                     >
                         <select
+                            v-model="$v.record.subject_id.$model"
                             class="form-control"
+                            :class="{
+                                'is-invalid': $v.record.subject_id.$error
+                            }"
                         >
                             <option value="">Select Subject</option>
+                            <option
+                                :value="id"
+                                v-for="(name, id) in subjects"
+                                :key="id"
+                            >{{ name }}</option>
                         </select>
                     </b-form-group>
                     <b-form-group
@@ -88,8 +107,13 @@
                     >
                         <b-input
                             type="number"
+                            v-model.trim="$v.record.duration.$model"
                             placeholder="Enter Duration"
+                            :class="{
+                                'is-invalid': $v.record.duration.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
@@ -98,7 +122,12 @@
                         <b-input
                             type="date"
                             placeholder="Enter Exam Date"
+                            v-model.trim="$v.record.date.$model"
+                            :class="{
+                                'is-invalid': $v.record.date.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
@@ -107,7 +136,12 @@
                         <b-input
                             type="time"
                             placeholder="Enter Exam Time"
+                            v-model.trim="$v.record.time.$model"
+                            :class="{
+                                'is-invalid': $v.record.time.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
@@ -116,7 +150,12 @@
                         <b-input
                             type="number"
                             placeholder="Enter Exam Expire In"
+                            v-model="$v.record.expire_in.$model"
+                            :class="{
+                                'is-invalid': $v.record.expire_in.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
@@ -125,7 +164,12 @@
                         <b-input
                             type="number"
                             placeholder="Enter Total Questions"
+                            v-model="$v.record.total_questions.$model"
+                            :class="{
+                                'is-invalid': $v.record.total_questions.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-2"
@@ -134,7 +178,12 @@
                         <b-input
                             type="number"
                             placeholder="Enter Max Marks"
+                            v-model="$v.record.max_marks.$model"
+                            :class="{
+                                'is-invalid': $v.record.max_marks.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-2"
@@ -143,7 +192,12 @@
                         <b-input
                             type="number"
                             placeholder="Enter Min Marks"
+                            v-model="$v.record.min_marks.$model"
+                            :class="{
+                                'is-invalid': $v.record.min_marks.$error
+                            }"
                         ></b-input>
+                        <b-form-invalid-feedback>Please enter required field.</b-form-invalid-feedback>
                     </b-form-group>
                 </b-row>
                 <b-button
@@ -157,7 +211,7 @@
 </template>
 <script>
 import { required } from 'vuelidate/lib/validators'
-import { add_instruction, edit_instruction, fetchSubjects, show_instruction, view_all_classes } from '../../../../api/script'
+import { add_test, edit_test, fetchSubjects, show_test, view_all_classes, view_instruction } from '../../../../api/script'
 import Editor from '@tinymce/tinymce-vue'
 export default {
     components: {
@@ -167,7 +221,16 @@ export default {
         return {
             record: {
                 name: '',
-                description: ''
+                instruction_id: '',
+                class_id: '',
+                subject_id: '',
+                duration: 60,
+                date: '',
+                time: '',
+                expire_in: 12,
+                total_questions: 100,
+                max_marks: 100,
+                min_marks: 40
             },
             editor_options: {
                 height: 600,
@@ -183,6 +246,7 @@ export default {
                     alignleft aligncenter alignright alignjustify | \
                     bullist numlist outdent indent | removeformat | image imagetools | code fullscreen'
             },
+            instructions: {},
             classes: {},
             subjects: {}
         }
@@ -192,19 +256,66 @@ export default {
             name: {
                 required
             },
-            description: {
+            instruction_id: {
+                required
+            },
+            class_id: {
+                required
+            },
+            subject_id: {
+                required
+            },
+            duration: {
+                required
+            },
+            date: {
+                required
+            },
+            time: {
+                required
+            },
+            expire_in: {
+                required
+            },
+            total_questions: {
+                required
+            },
+            max_marks: {
+                required
+            },
+            min_marks: {
                 required
             }
         }
     },
     mounted () {
+        this.getClasses()
+        this.getInstructions()
         if(this.$route.params.id) {
             this.getInfo()
         }
     },
     methods: {
+        getClasses () {
+            view_all_classes('type=all')
+                .then(res => {
+                    this.classes = res.data
+                })
+        },
+        getSubjects () {
+            fetchSubjects(this.record.class_id)
+                .then(res => {
+                    this.subjects = res.data
+                })
+        },
+        getInstructions () {
+            view_instruction ('type=all')
+                .then(res => {
+                    this.instructions = res.data
+                })
+        },
         getInfo () {
-            show_instruction (this.$route.params.id)
+            show_test (this.$route.params.id)
                 .then(res => {
                     this.record = res.data
                 })
@@ -216,9 +327,9 @@ export default {
                 let apiResponse = ''
     
                 if (!this.$route.params.id) {
-                    apiResponse = add_instruction (params)
+                    apiResponse = add_test (params)
                 } else {
-                    apiResponse = edit_instruction (this.$route.params.id, params)
+                    apiResponse = edit_test (this.$route.params.id, params)
                 }
                 
                 apiResponse
@@ -235,7 +346,7 @@ export default {
     },
     watch: {
         "record.class_id" () {
-            this.fetchAllSubjects()
+            this.getSubjects()
         }
     }
 }

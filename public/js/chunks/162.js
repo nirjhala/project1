@@ -1,16 +1,26 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[162],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/view.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/subject/view.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/student/payFees.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/student/payFees.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _api_script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../api/script */ "./resources/js/api/script.js");
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -124,206 +134,153 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+var d = new Date();
+var current_year = d.getFullYear();
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       errors: 0,
-      lists: {},
-      allSelected: 0,
-      check: [],
-      s: '',
-      allClasses: [],
-      classes: [],
+      lists: [],
+      fee_setting: {},
       loaded: 0,
-      subjectId: '',
-      token: localStorage.getItem('token')
+      amount: 0,
+      penalty_amount: 0
     };
   },
-  mounted: function mounted() {
-    this.getRecords();
-    this.getAllClasses();
-  },
-  methods: {
-    searchAfterDebounce: lodash__WEBPACK_IMPORTED_MODULE_0___default.a.debounce(function () {
-      this.searchData();
-    }, 500),
-    checkAll: function checkAll() {
-      var self = this;
-      self.check = [];
-
-      if (!self.allSelected) {
-        $.each(self.lists.data, function (i, row) {
-          self.check.push(row.id);
-        });
-      }
-    },
-    assignClass: function assignClass() {
-      var _this = this;
-
-      var classes = this.classes,
-          subject = this.subjectId;
-      this.loaded = 0;
-      var params = {
-        classes: classes,
-        subjectId: subject
-      };
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
+  computed: {
+    totalFees: function totalFees() {
+      var total = 0;
+      this.lists.forEach(function (row) {
+        if (row.pay_status == 'due') {
+          total += parseFloat(row.amount - row.paid_amount);
         }
       });
-      instance.post('assign-subject-class', params).then(function (res) {
-        _this.loaded = 1;
-        $('#classModal').modal('hide');
+      return total;
+    },
+    penaltyAmt: function penaltyAmt() {
+      var _this = this;
 
-        _this.getRecords(1);
+      var total = 0;
+      this.lists.forEach(function (row, index) {
+        if (row.pay_status == 'paid') {
+          total += parseFloat(row.penalty_amount - row.paid_penalty);
+        } else {
+          var penalty_amt = 0,
+              _month = row.month > 9 ? "0".concat(row.month) : row.month,
+              date = row.month > 3 ? new Date(current_year, row.month - 1, _this.fee_setting.fee_day) : new Date(current_year + 1, row.month - 1, _this.fee_setting.fee_day),
+              late = 0;
+
+          switch (_this.fee_setting.penalty_type) {
+            case 'daily':
+              late = Math.round((d - date) / (24 * 60 * 60 * 1000));
+              break;
+
+            case 'weekly':
+              late = Math.round((d - date) / (7 * 24 * 60 * 60 * 1000));
+              break;
+
+            case 'monthly':
+              late = _this.monthDiff(d, date);
+              break;
+          }
+
+          late = late > 0 ? late : 0;
+          _this.lists[index].penalty_amount = _this.fee_setting.penalty_amount * late;
+          total += _this.lists[index].penalty_amount;
+        }
       });
+      return total;
+    }
+  },
+  mounted: function mounted() {
+    this.getLists();
+  },
+  methods: {
+    monthDiff: function monthDiff(d2, d1) {
+      var months;
+      months = (d2.getFullYear() - d1.getFullYear()) * 12;
+      months -= d1.getMonth();
+      months += d2.getMonth();
+      if (d2.getDate() < d1.getDate()) month--;
+      return months <= 0 ? 0 : months;
     },
-    showClassPop: function showClassPop(id, classes) {
-      this.subjectId = id;
-      var classArr = [];
-      $(classes).each(function (i, row) {
-        classArr.push(row["class"]);
-      });
-      this.classes = classArr;
-      $('#classModal').modal('show');
-    },
-    getAllClasses: function getAllClasses() {
+    getLists: function getLists() {
       var _this2 = this;
 
       this.loaded = 0;
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_fee_setting"])().then(function (res) {
+        _this2.fee_setting = res.data;
       });
-      instance.get('get-all-classes').then(function (res) {
-        _this2.loaded = 1;
-        _this2.allClasses = res.data;
+      var apiResponse = _api_script__WEBPACK_IMPORTED_MODULE_0__["default"].studentFees(this.$route.params.id);
+      apiResponse.then(function (res) {
+        setTimeout(function () {
+          _this2.lists = res.data;
+          _this2.amount = _this2.totalFees;
+          _this2.penalty_amount = _this2.penaltyAmt;
+        }, 300);
+      })["catch"](function (err) {
+        console.log('Errors: ', err);
       });
     },
-    searchData: function searchData(page) {
+    payFees: function payFees() {
       var _this3 = this;
 
-      var s = this.s;
-
-      if (typeof page === 'undefined') {
-        page = 1;
-      }
-
-      this.loaded = 0;
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
+      var amount = this.amount;
+      var installment_penalty = {};
+      this.lists.forEach(function (row) {
+        installment_penalty[row.id] = row.penalty_amount - row.paid_penalty;
       });
-      instance.get('search-subject/?page=' + page + '&s=' + s).then(function (res) {
-        _this3.loaded = 1;
 
-        if (res.status) {
-          _this3.lists = res.data.data;
-        } else {
-          _this3.errors = 1;
-        }
-      })["catch"](function (err) {
-        _this3.loaded = 1;
-        console.log(err);
-      });
-    },
-    getRecords: function getRecords(page) {
-      var _this4 = this;
+      if (amount && amount > 0 || this.penalty_amount || this.penalty_amount > 0) {
+        Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["pay_student_fees"])({
+          sid: this.$route.params.id,
+          amount: this.amount,
+          penalty_amount: this.penalty_amount,
+          installment_penalty: installment_penalty
+        }).then(function (res) {
+          _this3.$toast.success(res.message);
 
-      if (typeof page === 'undefined') {
-        page = 1;
-      }
-
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.get('view-subject/?page=' + page).then(function (res) {
-        _this4.loaded = 1;
-
-        if (res.status) {
-          _this4.lists = res.data.data;
-        } else {
-          _this4.errors = 1;
-        }
-      })["catch"](function (err) {
-        _this4.loaded = 1;
-        console.log(err);
-      });
-    },
-    deleteRecord: function deleteRecord() {
-      var _this5 = this;
-
-      var params = {
-        check: this.check
-      };
-      var parent = $(this).closest('form');
-
-      if (this.check.length > 0) {
-        swal({
-          title: "Are you sure?",
-          text: "Once deleted, you will not be able to recover this record!",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true
-        }).then(function (willDelete) {
-          if (willDelete) {
-            _this5.loaded = 0;
-            var instance = axios.create({
-              baseURL: _this5.apiBaseUrl,
-              headers: {
-                'Authorization': 'Bearer ' + _this5.token,
-                'Accept': 'application/json'
-              }
-            });
-            instance.post('remove-subject', params).then(function (res) {
-              if (res.status) {
-                _this5.getRecords();
-
-                _this5.$toast.success('Selected record(s) has been deleted.');
-              } else {
-                _this5.loaded = 1;
-
-                _this5.$toast.warning('Record(s) unable to delete.');
-              }
-            })["catch"](function (err) {
-              _this5.loaded = 1;
-              console.log(err);
-            });
-          }
+          _this3.getLists();
         });
-      } else {
-        this.loaded = 1;
-        swal("Warning", "Please select at least one record to delete.", "warning");
-        return false;
       }
     }
   },
   watch: {
-    s: function s(val) {
-      this.searchAfterDebounce();
+    amount: function amount(amt) {
+      var _this4 = this;
+
+      if (parseFloat(amt) > parseFloat(this.totalFees)) {
+        setTimeout(function () {
+          _this4.amount = parseFloat(_this4.totalFees);
+        }, 1);
+      }
+
+      if (this.totalFees > 0 && amt < this.totalFees) {
+        setTimeout(function () {
+          _this4.penalty_amount = 0;
+        }, 1);
+      } else if (amt == this.totalFees && this.penalty_amount == 0) {
+        this.penalty_amount = this.penaltyAmt;
+      }
+    },
+    penalty_amount: function penalty_amount(amt) {
+      var _this5 = this;
+
+      if (parseFloat(amt) > parseFloat(this.penaltyAmt)) {
+        setTimeout(function () {
+          _this5.penalty_amount = parseFloat(_this5.penaltyAmt);
+        }, 1);
+      }
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/view.vue?vue&type=template&id=c5831dde&":
-/*!****************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/subject/view.vue?vue&type=template&id=c5831dde& ***!
-  \****************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/student/payFees.vue?vue&type=template&id=1c660648&":
+/*!*******************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/student/payFees.vue?vue&type=template&id=1c660648& ***!
+  \*******************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -335,515 +292,284 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "dashboard-content-one" }, [
-    _c("div", { staticClass: "breadcrumbs-area" }, [
-      _c(
-        "div",
-        { staticClass: "float-right" },
-        [
-          _c(
-            "router-link",
-            {
-              staticClass: "fw-btn-fill btn-gradient-yellow text-white",
-              attrs: { to: { name: "add-subject" } }
-            },
-            [_vm._v("Add New")]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c("h3", [_vm._v("Subject")]),
-      _vm._v(" "),
-      _c("ul", [
-        _c(
-          "li",
-          [
-            _c("router-link", { attrs: { to: { name: "dashboard" } } }, [
-              _vm._v("Dashboard")
-            ])
-          ],
-          1
-        ),
+  return _c(
+    "div",
+    { staticClass: "dashboard-content-one" },
+    [
+      _c("div", { staticClass: "breadcrumbs-area" }, [
+        _c("h3", [_vm._v("Pay Fee")]),
         _vm._v(" "),
-        _c("li", [_vm._v("Subject")])
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "mg-b-20" }, [
-      _c("div", { staticClass: "row gutters-8" }, [
-        _c(
-          "div",
-          { staticClass: "col-4-xxxl col-xl-4 col-lg-3 col-12 form-group" },
-          [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.s,
-                  expression: "s"
-                }
-              ],
-              staticClass: "form-control bg-white",
-              attrs: { type: "text", placeholder: "Search ..." },
-              domProps: { value: _vm.s },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
-                  }
-                  _vm.s = $event.target.value
-                }
-              }
-            })
-          ]
-        )
-      ])
-    ]),
-    _vm._v(" "),
-    _c(
-      "form",
-      {
-        attrs: { method: "post" },
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            return _vm.deleteRecord()
-          }
-        }
-      },
-      [
-        _c("div", { staticClass: "card height-auto" }, [
-          _c("div", { staticClass: "card-body" }, [
-            !_vm.loaded
-              ? _c("div", { staticClass: "text-center" }, [
-                  _c("img", {
-                    staticStyle: { "max-width": "100%" },
-                    attrs: { src: "img/preloader.gif", alt: "" }
-                  })
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.loaded
-              ? _c("div", [
-                  _vm._m(0),
-                  _vm._v(" "),
-                  !_vm.lists
-                    ? _c("div", { staticClass: "alert alert-warning" }, [
-                        _c("i", { staticClass: "fa fa-exclamation-circle" }),
-                        _vm._v(
-                          "\n                        No record(s) found.\n                    "
-                        )
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.lists
-                    ? _c(
-                        "div",
-                        { staticClass: "table-responsive" },
-                        [
-                          _c(
-                            "table",
-                            {
-                              staticClass:
-                                "table display data-table text-nowrap"
-                            },
-                            [
-                              _c("thead", [
-                                _c("tr", [
-                                  _c("th", [
-                                    _c("div", { staticClass: "form-check" }, [
-                                      _c("input", {
-                                        directives: [
-                                          {
-                                            name: "model",
-                                            rawName: "v-model",
-                                            value: _vm.allSelected,
-                                            expression: "allSelected"
-                                          }
-                                        ],
-                                        staticClass: "form-check-input",
-                                        attrs: { type: "checkbox" },
-                                        domProps: {
-                                          checked: Array.isArray(
-                                            _vm.allSelected
-                                          )
-                                            ? _vm._i(_vm.allSelected, null) > -1
-                                            : _vm.allSelected
-                                        },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.checkAll()
-                                          },
-                                          change: function($event) {
-                                            var $$a = _vm.allSelected,
-                                              $$el = $event.target,
-                                              $$c = $$el.checked ? true : false
-                                            if (Array.isArray($$a)) {
-                                              var $$v = null,
-                                                $$i = _vm._i($$a, $$v)
-                                              if ($$el.checked) {
-                                                $$i < 0 &&
-                                                  (_vm.allSelected = $$a.concat(
-                                                    [$$v]
-                                                  ))
-                                              } else {
-                                                $$i > -1 &&
-                                                  (_vm.allSelected = $$a
-                                                    .slice(0, $$i)
-                                                    .concat($$a.slice($$i + 1)))
-                                              }
-                                            } else {
-                                              _vm.allSelected = $$c
-                                            }
-                                          }
-                                        }
-                                      }),
-                                      _vm._v(" "),
-                                      _c(
-                                        "label",
-                                        { staticClass: "form-check-label" },
-                                        [_vm._v("Sr. No.")]
-                                      )
-                                    ])
+        _c("ul", [
+          _c(
+            "li",
+            [
+              _c("router-link", { attrs: { to: { name: "dashboard" } } }, [
+                _vm._v("Dashboard")
+              ])
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c(
+            "li",
+            [
+              _c("router-link", { attrs: { to: { name: "StudentMaster" } } }, [
+                _vm._v("Student Master")
+              ])
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _c("li", [_vm._v("Pay Fee")])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm.lists.length
+        ? _c(
+            "b-row",
+            [
+              _c(
+                "b-col",
+                { attrs: { sm: "8" } },
+                [
+                  _c("b-card", { attrs: { header: "Fees Summary" } }, [
+                    _c("div", { staticClass: "table-responsive" }, [
+                      _c("table", { staticClass: "table table-bordered" }, [
+                        _c("thead", [
+                          _c("tr", [
+                            _c("th", [_vm._v("#")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("FEES AMOUNT")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("MONTH")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("Pay Status")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("Paid Amount")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("Due Amount")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("Penalty")]),
+                            _vm._v(" "),
+                            _c("th", [_vm._v("Due Penalty")])
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          [
+                            _vm._l(_vm.lists, function(s, i) {
+                              return _c(
+                                "tr",
+                                {
+                                  key: i,
+                                  class:
+                                    s.pay_status == "paid"
+                                      ? "bg-success text-white"
+                                      : "bg-danger text-white"
+                                },
+                                [
+                                  _c("td", [_vm._v(_vm._s(i + 1))]),
+                                  _vm._v(" "),
+                                  _c("td", [_vm._v("₹ " + _vm._s(s.amount))]),
+                                  _vm._v(" "),
+                                  _c("td", [_vm._v(_vm._s(s.month))]),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _vm._v(
+                                      "\n                                    " +
+                                        _vm._s(s.pay_status) +
+                                        "\n                                "
+                                    )
                                   ]),
                                   _vm._v(" "),
-                                  _c("th", [_vm._v("Subject Name")]),
+                                  _c("td", [_vm._v(_vm._s(s.paid_amount))]),
                                   _vm._v(" "),
-                                  _c("th", [_vm._v("Classes")])
-                                ])
+                                  _c("td", [
+                                    _vm._v(_vm._s(s.amount - s.paid_amount))
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("td", [_vm._v(_vm._s(s.penalty_amount))]),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    _vm._v(
+                                      _vm._s(s.penalty_amount - s.paid_penalty)
+                                    )
+                                  ])
+                                ]
+                              )
+                            }),
+                            _vm._v(" "),
+                            _c("tr", [
+                              _c("th", { attrs: { colspan: "6" } }, [
+                                _vm._v(
+                                  "\n                                    TOTAL DUE FEES AMOUNT\n                                "
+                                )
                               ]),
                               _vm._v(" "),
-                              _c(
-                                "tbody",
-                                _vm._l(_vm.lists.data, function(list, i) {
-                                  return _c("tr", [
-                                    _c("td", [
-                                      _c("div", { staticClass: "form-check" }, [
-                                        _c("input", {
-                                          directives: [
-                                            {
-                                              name: "model",
-                                              rawName: "v-model",
-                                              value: _vm.check,
-                                              expression: "check"
-                                            }
-                                          ],
-                                          key: _vm.lists.from + i,
-                                          staticClass: "form-check-input",
-                                          attrs: { type: "checkbox" },
-                                          domProps: {
-                                            value: list.id,
-                                            checked: Array.isArray(_vm.check)
-                                              ? _vm._i(_vm.check, list.id) > -1
-                                              : _vm.check
-                                          },
-                                          on: {
-                                            change: function($event) {
-                                              var $$a = _vm.check,
-                                                $$el = $event.target,
-                                                $$c = $$el.checked
-                                                  ? true
-                                                  : false
-                                              if (Array.isArray($$a)) {
-                                                var $$v = list.id,
-                                                  $$i = _vm._i($$a, $$v)
-                                                if ($$el.checked) {
-                                                  $$i < 0 &&
-                                                    (_vm.check = $$a.concat([
-                                                      $$v
-                                                    ]))
-                                                } else {
-                                                  $$i > -1 &&
-                                                    (_vm.check = $$a
-                                                      .slice(0, $$i)
-                                                      .concat(
-                                                        $$a.slice($$i + 1)
-                                                      ))
-                                                }
-                                              } else {
-                                                _vm.check = $$c
-                                              }
-                                            }
-                                          }
-                                        }),
-                                        _vm._v(" "),
-                                        _c(
-                                          "label",
-                                          { staticClass: "form-check-label" },
-                                          [
-                                            _vm._v(
-                                              _vm._s(_vm.lists.from + i) + "."
-                                            )
-                                          ]
-                                        )
-                                      ])
-                                    ]),
-                                    _vm._v(" "),
-                                    _c(
-                                      "td",
-                                      [
-                                        _c(
-                                          "router-link",
-                                          {
-                                            attrs: {
-                                              to: {
-                                                path: "edit-subject/" + list.id,
-                                                params: list
-                                              },
-                                              "data-toggle": "tooltip",
-                                              title: "Edit"
-                                            }
-                                          },
-                                          [
-                                            _c("i", {
-                                              staticClass: "fa fa-edit"
-                                            }),
-                                            _vm._v(" " + _vm._s(list.name))
-                                          ]
-                                        )
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c("td", [
-                                      list.classes
-                                        ? _c(
-                                            "ol",
-                                            {
-                                              staticClass: "m-0 p-0",
-                                              staticStyle: {
-                                                "list-style": "inside decimal"
-                                              }
-                                            },
-                                            _vm._l(list.classes, function(
-                                              cls,
-                                              j
-                                            ) {
-                                              return _c("li", [
-                                                _vm._v(
-                                                  _vm._s(cls.cls.name) +
-                                                    " - " +
-                                                    _vm._s(
-                                                      cls.cls.dept.dept_name
-                                                    )
-                                                )
-                                              ])
-                                            }),
-                                            0
-                                          )
-                                        : _vm._e(),
-                                      _vm._v(" "),
-                                      _c(
-                                        "button",
-                                        {
-                                          staticClass:
-                                            "btn btn-primary addClassBtn",
-                                          attrs: { type: "button" },
-                                          on: {
-                                            click: function($event) {
-                                              return _vm.showClassPop(
-                                                list.id,
-                                                list.classes
-                                              )
-                                            }
-                                          }
-                                        },
-                                        [_vm._v("Add Class")]
-                                      )
-                                    ])
-                                  ])
-                                }),
-                                0
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c("pagination", {
-                            attrs: { data: _vm.lists },
-                            on: { "pagination-change-page": _vm.getRecords }
-                          })
-                        ],
-                        1
-                      )
-                    : _vm._e()
-                ])
-              : _vm._e()
-          ])
-        ])
-      ]
-    ),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "modal align-middle fade", attrs: { id: "classModal" } },
-      [
-        _c("div", { staticClass: "modal-dialog modal-dialog-centered" }, [
-          _c("div", { staticClass: "modal-content" }, [
-            _vm._m(1),
-            _vm._v(" "),
-            _c("div", { staticClass: "modal-body" }, [
-              _c("input", {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.subjectId,
-                    expression: "subjectId"
-                  }
-                ],
-                attrs: { type: "hidden" },
-                domProps: { value: _vm.subjectId },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
-                    }
-                    _vm.subjectId = $event.target.value
-                  }
-                }
-              }),
-              _vm._v(" "),
-              _c(
-                "ul",
-                { staticClass: "list-item-group" },
-                _vm._l(_vm.allClasses, function(cls) {
-                  return _c("li", { staticClass: "list-item" }, [
-                    _c("label", [
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.classes,
-                            expression: "classes"
-                          }
-                        ],
-                        attrs: { type: "checkbox" },
-                        domProps: {
-                          value: cls.id,
-                          checked: Array.isArray(_vm.classes)
-                            ? _vm._i(_vm.classes, cls.id) > -1
-                            : _vm.classes
-                        },
-                        on: {
-                          change: function($event) {
-                            var $$a = _vm.classes,
-                              $$el = $event.target,
-                              $$c = $$el.checked ? true : false
-                            if (Array.isArray($$a)) {
-                              var $$v = cls.id,
-                                $$i = _vm._i($$a, $$v)
-                              if ($$el.checked) {
-                                $$i < 0 && (_vm.classes = $$a.concat([$$v]))
-                              } else {
-                                $$i > -1 &&
-                                  (_vm.classes = $$a
-                                    .slice(0, $$i)
-                                    .concat($$a.slice($$i + 1)))
-                              }
-                            } else {
-                              _vm.classes = $$c
-                            }
-                          }
-                        }
-                      }),
-                      _vm._v(
-                        "\n                                " +
-                          _vm._s(cls.name) +
-                          " (" +
-                          _vm._s(cls.dept.dept_name) +
-                          ")\n                            "
-                      )
+                              _c("th", { attrs: { colspan: "2" } }, [
+                                _vm._v("₹ " + _vm._s(_vm.totalFees))
+                              ])
+                            ]),
+                            _vm._v(" "),
+                            _c("tr", [
+                              _c("th", { attrs: { colspan: "6" } }, [
+                                _c("span", { staticClass: "float-right" }, [
+                                  _vm._v("(+)")
+                                ]),
+                                _vm._v(
+                                  "\n                                    TOTAL PENALTY AMOUNT (due to late fees)\n                                "
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("th", { attrs: { colspan: "2" } }, [
+                                _vm._v("₹ " + _vm._s(_vm.penaltyAmt))
+                              ])
+                            ]),
+                            _vm._v(" "),
+                            _c("tr", [
+                              _c("th", { attrs: { colspan: "6" } }, [
+                                _vm._v(
+                                  "\n                                    TOTAL PAYABLE AMOUNT\n                                "
+                                )
+                              ]),
+                              _vm._v(" "),
+                              _c("th", { attrs: { colspan: "2" } }, [
+                                _vm._v(
+                                  "₹ " + _vm._s(_vm.totalFees + _vm.penaltyAmt)
+                                )
+                              ])
+                            ])
+                          ],
+                          2
+                        )
+                      ])
                     ])
                   ])
-                }),
-                0
-              )
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "modal-footer" }, [
-              _c(
-                "button",
-                {
-                  staticClass: "btn btn-primary",
-                  on: {
-                    click: function($event) {
-                      return _vm.assignClass()
-                    }
-                  }
-                },
-                [_vm._v("Submit")]
+                ],
+                1
               ),
               _vm._v(" "),
               _c(
-                "button",
-                {
-                  staticClass: "btn btn-info",
-                  attrs: { "data-dismiss": "modal" }
-                },
-                [_vm._v("Close")]
+                "b-col",
+                { attrs: { sm: "4" } },
+                [
+                  _c(
+                    "b-card",
+                    { attrs: { header: "Pay Fees" } },
+                    [
+                      _c(
+                        "b-form",
+                        [
+                          _c(
+                            "b-form-group",
+                            { attrs: { label: "Amount" } },
+                            [
+                              _c("b-input", {
+                                attrs: {
+                                  type: "number",
+                                  min: "1",
+                                  max: _vm.totalFees,
+                                  placeholder: "Enter Fees Amount"
+                                },
+                                on: {
+                                  focus: function($event) {
+                                    return $event.target.select()
+                                  }
+                                },
+                                model: {
+                                  value: _vm.amount,
+                                  callback: function($$v) {
+                                    _vm.amount = $$v
+                                  },
+                                  expression: "amount"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "b-form-group",
+                            { attrs: { label: "Penalty Amount" } },
+                            [
+                              _c("b-input", {
+                                attrs: {
+                                  type: "number",
+                                  min: "0",
+                                  max: _vm.penaltyAmt,
+                                  placeholder: "Enter Penalty Amount"
+                                },
+                                on: {
+                                  focus: function($event) {
+                                    return $event.target.select()
+                                  }
+                                },
+                                model: {
+                                  value: _vm.penalty_amount,
+                                  callback: function($$v) {
+                                    _vm.penalty_amount = $$v
+                                  },
+                                  expression: "penalty_amount"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "b-form-group",
+                            [
+                              _vm.amount > 0 || _vm.penalty_amount > 0
+                                ? _c(
+                                    "b-button",
+                                    {
+                                      staticClass:
+                                        "fw-btn-fill btn-gradient-yellow text-white",
+                                      attrs: { block: "" },
+                                      on: { click: _vm.payFees }
+                                    },
+                                    [_vm._v("Pay Now")]
+                                  )
+                                : _vm._e()
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
               )
-            ])
-          ])
-        ])
-      ]
-    )
-  ])
+            ],
+            1
+          )
+        : _vm._e()
+    ],
+    1
+  )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "heading-layout1" }, [
-      _c("div", { staticClass: "item-title" }, [
-        _c("h3", [_vm._v("All Subject Data")])
-      ]),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-link text-dark removeBtn",
-          attrs: { type: "submit", "data-toggle": "tooltip", title: "Remove" }
-        },
-        [_c("i", { staticClass: "fa fa-trash fa-2x" })]
-      )
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c("h5", { staticClass: "modal-title" }, [_vm._v("Assign Classes")]),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "close", attrs: { "data-dismiss": "modal" } },
-        [_vm._v("×")]
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/subject/view.vue":
-/*!***************************************************************!*\
-  !*** ./resources/js/components/school-panel/subject/view.vue ***!
-  \***************************************************************/
+/***/ "./resources/js/components/school-panel/student/payFees.vue":
+/*!******************************************************************!*\
+  !*** ./resources/js/components/school-panel/student/payFees.vue ***!
+  \******************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _view_vue_vue_type_template_id_c5831dde___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./view.vue?vue&type=template&id=c5831dde& */ "./resources/js/components/school-panel/subject/view.vue?vue&type=template&id=c5831dde&");
-/* harmony import */ var _view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./view.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/subject/view.vue?vue&type=script&lang=js&");
+/* harmony import */ var _payFees_vue_vue_type_template_id_1c660648___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./payFees.vue?vue&type=template&id=1c660648& */ "./resources/js/components/school-panel/student/payFees.vue?vue&type=template&id=1c660648&");
+/* harmony import */ var _payFees_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./payFees.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/student/payFees.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -853,9 +579,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _view_vue_vue_type_template_id_c5831dde___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _view_vue_vue_type_template_id_c5831dde___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _payFees_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _payFees_vue_vue_type_template_id_1c660648___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _payFees_vue_vue_type_template_id_1c660648___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -865,38 +591,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/subject/view.vue"
+component.options.__file = "resources/js/components/school-panel/student/payFees.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/subject/view.vue?vue&type=script&lang=js&":
-/*!****************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/subject/view.vue?vue&type=script&lang=js& ***!
-  \****************************************************************************************/
+/***/ "./resources/js/components/school-panel/student/payFees.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/student/payFees.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./view.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/view.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_payFees_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./payFees.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/student/payFees.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_payFees_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/subject/view.vue?vue&type=template&id=c5831dde&":
-/*!**********************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/subject/view.vue?vue&type=template&id=c5831dde& ***!
-  \**********************************************************************************************/
+/***/ "./resources/js/components/school-panel/student/payFees.vue?vue&type=template&id=1c660648&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/student/payFees.vue?vue&type=template&id=1c660648& ***!
+  \*************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_template_id_c5831dde___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./view.vue?vue&type=template&id=c5831dde& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/view.vue?vue&type=template&id=c5831dde&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_template_id_c5831dde___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_payFees_vue_vue_type_template_id_1c660648___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./payFees.vue?vue&type=template&id=1c660648& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/student/payFees.vue?vue&type=template&id=1c660648&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_payFees_vue_vue_type_template_id_1c660648___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_view_vue_vue_type_template_id_c5831dde___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_payFees_vue_vue_type_template_id_1c660648___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

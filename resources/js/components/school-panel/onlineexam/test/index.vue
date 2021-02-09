@@ -80,7 +80,7 @@
                         <template #head(index)="data">
                             <label>
                                 <input type="checkbox" v-model="checkAll" value="1" @click="selectAll">
-                                {{ data.label }}.
+                                {{ data.label }}
                             </label>
                         </template>
                         <template #cell(index)="data">
@@ -95,7 +95,7 @@
                                 {{ data.index + tests.from }}.
                             </label>
                         </template>
-                        <template #cell(title)="data">
+                        <template #cell(name)="data">
                             <div>
                                 <router-link
                                     :to="{
@@ -104,13 +104,8 @@
                                             id: data.item.id
                                         }
                                     }"
-                                ><i class="icon-mode_edit"></i> {{ data.item.title }}</router-link>
+                                ><i class="icon-mode_edit"></i> {{ data.item.name }}</router-link>
                             </div>
-                        </template>
-                        <template #cell(description)="data">
-                            <div
-                                v-html="data.item.description"
-                            ></div>
                         </template>
                     </b-table>
                 </div>
@@ -135,11 +130,21 @@ export default {
                         label: 'Sr. No.'
                     },
                     {
-                        key: 'title',
+                        key: 'name',
                         sortable: true
                     },
                     {
-                        key: 'description'
+                        key: 'duration',
+                        sortable: true
+                    },
+                    {
+                        key: 'date',
+                        sortable: true
+                    },
+                    'expire_in',
+                    {
+                        key: 'total_questions',
+                        sortable: true
                     }
                 ]
             },

@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[105],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=script&lang=js&":
-/*!**************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=script&lang=js& ***!
-  \**************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -139,17 +139,17 @@ __webpack_require__.r(__webpack_exports__);
       s: '',
       limit: 10,
       checkAll: false,
-      debit_note: {
+      credit_note: {
         check: [],
         fields: [{
           key: 'index',
           label: 'Sr. No.'
         }, {
-          key: 'purchase.supplier_name',
-          label: 'Supplier Name',
+          key: 'sale.customer_name',
+          label: 'Customer Name',
           sortable: true
         }, {
-          key: 'purchase.invoice_no',
+          key: 'sale.full_invoice_no',
           label: 'Invoice No.'
         }, {
           key: 'payment_mode'
@@ -163,40 +163,40 @@ __webpack_require__.r(__webpack_exports__);
           key: 'action'
         }]
       },
-      debit_notes: {}
+      credit_notes: {}
     };
   },
   mounted: function mounted() {
-    this.fetchDebitNotes();
+    this.fetchCreditNotes();
   },
   methods: {
     searchAfterDebounce: _.debounce(function () {
-      this.fetchDebitNotes();
+      this.fetchCreditNotes();
     }, 500),
     selectAll: function selectAll() {
-      this.debit_note.check = [];
+      this.credit_note.check = [];
 
       if (!this.checkAll) {
-        for (var index in this.debit_notes.data) {
-          if (!this.debit_notes.data[index].stock) {
-            this.debit_note.check.push(this.debit_notes.data[index].id);
+        for (var index in this.credit_notes.data) {
+          if (!this.credit_notes.data[index].stock) {
+            this.credit_note.check.push(this.credit_notes.data[index].id);
           }
         }
       }
     },
-    fetchDebitNotes: function fetchDebitNotes() {
+    fetchCreditNotes: function fetchCreditNotes() {
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      this.debit_notes = {};
-      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_debit_note"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
-        _this.debit_notes = res.data;
+      this.credit_notes = {};
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_credit_note"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
+        _this.credit_notes = res.data;
       });
     },
     deleteMultiple: function deleteMultiple() {
       var _this2 = this;
 
-      if (this.debit_note.check.length) {
+      if (this.credit_note.check.length) {
         swal({
           title: "Are you sure?",
           text: "Once deleted, you will not be able to recover this record!",
@@ -205,12 +205,12 @@ __webpack_require__.r(__webpack_exports__);
           dangerMode: true
         }).then(function (willDelete) {
           if (willDelete) {
-            Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["multiple_delete_debit_note"])({
-              ids: _this2.debit_note.check
+            Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["multiple_delete_credit_note"])({
+              ids: _this2.credit_note.check
             }).then(function (res) {
               _this2.$toast.success(res.data.message);
 
-              _this2.fetchDebitNotes(1);
+              _this2.fetchCreditNotes(1);
             });
           }
         });
@@ -224,17 +224,17 @@ __webpack_require__.r(__webpack_exports__);
       this.searchAfterDebounce();
     },
     limit: function limit() {
-      this.fetchDebitNotes(1);
+      this.fetchCreditNotes(1);
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=template&id=4db09d72&":
-/*!******************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=template&id=4db09d72& ***!
-  \******************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=template&id=6d761706&":
+/*!*******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=template&id=6d761706& ***!
+  \*******************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -261,17 +261,17 @@ var render = function() {
                 staticClass: "fw-btn-fill btn-gradient-yellow text-white",
                 attrs: {
                   to: {
-                    name: "AddDebitNote"
+                    name: "AddCreditNote"
                   }
                 }
               },
-              [_vm._v("Add Debit Notes")]
+              [_vm._v("Add Credit Notes")]
             )
           ],
           1
         ),
         _vm._v(" "),
-        _c("h3", [_vm._v("View Debit Notes")]),
+        _c("h3", [_vm._v("View Credit Notes")]),
         _vm._v(" "),
         _c("ul", [
           _c(
@@ -296,7 +296,7 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c("li", [_vm._v("View Debit Notes")])
+          _c("li", [_vm._v("View Credit Notes")])
         ])
       ]),
       _vm._v(" "),
@@ -317,7 +317,7 @@ var render = function() {
         1
       ),
       _vm._v(" "),
-      !_vm.debit_notes.data
+      !_vm.credit_notes.data
         ? _c(
             "b-card",
             { staticClass: "text-center h-auto" },
@@ -331,17 +331,17 @@ var render = function() {
           )
         : _vm._e(),
       _vm._v(" "),
-      _vm.debit_notes.data
+      _vm.credit_notes.data
         ? _c(
             "div",
             [
-              !_vm.debit_notes.data.length
+              !_vm.credit_notes.data.length
                 ? _c("b-card", { staticClass: "h-auto" }, [
                     _vm._v("\n            No record(s) found.\n        ")
                   ])
                 : _vm._e(),
               _vm._v(" "),
-              _vm.debit_notes.data.length
+              _vm.credit_notes.data.length
                 ? _c(
                     "b-card",
                     {
@@ -355,11 +355,11 @@ var render = function() {
                                 _c("div", { staticClass: "float-right" }, [
                                   _vm._v(
                                     "\n                    " +
-                                      _vm._s(_vm.debit_notes.from) +
+                                      _vm._s(_vm.credit_notes.from) +
                                       " - " +
-                                      _vm._s(_vm.debit_notes.to) +
+                                      _vm._s(_vm.credit_notes.to) +
                                       " of " +
-                                      _vm._s(_vm.debit_notes.total) +
+                                      _vm._s(_vm.credit_notes.total) +
                                       " record(s) are showing.\n                "
                                   )
                                 ]),
@@ -421,7 +421,7 @@ var render = function() {
                         ],
                         null,
                         false,
-                        1013739574
+                        1757940421
                       )
                     },
                     [
@@ -432,8 +432,8 @@ var render = function() {
                         [
                           _c("b-table", {
                             attrs: {
-                              fields: _vm.debit_note.fields,
-                              items: _vm.debit_notes.data,
+                              fields: _vm.credit_note.fields,
+                              items: _vm.credit_notes.data,
                               "foot-clone": true,
                               striped: "",
                               bordered: ""
@@ -448,7 +448,7 @@ var render = function() {
                                         _vm._v(
                                           "\n                            " +
                                             _vm._s(
-                                              data.index + _vm.debit_notes.from
+                                              data.index + _vm.credit_notes.from
                                             ) +
                                             ".\n                        "
                                         )
@@ -466,7 +466,7 @@ var render = function() {
                                           attrs: {
                                             href:
                                               _vm.baseURL +
-                                              "invoice/debit-note/" +
+                                              "invoice/credit-note/" +
                                               data.item.id,
                                             target: "_blank"
                                           }
@@ -493,7 +493,7 @@ var render = function() {
                                             {
                                               attrs: {
                                                 to: {
-                                                  name: "EditDebitNote",
+                                                  name: "EditCreditNote",
                                                   params: {
                                                     id: data.item.id
                                                   }
@@ -525,7 +525,7 @@ var render = function() {
                               ],
                               null,
                               false,
-                              1429677042
+                              4116608641
                             )
                           })
                         ],
@@ -533,8 +533,8 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c("pagination", {
-                        attrs: { data: _vm.debit_notes, limit: 2 },
-                        on: { "pagination-change-page": _vm.fetchDebitNotes }
+                        attrs: { data: _vm.credit_notes, limit: 2 },
+                        on: { "pagination-change-page": _vm.fetchCreditNotes }
                       })
                     ],
                     1
@@ -555,17 +555,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/debit-note/index.vue":
-/*!*****************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/debit-note/index.vue ***!
-  \*****************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/credit-note/index.vue":
+/*!******************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/credit-note/index.vue ***!
+  \******************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _index_vue_vue_type_template_id_4db09d72___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=4db09d72& */ "./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=template&id=4db09d72&");
-/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=script&lang=js&");
+/* harmony import */ var _index_vue_vue_type_template_id_6d761706___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=6d761706& */ "./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=template&id=6d761706&");
+/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -576,8 +576,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _index_vue_vue_type_template_id_4db09d72___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _index_vue_vue_type_template_id_4db09d72___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _index_vue_vue_type_template_id_6d761706___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _index_vue_vue_type_template_id_6d761706___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -587,38 +587,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/inventory/debit-note/index.vue"
+component.options.__file = "resources/js/components/school-panel/inventory/credit-note/index.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=script&lang=js&":
-/*!******************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=script&lang=js& ***!
-  \******************************************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=template&id=4db09d72&":
-/*!************************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=template&id=4db09d72& ***!
-  \************************************************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=template&id=6d761706&":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=template&id=6d761706& ***!
+  \*************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_4db09d72___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=4db09d72& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/debit-note/index.vue?vue&type=template&id=4db09d72&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_4db09d72___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_6d761706___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=6d761706& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/credit-note/index.vue?vue&type=template&id=6d761706&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_6d761706___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_4db09d72___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_6d761706___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

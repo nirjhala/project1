@@ -1,25 +1,15 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[109],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../api/script */ "./resources/js/api/script.js");
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -139,62 +129,65 @@ __webpack_require__.r(__webpack_exports__);
       s: '',
       limit: 10,
       checkAll: false,
-      purchase: {
+      payment: {
         check: [],
         fields: [{
           key: 'index',
           label: 'Sr. No.'
-        }, {
-          key: 'supplier_name',
+        }, 'payment_no', {
+          key: 'purchase.supplier_name',
+          label: 'Supplier Name',
           sortable: true
         }, {
-          key: 'invoice_no'
+          key: 'purchase.invoice_no',
+          label: 'Invoice No.'
         }, {
           key: 'payment_mode'
         }, {
-          key: 'total_amount',
+          key: 'amount',
           sortable: true
         }, {
-          key: 'paid_amount',
+          label: 'Date',
+          key: 'created_at',
           sortable: true
         }, {
           key: 'action'
         }]
       },
-      purchases: {}
+      payments: {}
     };
   },
   mounted: function mounted() {
-    this.fetchPurchases();
+    this.fetchPayments();
   },
   methods: {
     searchAfterDebounce: _.debounce(function () {
-      this.fetchPurchases();
+      this.fetchPayments();
     }, 500),
     selectAll: function selectAll() {
-      this.purchase.check = [];
+      this.payment.check = [];
 
       if (!this.checkAll) {
-        for (var index in this.purchases.data) {
-          if (!this.purchases.data[index].stock) {
-            this.purchase.check.push(this.purchases.data[index].id);
+        for (var index in this.payments.data) {
+          if (!this.payments.data[index].stock) {
+            this.payment.check.push(this.payments.data[index].id);
           }
         }
       }
     },
-    fetchPurchases: function fetchPurchases() {
+    fetchPayments: function fetchPayments() {
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      this.purchases = {};
-      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_purchase"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
-        _this.purchases = res.data;
+      this.payments = {};
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_payment"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
+        _this.payments = res.data;
       });
     },
     deleteMultiple: function deleteMultiple() {
       var _this2 = this;
 
-      if (this.purchase.check.length) {
+      if (this.payment.check.length) {
         swal({
           title: "Are you sure?",
           text: "Once deleted, you will not be able to recover this record!",
@@ -203,12 +196,12 @@ __webpack_require__.r(__webpack_exports__);
           dangerMode: true
         }).then(function (willDelete) {
           if (willDelete) {
-            Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["multiple_delete_purchase"])({
-              ids: _this2.purchase.check
+            Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["multiple_delete_payment"])({
+              ids: _this2.payment.check
             }).then(function (res) {
               _this2.$toast.success(res.data.message);
 
-              _this2.fetchPurchases(1);
+              _this2.fetchPayments(1);
             });
           }
         });
@@ -222,17 +215,17 @@ __webpack_require__.r(__webpack_exports__);
       this.searchAfterDebounce();
     },
     limit: function limit() {
-      this.fetchPurchases(1);
+      this.fetchPayments(1);
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=template&id=40f031c0&":
-/*!****************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=template&id=40f031c0& ***!
-  \****************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=template&id=1a970a3d&":
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=template&id=1a970a3d& ***!
+  \***************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -259,17 +252,17 @@ var render = function() {
                 staticClass: "fw-btn-fill btn-gradient-yellow text-white",
                 attrs: {
                   to: {
-                    name: "AddPurchase"
+                    name: "AddPayment"
                   }
                 }
               },
-              [_vm._v("Add Purchases")]
+              [_vm._v("Add Payments")]
             )
           ],
           1
         ),
         _vm._v(" "),
-        _c("h3", [_vm._v("View Purchases")]),
+        _c("h3", [_vm._v("View Payments")]),
         _vm._v(" "),
         _c("ul", [
           _c(
@@ -294,28 +287,11 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c("li", [_vm._v("View Purchases")])
+          _c("li", [_vm._v("View Payments")])
         ])
       ]),
       _vm._v(" "),
-      _c(
-        "b-form-group",
-        [
-          _c("b-input", {
-            attrs: { type: "search", placeholder: "Search ..." },
-            model: {
-              value: _vm.s,
-              callback: function($$v) {
-                _vm.s = typeof $$v === "string" ? $$v.trim() : $$v
-              },
-              expression: "s"
-            }
-          })
-        ],
-        1
-      ),
-      _vm._v(" "),
-      !_vm.purchases.data
+      !_vm.payments.data
         ? _c(
             "b-card",
             { staticClass: "text-center h-auto" },
@@ -329,17 +305,17 @@ var render = function() {
           )
         : _vm._e(),
       _vm._v(" "),
-      _vm.purchases.data
+      _vm.payments.data
         ? _c(
             "div",
             [
-              !_vm.purchases.data.length
+              !_vm.payments.data.length
                 ? _c("b-card", { staticClass: "h-auto" }, [
                     _vm._v("\n            No record(s) found.\n        ")
                   ])
                 : _vm._e(),
               _vm._v(" "),
-              _vm.purchases.data.length
+              _vm.payments.data.length
                 ? _c(
                     "b-card",
                     {
@@ -353,11 +329,11 @@ var render = function() {
                                 _c("div", { staticClass: "float-right" }, [
                                   _vm._v(
                                     "\n                    " +
-                                      _vm._s(_vm.purchases.from) +
+                                      _vm._s(_vm.payments.from) +
                                       " - " +
-                                      _vm._s(_vm.purchases.to) +
+                                      _vm._s(_vm.payments.to) +
                                       " of " +
-                                      _vm._s(_vm.purchases.total) +
+                                      _vm._s(_vm.payments.total) +
                                       " record(s) are showing.\n                "
                                   )
                                 ]),
@@ -419,7 +395,7 @@ var render = function() {
                         ],
                         null,
                         false,
-                        1741595564
+                        1509905085
                       )
                     },
                     [
@@ -430,8 +406,8 @@ var render = function() {
                         [
                           _c("b-table", {
                             attrs: {
-                              fields: _vm.purchase.fields,
-                              items: _vm.purchases.data,
+                              fields: _vm.payment.fields,
+                              items: _vm.payments.data,
                               "foot-clone": true,
                               striped: "",
                               bordered: ""
@@ -446,7 +422,7 @@ var render = function() {
                                         _vm._v(
                                           "\n                            " +
                                             _vm._s(
-                                              data.index + _vm.purchases.from
+                                              data.index + _vm.payments.from
                                             ) +
                                             ".\n                        "
                                         )
@@ -464,7 +440,7 @@ var render = function() {
                                           attrs: {
                                             href:
                                               _vm.baseURL +
-                                              "invoice/purchase/" +
+                                              "invoice/payment/" +
                                               data.item.id,
                                             target: "_blank"
                                           }
@@ -480,50 +456,25 @@ var render = function() {
                                   }
                                 },
                                 {
-                                  key: "cell(description)",
+                                  key: "cell(created_at)",
                                   fn: function(data) {
                                     return [
-                                      _c(
-                                        "div",
-                                        [
-                                          _c(
-                                            "router-link",
-                                            {
-                                              attrs: {
-                                                to: {
-                                                  name: "EditPurchase",
-                                                  params: {
-                                                    id: data.item.id
-                                                  }
-                                                }
-                                              }
-                                            },
-                                            [
-                                              _c("i", {
-                                                staticClass: "icon-mode_edit"
-                                              }),
-                                              _vm._v(
-                                                " " +
-                                                  _vm._s(
-                                                    data.item.organization_name
-                                                  )
-                                              )
-                                            ]
-                                          )
-                                        ],
-                                        1
-                                      ),
-                                      _vm._v(" "),
-                                      _c("div", [
-                                        _vm._v(_vm._s(data.item.name))
-                                      ])
+                                      _vm._v(
+                                        "\n                        " +
+                                          _vm._s(
+                                            _vm._f("formatDate")(
+                                              data.item.created_at
+                                            )
+                                          ) +
+                                          "\n                    "
+                                      )
                                     ]
                                   }
                                 }
                               ],
                               null,
                               false,
-                              2783048901
+                              2959390684
                             )
                           })
                         ],
@@ -531,8 +482,8 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c("pagination", {
-                        attrs: { data: _vm.purchases, limit: 2 },
-                        on: { "pagination-change-page": _vm.fetchPurchases }
+                        attrs: { data: _vm.payments, limit: 2 },
+                        on: { "pagination-change-page": _vm.fetchPayments }
                       })
                     ],
                     1
@@ -553,17 +504,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/purchase/index.vue":
-/*!***************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/purchase/index.vue ***!
-  \***************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/payment/index.vue":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/payment/index.vue ***!
+  \**************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _index_vue_vue_type_template_id_40f031c0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=40f031c0& */ "./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=template&id=40f031c0&");
-/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=script&lang=js&");
+/* harmony import */ var _index_vue_vue_type_template_id_1a970a3d___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=1a970a3d& */ "./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=template&id=1a970a3d&");
+/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -574,8 +525,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _index_vue_vue_type_template_id_40f031c0___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _index_vue_vue_type_template_id_40f031c0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _index_vue_vue_type_template_id_1a970a3d___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _index_vue_vue_type_template_id_1a970a3d___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -585,38 +536,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/inventory/purchase/index.vue"
+component.options.__file = "resources/js/components/school-panel/inventory/payment/index.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=script&lang=js&":
-/*!****************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=script&lang=js& ***!
-  \****************************************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=template&id=40f031c0&":
-/*!**********************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=template&id=40f031c0& ***!
-  \**********************************************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=template&id=1a970a3d&":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=template&id=1a970a3d& ***!
+  \*********************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_40f031c0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=40f031c0& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/purchase/index.vue?vue&type=template&id=40f031c0&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_40f031c0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_1a970a3d___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=1a970a3d& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/payment/index.vue?vue&type=template&id=1a970a3d&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_1a970a3d___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_40f031c0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_1a970a3d___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

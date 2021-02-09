@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[82],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/student.vue?vue&type=script&lang=js&":
-/*!******************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/attendence/student.vue?vue&type=script&lang=js& ***!
-  \******************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/staff.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/attendence/staff.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11,20 +11,6 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 //
 //
 //
@@ -115,7 +101,7 @@ var currentDate = [year, month, day].join('-');
       section: '',
       departments: [],
       classes: [],
-      students: [],
+      users: [],
       attendence: [],
       lists: [],
       attd_date: currentDate,
@@ -126,27 +112,16 @@ var currentDate = [year, month, day].join('-');
     };
   },
   mounted: function mounted() {
-    this.getDepts();
+    this.getStaffs();
   },
   methods: {
-    printTimeTable: function printTimeTable() {
-      var divToPrint = document.getElementById('timetable');
-      var newWin = window.open('', 'Time-Table', "width=800,height=600");
-      newWin.document.open();
-      var html = "\n            <html>\n                <head>\n                    <title>Time-Table</title>\n                    <style>\n                    body {\n                        margin:0;\n                        font-family: sans-serif;\n                    }\n                    table {\n                        width: 100%;\n                        border-collapse: collapse;\n                    }\n                    table, th, td {\n                        border: 1px solid #000;\n                        padding: 5px 10px;\n                        font-size: 12px;\n                    }\n                    th {\n                        background: #555;\n                        color: #fff;\n                    }\n                    .text-center {\n                        text-align: center;\n                    }\n                    div.table-responsive {\n                        margin: 10px;\n                        padding: 10px;\n                        border: 1px solid #000;\n                    }\n                    h4 {\n                        margin-top: 20px;\n                    }\n                    @page {\n                        margin: 0;\n                        size: landscape;\n                    }\n                    </style>\n                </head>\n                <body onload=\"window.print()\">".concat(divToPrint.innerHTML, "</body>\n            </html>");
-      newWin.document.write(html);
-      newWin.document.close();
-      setTimeout(function () {
-        newWin.close();
-      }, 10);
-    },
     saveAttendence: function saveAttendence() {
       var _this = this;
 
       var params = {
         'attendence': this.attendence,
         'date': this.attd_date,
-        'section': this.section
+        'role': 'staff'
       };
       var instance = axios.create({
         baseURL: this.apiBaseUrl,
@@ -159,40 +134,11 @@ var currentDate = [year, month, day].join('-');
         _this.$toast.success('Attendence saved.');
       });
     },
-    getDepts: function getDepts() {
+    getStaffs: function getStaffs() {
       var _this2 = this;
 
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.get('get-departments').then(function (res) {
-        _this2.departments = res.data.data;
-      });
-    },
-    getClasses: function getClasses() {
-      var _this3 = this;
-
-      var instance = axios.create({
-        baseURL: this.apiBaseUrl,
-        headers: {
-          'Authorization': 'Bearer ' + this.token,
-          'Accept': 'application/json'
-        }
-      });
-      instance.get('get-class-by-dept/' + this.department).then(function (res) {
-        _this3.classes = res.data;
-      });
-    },
-    getStudents: function getStudents() {
-      var _this4 = this;
-
-      if (this.section) {
+      if (this.attd_date) {
         var params = {
-          section: this.section,
           date: this.attd_date
         };
         var instance = axios.create({
@@ -202,23 +148,17 @@ var currentDate = [year, month, day].join('-');
             'Accept': 'application/json'
           }
         });
-        instance.post('attd-students', params).then(function (res) {
-          _this4.loaded = 1;
+        instance.post('attd-users/Staff', params).then(function (res) {
+          _this2.loaded = 1;
 
           if (res.status) {
-            _this4.students = res.data.data;
-            _this4.attendence = res.data.attendees;
-
-            if (typeof res.data.attendees === 'undefined' || res.data.attendees.length == 0) {
-              _this4.students.forEach(function (i, row) {
-                this.students[i].attd_count = 1;
-              });
-            }
+            _this2.users = res.data.data;
+            _this2.attendence = res.data.attendees;
           } else {
-            _this4.errors = 1;
+            _this2.errors = 1;
           }
         })["catch"](function (err) {
-          _this4.loaded = 1;
+          _this2.loaded = 1;
           console.log(err);
         });
       }
@@ -228,10 +168,10 @@ var currentDate = [year, month, day].join('-');
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/student.vue?vue&type=template&id=40103e8c&":
-/*!**********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/attendence/student.vue?vue&type=template&id=40103e8c& ***!
-  \**********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/staff.vue?vue&type=template&id=2698749f&":
+/*!********************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/attendence/staff.vue?vue&type=template&id=2698749f& ***!
+  \********************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -245,7 +185,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "dashboard-content-one" }, [
     _c("div", { staticClass: "breadcrumbs-area" }, [
-      _c("h3", [_vm._v("Student Attendence")]),
+      _c("h3", [_vm._v("Staff Attendence")]),
       _vm._v(" "),
       _c("ul", [
         _c(
@@ -258,7 +198,7 @@ var render = function() {
           1
         ),
         _vm._v(" "),
-        _c("li", [_vm._v("Student Attendence")])
+        _c("li", [_vm._v("Staff Attendence")])
       ])
     ]),
     _vm._v(" "),
@@ -287,7 +227,7 @@ var render = function() {
               domProps: { value: _vm.attd_date },
               on: {
                 change: function($event) {
-                  return _vm.getStudents()
+                  return _vm.getStaffs()
                 },
                 input: function($event) {
                   if ($event.target.composing) {
@@ -297,125 +237,6 @@ var render = function() {
                 }
               }
             })
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col-4-xxxl col-xl-4 col-lg-3 col-12 form-group" },
-          [
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.department,
-                    expression: "department"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { required: "" },
-                on: {
-                  change: [
-                    function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.department = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
-                    },
-                    function($event) {
-                      return _vm.getClasses()
-                    }
-                  ]
-                }
-              },
-              [
-                _c("option", { attrs: { value: "" } }, [
-                  _vm._v("Select Department")
-                ]),
-                _vm._v(" "),
-                _vm._l(_vm.departments, function(d) {
-                  return _c(
-                    "option",
-                    { key: d.id, domProps: { value: d.id } },
-                    [_vm._v(_vm._s(d.dept_name))]
-                  )
-                })
-              ],
-              2
-            )
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col-4-xxxl col-xl-4 col-lg-3 col-12 form-group" },
-          [
-            _c(
-              "select",
-              {
-                directives: [
-                  {
-                    name: "model",
-                    rawName: "v-model",
-                    value: _vm.section,
-                    expression: "section"
-                  }
-                ],
-                staticClass: "form-control",
-                attrs: { required: "" },
-                on: {
-                  change: [
-                    function($event) {
-                      var $$selectedVal = Array.prototype.filter
-                        .call($event.target.options, function(o) {
-                          return o.selected
-                        })
-                        .map(function(o) {
-                          var val = "_value" in o ? o._value : o.value
-                          return val
-                        })
-                      _vm.section = $event.target.multiple
-                        ? $$selectedVal
-                        : $$selectedVal[0]
-                    },
-                    function($event) {
-                      return _vm.getStudents()
-                    }
-                  ]
-                }
-              },
-              [
-                _c("option", { attrs: { value: "" } }, [
-                  _vm._v("Select Class / Section")
-                ]),
-                _vm._v(" "),
-                _vm._l(_vm.classes, function(cls) {
-                  return _c(
-                    "optgroup",
-                    { key: cls.id, attrs: { label: cls.name } },
-                    _vm._l(cls.sections, function(s) {
-                      return _c(
-                        "option",
-                        { key: s.id, domProps: { value: s.id } },
-                        [_vm._v(_vm._s(cls.name) + " - " + _vm._s(s.name))]
-                      )
-                    }),
-                    0
-                  )
-                })
-              ],
-              2
-            )
           ]
         )
       ])
@@ -433,7 +254,7 @@ var render = function() {
         }
       },
       [
-        _vm.section
+        _vm.attd_date
           ? _c("div", { staticClass: "card height-auto" }, [
               _c("div", { staticClass: "card-body" }, [
                 !_vm.loaded
@@ -461,8 +282,8 @@ var render = function() {
                                   _vm._v(" "),
                                   _c(
                                     "tbody",
-                                    _vm._l(_vm.students, function(x, i) {
-                                      return _c("tr", { key: i }, [
+                                    _vm._l(_vm.users, function(x, i) {
+                                      return _c("tr", [
                                         _c(
                                           "td",
                                           { staticClass: "text-center" },
@@ -484,17 +305,7 @@ var render = function() {
                                         _c(
                                           "td",
                                           { staticClass: "text-center" },
-                                          [
-                                            _vm._v(
-                                              _vm._s(
-                                                x.student_data &&
-                                                  x.student_data.father_info
-                                                  ? x.student_data.father_info
-                                                      .name
-                                                  : ""
-                                              )
-                                            )
-                                          ]
+                                          [_vm._v(_vm._s(x.mobile))]
                                         ),
                                         _vm._v(" "),
                                         _c(
@@ -629,7 +440,7 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { staticClass: "text-center" }, [_vm._v("NAME")]),
         _vm._v(" "),
-        _c("th", { staticClass: "text-center" }, [_vm._v("FATHER")]),
+        _c("th", { staticClass: "text-center" }, [_vm._v("CONTACT")]),
         _vm._v(" "),
         _c("th", { staticClass: "text-center" }, [_vm._v("Attendence")])
       ])
@@ -657,17 +468,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/attendence/student.vue":
-/*!*********************************************************************!*\
-  !*** ./resources/js/components/school-panel/attendence/student.vue ***!
-  \*********************************************************************/
+/***/ "./resources/js/components/school-panel/attendence/staff.vue":
+/*!*******************************************************************!*\
+  !*** ./resources/js/components/school-panel/attendence/staff.vue ***!
+  \*******************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _student_vue_vue_type_template_id_40103e8c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./student.vue?vue&type=template&id=40103e8c& */ "./resources/js/components/school-panel/attendence/student.vue?vue&type=template&id=40103e8c&");
-/* harmony import */ var _student_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./student.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/attendence/student.vue?vue&type=script&lang=js&");
+/* harmony import */ var _staff_vue_vue_type_template_id_2698749f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./staff.vue?vue&type=template&id=2698749f& */ "./resources/js/components/school-panel/attendence/staff.vue?vue&type=template&id=2698749f&");
+/* harmony import */ var _staff_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./staff.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/attendence/staff.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -677,9 +488,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _student_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _student_vue_vue_type_template_id_40103e8c___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _student_vue_vue_type_template_id_40103e8c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _staff_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _staff_vue_vue_type_template_id_2698749f___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _staff_vue_vue_type_template_id_2698749f___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -689,38 +500,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/attendence/student.vue"
+component.options.__file = "resources/js/components/school-panel/attendence/staff.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/attendence/student.vue?vue&type=script&lang=js&":
-/*!**********************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/attendence/student.vue?vue&type=script&lang=js& ***!
-  \**********************************************************************************************/
+/***/ "./resources/js/components/school-panel/attendence/staff.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/attendence/staff.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_student_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./student.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/student.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_student_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_staff_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./staff.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/staff.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_staff_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/attendence/student.vue?vue&type=template&id=40103e8c&":
-/*!****************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/attendence/student.vue?vue&type=template&id=40103e8c& ***!
-  \****************************************************************************************************/
+/***/ "./resources/js/components/school-panel/attendence/staff.vue?vue&type=template&id=2698749f&":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/attendence/staff.vue?vue&type=template&id=2698749f& ***!
+  \**************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_student_vue_vue_type_template_id_40103e8c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./student.vue?vue&type=template&id=40103e8c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/student.vue?vue&type=template&id=40103e8c&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_student_vue_vue_type_template_id_40103e8c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_staff_vue_vue_type_template_id_2698749f___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./staff.vue?vue&type=template&id=2698749f& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/attendence/staff.vue?vue&type=template&id=2698749f&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_staff_vue_vue_type_template_id_2698749f___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_student_vue_vue_type_template_id_40103e8c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_staff_vue_vue_type_template_id_2698749f___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

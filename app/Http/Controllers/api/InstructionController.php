@@ -27,7 +27,11 @@ class InstructionController extends Controller
             });
         }
 
-        $instructions = $query->paginate($limit);
+        if(!empty($request->type) && $request->type == 'all') {
+            $instructions = $query->orderBy('title')->pluck('title', 'id');
+        } else {
+            $instructions = $query->latest()->paginate($limit);
+        }
 
         return response()->json($instructions);
     }

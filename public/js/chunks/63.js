@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[63],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=script&lang=js&":
-/*!*********************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=script&lang=js& ***!
-  \*********************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=script&lang=js&":
+/*!********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=script&lang=js& ***!
+  \********************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -208,157 +208,22 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var d = new Date();
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      salary: {
-        type: 'Teacher',
-        employee_id: '',
+      deduction: {
+        gender: 'Male',
+        from_amount: '',
+        to_amount: '',
+        type: 'percent',
         name: '',
-        designation: '',
-        grade: '',
-        pan_no: '',
-        bank_name: '',
-        account_no: '',
-        ifsc_code: '',
-        total_days: 0,
-        total_leave: 0,
-        days_paid: 0,
-        basic_salary: 0,
-        previous_due: 0,
-        month: d.getMonth() > 0 ? d.getMonth() - 1 : 11,
-        year: d.getMonth() > 0 ? d.getFullYear() : d.getFullYear() - 1
+        percent: 5,
+        amount: ''
       },
-      employees: {},
-      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-      allowances: [],
-      deductions: [],
-      currentYear: d.getFullYear(),
+      percentages: [],
+      payroll_masters: {},
       success: null,
       errors: [],
       loaded: 0
@@ -366,8 +231,14 @@ var d = new Date();
   },
   validations: function validations() {
     return {
-      salary: {
-        employee_id: {
+      deduction: {
+        to_amount: {
+          required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+        },
+        name: {
+          required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+        },
+        amount: {
           required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
         }
       }
@@ -375,7 +246,13 @@ var d = new Date();
   },
   mounted: function mounted() {
     this.routeLoading();
-    this.fetch_employees();
+    this.fetch_payroll_master(); // if(!this.$route.params.id) {
+    //     view_max_salary_deduction(this.deduction.gender, this.deduction.name)
+    //         .then(res => {
+    //             this.deduction.from_amount = res.data
+    //         })
+    // }
+
     var num = 1;
 
     do {
@@ -383,7 +260,7 @@ var d = new Date();
       if (num < 10) num++;else num += 5;
     } while (num <= 50);
 
-    this.salary.percent = 1;
+    this.deduction.percent = 1;
   },
   methods: {
     routeLoading: function routeLoading() {
@@ -393,81 +270,62 @@ var d = new Date();
         this.loaded = 1;
       }
     },
-    fetch_employees: function fetch_employees() {
+    fetch_last_deduction: function fetch_last_deduction() {
       var _this = this;
 
-      this.salary.employee_id = '';
-      Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["view_users"])("type=all&role=".concat(this.salary.type, "&month=").concat(this.salary.month, "&year=").concat(this.salary.year)).then(function (res) {
-        _this.employees = res.data;
-      });
-    },
-    fetch_employee_info: function fetch_employee_info() {
-      var self = this;
-
-      if (this.salary.employee_id) {
-        Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["view_employee_info"])(this.salary.employee_id, "type=all-details&month=".concat(this.salary.month, "&year=").concat(this.salary.year)).then(function (res) {
-          var _user$EmployeeNumber, _user$Designation, _user$grade, _user$PANNumber, _user$BankName, _user$AccountNumber, _user$IFSCCode, _user$salary;
-
-          var user = res.data;
-          self.salary.name = user.name;
-          self.salary.employee_no = (_user$EmployeeNumber = user['Employee Number']) !== null && _user$EmployeeNumber !== void 0 ? _user$EmployeeNumber : '';
-          self.salary.designation = (_user$Designation = user.Designation) !== null && _user$Designation !== void 0 ? _user$Designation : '';
-          self.salary.grade = (_user$grade = user.grade) !== null && _user$grade !== void 0 ? _user$grade : '';
-          self.salary.pan_no = (_user$PANNumber = user['PAN Number']) !== null && _user$PANNumber !== void 0 ? _user$PANNumber : '';
-          self.salary.bank_name = (_user$BankName = user['Bank Name']) !== null && _user$BankName !== void 0 ? _user$BankName : '';
-          self.salary.account_no = (_user$AccountNumber = user['Account Number']) !== null && _user$AccountNumber !== void 0 ? _user$AccountNumber : '';
-          self.salary.ifsc_code = (_user$IFSCCode = user['IFSC Code']) !== null && _user$IFSCCode !== void 0 ? _user$IFSCCode : '';
-          self.salary.basic_salary = (_user$salary = user.salary) !== null && _user$salary !== void 0 ? _user$salary : '';
-          self.salary.total_days = user.total_days;
-          self.salary.days_paid = user.paid_days;
-          self.salary.total_leave = user.total_days - user.paid_days;
-          self.allowances = user.allowance;
-          self.deductions = user.deduction;
+      if (!this.$route.params.id && this.deduction.gender && this.deduction.name) {
+        Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["view_max_salary_deduction"])(this.deduction.gender, this.deduction.name).then(function (res) {
+          _this.deduction.from_amount = res.data;
         });
       }
     },
-    getInfo: function getInfo() {
+    fetch_payroll_master: function fetch_payroll_master() {
       var _this2 = this;
 
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["view_all_payroll_masters"])('deduction').then(function (res) {
+        _this2.payroll_masters = res.data;
+      });
+    },
+    getInfo: function getInfo() {
+      var _this3 = this;
+
       this.loaded = 0;
-      Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["show_salary_slip"])(this.$route.params.id).then(function (res) {
-        _this2.allowance = res.data;
-        _this2.loaded = 1;
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["show_deduction"])(this.$route.params.id).then(function (res) {
+        _this3.deduction = res.data;
+        _this3.loaded = 1;
       });
     },
     saveData: function saveData() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.$v.$touch();
 
       if (!this.$v.$anyError) {
         this.loaded = 0;
         var params = {
-          salary: this.salary,
-          allowances: this.allowances,
-          deductions: this.deductions
+          deduction: this.deduction
         };
 
         if (!this.$route.params.id) {
-          Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["add_salary_slip"])(params).then(function (res) {
-            _this3.loaded = 1;
+          Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["add_deduction"])(params).then(function (res) {
+            _this4.loaded = 1;
 
-            _this3.$router.push({
-              name: 'PayrollSalarySlip'
+            _this4.$router.push({
+              name: 'PayrollDeduction'
             });
           })["catch"](function (error) {
-            _this3.loaded = 1;
+            _this4.loaded = 1;
             console.log(error);
           });
         } else {
-          Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["edit_salary_slip"])(this.$route.params.id, params).then(function (res) {
-            _this3.loaded = 1;
+          Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["edit_deduction"])(this.$route.params.id, params).then(function (res) {
+            _this4.loaded = 1;
 
-            _this3.$router.push({
-              name: 'PayrollSalarySlip'
+            _this4.$router.push({
+              name: 'PayrollDeduction'
             });
           })["catch"](function (error) {
-            _this3.loaded = 1;
+            _this4.loaded = 1;
             console.log(error);
           });
         }
@@ -478,27 +336,39 @@ var d = new Date();
     "$route.params.id": function $routeParamsId() {
       this.routeLoading();
     },
-    "salary.type": function salaryType() {
+    "deduction.type": function deductionType(type) {
+      if (type == 'percent') {
+        this.percentages = [];
+        var num = 1;
+
+        do {
+          this.percentages.push(num);
+          if (num < 10) num++;else num += 5;
+        } while (num <= 50);
+
+        this.deduction.percent = 1;
+      } else {
+        this.percentages.push(0);
+        this.deduction.percent = 0;
+      }
+
       this.fetch_employees();
     },
-    "salary.employee_id": function salaryEmployee_id() {
-      this.fetch_employee_info();
+    "deduction.gender": function deductionGender() {
+      this.fetch_last_deduction();
     },
-    "salary.month": function salaryMonth() {
-      this.fetch_employee_info();
-    },
-    "salary.year": function salaryYear() {
-      this.fetch_employee_info();
+    "deduction.name": function deductionName() {
+      this.fetch_last_deduction();
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css&":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css& ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css&":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css& ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -507,22 +377,22 @@ exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/c
 
 
 // module
-exports.push([module.i, "\nlabel[data-v-757a3288] {\n    text-transform: capitalize;\n}\n", ""]);
+exports.push([module.i, "\nlabel[data-v-1e8eb4f7] {\n    text-transform: capitalize;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css&":
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css& ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css&":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css& ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-var content = __webpack_require__(/*! !../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css&");
+var content = __webpack_require__(/*! !../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css&");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -544,10 +414,10 @@ if(false) {}
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true&":
-/*!*************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true& ***!
-  \*************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true&":
+/*!************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true& ***!
+  \************************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -574,20 +444,18 @@ var render = function() {
                 staticClass: "fw-btn-fill btn-gradient-yellow text-white",
                 attrs: {
                   to: {
-                    name: "PayrollSalarySlip"
+                    name: "PayrollDeduction"
                   }
                 }
               },
-              [_vm._v("View Salary Slip")]
+              [_vm._v("View Deduction")]
             )
           ],
           1
         ),
         _vm._v(" "),
         _c("h3", [
-          _vm._v(
-            _vm._s(!_vm.$route.params.id ? "Add" : "Edit") + " Salary Slip"
-          )
+          _vm._v(_vm._s(!_vm.$route.params.id ? "Add" : "Edit") + " Deduction")
         ]),
         _vm._v(" "),
         _c("ul", [
@@ -616,8 +484,8 @@ var render = function() {
             [
               _c(
                 "router-link",
-                { attrs: { to: { name: "PayrollSalarySlip" } } },
-                [_vm._v("Salary Slip")]
+                { attrs: { to: { name: "PayrollDeduction" } } },
+                [_vm._v("Deduction")]
               )
             ],
             1
@@ -625,7 +493,7 @@ var render = function() {
           _vm._v(" "),
           _c("li", [
             _vm._v(
-              _vm._s(!_vm.$route.params.id ? "Add" : "Edit") + " Salary Slip"
+              _vm._s(!_vm.$route.params.id ? "Add" : "Edit") + " Deduction"
             )
           ])
         ])
@@ -636,9 +504,7 @@ var render = function() {
         {
           staticClass: "h-auto",
           attrs: {
-            title: !_vm.$route.params.id
-              ? "Create Salary Slip"
-              : "Edit Salary Slip"
+            title: !_vm.$route.params.id ? "Create Deduction" : "Edit Deduction"
           }
         },
         [
@@ -659,10 +525,7 @@ var render = function() {
                 [
                   _c(
                     "b-form-group",
-                    {
-                      staticClass: "col-sm-4",
-                      attrs: { label: "Teacher / Staff *" }
-                    },
+                    { staticClass: "col-sm-4", attrs: { label: "Gender *" } },
                     [
                       _c("label", { staticClass: "mr-2" }, [
                         _c("input", {
@@ -670,26 +533,26 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.salary.type,
-                              expression: "salary.type"
+                              value: _vm.deduction.gender,
+                              expression: "deduction.gender"
                             }
                           ],
                           attrs: {
                             type: "radio",
-                            name: "type",
-                            value: "Teacher"
+                            name: "gender",
+                            value: "Male"
                           },
                           domProps: {
-                            checked: _vm._q(_vm.salary.type, "Teacher")
+                            checked: _vm._q(_vm.deduction.gender, "Male")
                           },
                           on: {
                             change: function($event) {
-                              return _vm.$set(_vm.salary, "type", "Teacher")
+                              return _vm.$set(_vm.deduction, "gender", "Male")
                             }
                           }
                         }),
                         _vm._v(
-                          "\n                        Teacher\n                    "
+                          "\n                        Male\n                    "
                         )
                       ]),
                       _vm._v(" "),
@@ -699,26 +562,55 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.salary.type,
-                              expression: "salary.type"
+                              value: _vm.deduction.gender,
+                              expression: "deduction.gender"
                             }
                           ],
                           attrs: {
                             type: "radio",
-                            name: "type",
-                            value: "Staff"
+                            name: "gender",
+                            value: "Female"
                           },
                           domProps: {
-                            checked: _vm._q(_vm.salary.type, "Staff")
+                            checked: _vm._q(_vm.deduction.gender, "Female")
                           },
                           on: {
                             change: function($event) {
-                              return _vm.$set(_vm.salary, "type", "Staff")
+                              return _vm.$set(_vm.deduction, "gender", "Female")
                             }
                           }
                         }),
                         _vm._v(
-                          "\n                        Staff\n                    "
+                          "\n                        Female\n                    "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "mr-2" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deduction.gender,
+                              expression: "deduction.gender"
+                            }
+                          ],
+                          attrs: {
+                            type: "radio",
+                            name: "gender",
+                            value: "Other"
+                          },
+                          domProps: {
+                            checked: _vm._q(_vm.deduction.gender, "Other")
+                          },
+                          on: {
+                            change: function($event) {
+                              return _vm.$set(_vm.deduction, "gender", "Other")
+                            }
+                          }
+                        }),
+                        _vm._v(
+                          "\n                        Other\n                    "
                         )
                       ])
                     ]
@@ -728,7 +620,7 @@ var render = function() {
                     "b-form-group",
                     {
                       staticClass: "col-sm-4",
-                      attrs: { label: "Select " + _vm.salary.type }
+                      attrs: { label: "Select Deduction" }
                     },
                     [
                       _c(
@@ -738,13 +630,13 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.$v.salary.employee_id.$model,
-                              expression: "$v.salary.employee_id.$model"
+                              value: _vm.$v.deduction.name.$model,
+                              expression: "$v.deduction.name.$model"
                             }
                           ],
                           staticClass: "form-control",
                           class: {
-                            "is-invalid": _vm.$v.salary.employee_id.$error
+                            "is-invalid": _vm.$v.deduction.name.$error
                           },
                           on: {
                             change: function($event) {
@@ -757,7 +649,7 @@ var render = function() {
                                   return val
                                 })
                               _vm.$set(
-                                _vm.$v.salary.employee_id,
+                                _vm.$v.deduction.name,
                                 "$model",
                                 $event.target.multiple
                                   ? $$selectedVal
@@ -771,10 +663,10 @@ var render = function() {
                             _vm._v("Select Name")
                           ]),
                           _vm._v(" "),
-                          _vm._l(_vm.employees, function(name, id) {
+                          _vm._l(_vm.payroll_masters, function(name, id) {
                             return _c(
                               "option",
-                              { key: id, domProps: { value: id } },
+                              { key: id, domProps: { value: name } },
                               [_vm._v(_vm._s(name))]
                             )
                           })
@@ -793,8 +685,125 @@ var render = function() {
                     "b-form-group",
                     {
                       staticClass: "col-sm-2",
-                      attrs: { label: "Select Month" }
+                      attrs: { label: "From Salary Amount" }
                     },
+                    [
+                      _c("b-input", {
+                        attrs: {
+                          type: "number",
+                          placeholder: "From Salary Amount",
+                          readonly: ""
+                        },
+                        model: {
+                          value: _vm.deduction.from_amount,
+                          callback: function($$v) {
+                            _vm.$set(_vm.deduction, "from_amount", $$v)
+                          },
+                          expression: "deduction.from_amount"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-form-group",
+                    {
+                      staticClass: "col-sm-2",
+                      attrs: { label: "To Salary Amount" }
+                    },
+                    [
+                      _c("b-input", {
+                        class: {
+                          "is-invalid": _vm.$v.deduction.to_amount.$error
+                        },
+                        attrs: {
+                          type: "number",
+                          placeholder: "To Salary Amount"
+                        },
+                        model: {
+                          value: _vm.$v.deduction.to_amount.$model,
+                          callback: function($$v) {
+                            _vm.$set(_vm.$v.deduction.to_amount, "$model", $$v)
+                          },
+                          expression: "$v.deduction.to_amount.$model"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("b-form-invalid-feedback", [
+                        _vm._v("Please enter required field.")
+                      ])
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-form-group",
+                    { staticClass: "col-sm-4", attrs: { label: "Type" } },
+                    [
+                      _c("label", { staticClass: "mr-2" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deduction.type,
+                              expression: "deduction.type"
+                            }
+                          ],
+                          attrs: {
+                            type: "radio",
+                            name: "type",
+                            value: "percent"
+                          },
+                          domProps: {
+                            checked: _vm._q(_vm.deduction.type, "percent")
+                          },
+                          on: {
+                            change: function($event) {
+                              return _vm.$set(_vm.deduction, "type", "percent")
+                            }
+                          }
+                        }),
+                        _vm._v(
+                          "\n                        Percent\n                    "
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "mr-2" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.deduction.type,
+                              expression: "deduction.type"
+                            }
+                          ],
+                          attrs: {
+                            type: "radio",
+                            name: "type",
+                            value: "fixed"
+                          },
+                          domProps: {
+                            checked: _vm._q(_vm.deduction.type, "fixed")
+                          },
+                          on: {
+                            change: function($event) {
+                              return _vm.$set(_vm.deduction, "type", "fixed")
+                            }
+                          }
+                        }),
+                        _vm._v(
+                          "\n                        Fixed\n                    "
+                        )
+                      ])
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "b-form-group",
+                    { staticClass: "col-sm-4", attrs: { label: "Percent" } },
                     [
                       _c(
                         "select",
@@ -803,11 +812,12 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.salary.month,
-                              expression: "salary.month"
+                              value: _vm.deduction.percent,
+                              expression: "deduction.percent"
                             }
                           ],
                           staticClass: "form-control",
+                          attrs: { disabled: _vm.deduction.type == "fixed" },
                           on: {
                             change: function($event) {
                               var $$selectedVal = Array.prototype.filter
@@ -819,8 +829,8 @@ var render = function() {
                                   return val
                                 })
                               _vm.$set(
-                                _vm.salary,
-                                "month",
+                                _vm.deduction,
+                                "percent",
                                 $event.target.multiple
                                   ? $$selectedVal
                                   : $$selectedVal[0]
@@ -828,11 +838,11 @@ var render = function() {
                             }
                           }
                         },
-                        _vm._l(_vm.months, function(name, num) {
+                        _vm._l(_vm.percentages, function(percent, index) {
                           return _c(
                             "option",
-                            { key: num, domProps: { value: num } },
-                            [_vm._v(_vm._s(name))]
+                            { key: index, domProps: { value: percent } },
+                            [_vm._v(_vm._s(percent))]
                           )
                         }),
                         0
@@ -843,467 +853,33 @@ var render = function() {
                   _c(
                     "b-form-group",
                     {
-                      staticClass: "col-sm-2",
-                      attrs: { label: "Select Month" }
+                      staticClass: "col-sm-4",
+                      attrs: { label: "Amount (upto)" }
                     },
                     [
-                      _c(
-                        "select",
-                        {
-                          directives: [
-                            {
-                              name: "model",
-                              rawName: "v-model",
-                              value: _vm.salary.year,
-                              expression: "salary.year"
-                            }
-                          ],
-                          staticClass: "form-control",
-                          on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.salary,
-                                "year",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
-                          }
+                      _c("b-input", {
+                        class: {
+                          "is-invalid": _vm.$v.deduction.amount.$error
                         },
-                        [
-                          _c(
-                            "option",
-                            { domProps: { value: _vm.currentYear } },
-                            [_vm._v(_vm._s(_vm.currentYear))]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "option",
-                            { domProps: { value: _vm.currentYear - 1 } },
-                            [_vm._v(_vm._s(_vm.currentYear - 1))]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "option",
-                            { domProps: { value: _vm.currentYear - 2 } },
-                            [_vm._v(_vm._s(_vm.currentYear - 2))]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "option",
-                            { domProps: { value: _vm.currentYear - 3 } },
-                            [_vm._v(_vm._s(_vm.currentYear - 3))]
-                          )
-                        ]
-                      )
-                    ]
+                        attrs: { placeholder: "Enter Amount" },
+                        model: {
+                          value: _vm.$v.deduction.amount.$model,
+                          callback: function($$v) {
+                            _vm.$set(_vm.$v.deduction.amount, "$model", $$v)
+                          },
+                          expression: "$v.deduction.amount.$model"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("b-form-invalid-feedback", [
+                        _vm._v("Please enter required field.")
+                      ])
+                    ],
+                    1
                   )
                 ],
                 1
               ),
-              _vm._v(" "),
-              _vm.salary.employee_id
-                ? _c(
-                    "b-row",
-                    [
-                      _c(
-                        "b-form-group",
-                        { staticClass: "col-sm-2", attrs: { label: "Name" } },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Name", readonly: "" },
-                            model: {
-                              value: _vm.salary.name,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "name", $$v)
-                              },
-                              expression: "salary.name"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Employee No." }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: {
-                              placeholder: "Employee No.",
-                              readonly: ""
-                            },
-                            model: {
-                              value: _vm.salary.employee_no,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "employee_no", $$v)
-                              },
-                              expression: "salary.employee_no"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Designation" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Designation", readonly: "" },
-                            model: {
-                              value: _vm.salary.designation,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "designation", $$v)
-                              },
-                              expression: "salary.designation"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        { staticClass: "col-sm-2", attrs: { label: "Grade" } },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Grade", readonly: "" },
-                            model: {
-                              value: _vm.salary.grade,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "grade", $$v)
-                              },
-                              expression: "salary.grade"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "PAN No." }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "PAN No.", readonly: "" },
-                            model: {
-                              value: _vm.salary.pan_no,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "pan_no", $$v)
-                              },
-                              expression: "salary.pan_no"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Bank Name" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Bank Name", readonly: "" },
-                            model: {
-                              value: _vm.salary.bank_name,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "bank_name", $$v)
-                              },
-                              expression: "salary.bank_name"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Account No." }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Account No.", readonly: "" },
-                            model: {
-                              value: _vm.salary.account_no,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "account_no", $$v)
-                              },
-                              expression: "salary.account_no"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "IFSC Code" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "IFSC Code", readonly: "" },
-                            model: {
-                              value: _vm.salary.ifsc_code,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "ifsc_code", $$v)
-                              },
-                              expression: "salary.ifsc_code"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Total Days in Month" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: {
-                              placeholder: "Total Days in Month",
-                              readonly: ""
-                            },
-                            model: {
-                              value: _vm.salary.total_days,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "total_days", $$v)
-                              },
-                              expression: "salary.total_days"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Days Paid" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Days Paid", readonly: "" },
-                            model: {
-                              value: _vm.salary.days_paid,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "days_paid", $$v)
-                              },
-                              expression: "salary.days_paid"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Total Leave" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: { placeholder: "Leave Taken", readonly: "" },
-                            model: {
-                              value: _vm.salary.total_leave,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "total_leave", $$v)
-                              },
-                              expression: "salary.total_leave"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Basic Salary" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: {
-                              placeholder: "Basic Salary",
-                              readonly: ""
-                            },
-                            model: {
-                              value: _vm.salary.basic_salary,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "basic_salary", $$v)
-                              },
-                              expression: "salary.basic_salary"
-                            }
-                          })
-                        ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-form-group",
-                        {
-                          staticClass: "col-sm-2",
-                          attrs: { label: "Previous Due" }
-                        },
-                        [
-                          _c("b-input", {
-                            attrs: {
-                              type: "number",
-                              min: "0",
-                              placeholder: "Previous Due"
-                            },
-                            model: {
-                              value: _vm.salary.previous_due,
-                              callback: function($$v) {
-                                _vm.$set(_vm.salary, "previous_due", $$v)
-                              },
-                              expression: "salary.previous_due"
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.salary.employee_id
-                ? _c(
-                    "b-row",
-                    [
-                      _c(
-                        "b-col",
-                        { attrs: { sm: "6" } },
-                        [
-                          _c("h4", { staticClass: "card-title" }, [
-                            _vm._v("Allowance")
-                          ]),
-                          _vm._v(" "),
-                          _vm._l(_vm.allowances, function(allowance, i) {
-                            return _c(
-                              "b-row",
-                              { key: i, staticClass: "form-group" },
-                              [
-                                _c(
-                                  "label",
-                                  {
-                                    staticClass: "col-sm-5",
-                                    attrs: { for: "" }
-                                  },
-                                  [_vm._v(_vm._s(allowance.name))]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  { staticClass: "col-sm-7" },
-                                  [
-                                    _c("b-input", {
-                                      attrs: {
-                                        type: "number",
-                                        placeholder: "Amount"
-                                      },
-                                      model: {
-                                        value: allowance.amount,
-                                        callback: function($$v) {
-                                          _vm.$set(allowance, "amount", $$v)
-                                        },
-                                        expression: "allowance.amount"
-                                      }
-                                    })
-                                  ],
-                                  1
-                                )
-                              ]
-                            )
-                          })
-                        ],
-                        2
-                      ),
-                      _vm._v(" "),
-                      _c(
-                        "b-col",
-                        { attrs: { sm: "6" } },
-                        [
-                          _c("h4", { staticClass: "card-title" }, [
-                            _vm._v("Deduction")
-                          ]),
-                          _vm._v(" "),
-                          _vm._l(_vm.deductions, function(deduction, i) {
-                            return _c(
-                              "b-row",
-                              { key: i, staticClass: "form-group" },
-                              [
-                                _c(
-                                  "label",
-                                  {
-                                    staticClass: "col-sm-5",
-                                    attrs: { for: "" }
-                                  },
-                                  [_vm._v(_vm._s(deduction.name))]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "div",
-                                  { staticClass: "col-sm-7" },
-                                  [
-                                    _c("b-input", {
-                                      attrs: {
-                                        type: "number",
-                                        placeholder: "Amount"
-                                      },
-                                      model: {
-                                        value: deduction.amount,
-                                        callback: function($$v) {
-                                          _vm.$set(deduction, "amount", $$v)
-                                        },
-                                        expression: "deduction.amount"
-                                      }
-                                    })
-                                  ],
-                                  1
-                                )
-                              ]
-                            )
-                          })
-                        ],
-                        2
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
               _vm._v(" "),
               _c(
                 "button",
@@ -1340,18 +916,18 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue":
-/*!************************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/AddSalarySlip.vue ***!
-  \************************************************************************/
+/***/ "./resources/js/components/school-panel/payroll/AddDeduction.vue":
+/*!***********************************************************************!*\
+  !*** ./resources/js/components/school-panel/payroll/AddDeduction.vue ***!
+  \***********************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _AddSalarySlip_vue_vue_type_template_id_757a3288_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true& */ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true&");
-/* harmony import */ var _AddSalarySlip_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AddSalarySlip.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css& */ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css&");
+/* harmony import */ var _AddDeduction_vue_vue_type_template_id_1e8eb4f7_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true& */ "./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true&");
+/* harmony import */ var _AddDeduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AddDeduction.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css& */ "./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css&");
 /* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -1362,66 +938,66 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
-  _AddSalarySlip_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _AddSalarySlip_vue_vue_type_template_id_757a3288_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _AddSalarySlip_vue_vue_type_template_id_757a3288_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _AddDeduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _AddDeduction_vue_vue_type_template_id_1e8eb4f7_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _AddDeduction_vue_vue_type_template_id_1e8eb4f7_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
-  "757a3288",
+  "1e8eb4f7",
   null
   
 )
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/payroll/AddSalarySlip.vue"
+component.options.__file = "resources/js/components/school-panel/payroll/AddDeduction.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************************/
+/***/ "./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=script&lang=js&":
+/*!************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=script&lang=js& ***!
+  \************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddSalarySlip.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddDeduction.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css&":
-/*!*********************************************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css& ***!
-  \*********************************************************************************************************************************/
+/***/ "./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css&":
+/*!********************************************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader!../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=style&index=0&id=757a3288&scoped=true&lang=css&");
-/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
-/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
- /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_style_index_0_id_757a3288_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader!../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=style&index=0&id=1e8eb4f7&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_style_index_0_id_1e8eb4f7_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true&":
-/*!*******************************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true& ***!
-  \*******************************************************************************************************************/
+/***/ "./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true&":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true& ***!
+  \******************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_template_id_757a3288_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddSalarySlip.vue?vue&type=template&id=757a3288&scoped=true&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_template_id_757a3288_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_template_id_1e8eb4f7_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/AddDeduction.vue?vue&type=template&id=1e8eb4f7&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_template_id_1e8eb4f7_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AddSalarySlip_vue_vue_type_template_id_757a3288_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_AddDeduction_vue_vue_type_template_id_1e8eb4f7_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

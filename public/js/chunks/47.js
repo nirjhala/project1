@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[47],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/add.vue?vue&type=script&lang=js&":
-/*!***********************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/subject/add.vue?vue&type=script&lang=js& ***!
-  \***********************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/shift/add.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/shift/add.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -78,19 +78,55 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  name: 'addShift',
   data: function data() {
     return {
       id: '',
-      subjectName: '',
+      shiftName: '',
+      openingTime: '',
+      closingTime: '',
       errors: [],
       loaded: 0,
       token: localStorage.getItem('token')
     };
   },
   validations: {
-    subjectName: {
+    shiftName: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    openingTime: {
+      required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
+    },
+    closingTime: {
       required: vuelidate_lib_validators__WEBPACK_IMPORTED_MODULE_0__["required"]
     }
   },
@@ -114,23 +150,27 @@ __webpack_require__.r(__webpack_exports__);
           'Accept': 'application/json'
         }
       });
-      instance.get('get-subject-info/' + id).then(function (res) {
+      instance.get('get-shift-info/' + id).then(function (res) {
         _this.id = res.data.data.id;
-        _this.subjectName = res.data.data.name;
+        _this.shiftName = res.data.data.shift_name;
+        _this.openingTime = res.data.data.shift_opening_time;
+        _this.closingTime = res.data.data.shift_closing_time;
         _this.loaded = 1;
         $('.select2').each(function () {
           $(this).trigger('change');
         });
       });
     },
-    addData: function addData() {
+    addSession: function addSession() {
       var _this2 = this;
 
       this.$v.$touch();
 
       if (!this.$v.$anyError) {
         var params = {
-          name: this.subjectName
+          shift_name: this.shiftName,
+          shift_opening_time: this.openingTime,
+          shift_closing_time: this.closingTime
         };
         this.loaded = 0;
         var instance = axios.create({
@@ -140,10 +180,10 @@ __webpack_require__.r(__webpack_exports__);
             'Accept': 'application/json'
           }
         });
-        instance.post('add-subject', params).then(function (res) {
+        instance.post('add-shift', params).then(function (res) {
           if (res.data.status) {
             _this2.$router.push({
-              name: 'subject'
+              name: 'shift'
             }).then(function (res) {
               _this2.loaded = 1;
 
@@ -170,7 +210,9 @@ __webpack_require__.r(__webpack_exports__);
       if (!this.$v.$anyError) {
         var params = {
           id: this.id,
-          name: this.subjectName
+          shift_name: this.shiftName,
+          shift_opening_time: this.openingTime,
+          shift_closing_time: this.closingTime
         };
         this.loaded = 0;
         var instance = axios.create({
@@ -180,10 +222,10 @@ __webpack_require__.r(__webpack_exports__);
             'Accept': 'application/json'
           }
         });
-        instance.post('update-subject', params).then(function (res) {
+        instance.post('update-shift', params).then(function (res) {
           if (res.data.status) {
             _this3.$router.push({
-              name: 'subject'
+              name: 'shift'
             }).then(function (res) {
               _this3.loaded = 1;
 
@@ -207,10 +249,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/add.vue?vue&type=template&id=72fd0c36&":
-/*!***************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/subject/add.vue?vue&type=template&id=72fd0c36& ***!
-  \***************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/shift/add.vue?vue&type=template&id=75e5d2fb&":
+/*!*************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/shift/add.vue?vue&type=template&id=75e5d2fb& ***!
+  \*************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -232,15 +274,15 @@ var render = function() {
             "router-link",
             {
               staticClass: "fw-btn-fill btn-gradient-yellow text-white",
-              attrs: { to: { name: "subject" } }
+              attrs: { to: { name: "shift" } }
             },
-            [_vm._v("View Subject")]
+            [_vm._v("View Shift")]
           )
         ],
         1
       ),
       _vm._v(" "),
-      _c("h3", [_vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Subject")]),
+      _c("h3", [_vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Shift")]),
       _vm._v(" "),
       _c("ul", [
         _c(
@@ -256,14 +298,14 @@ var render = function() {
         _c(
           "li",
           [
-            _c("router-link", { attrs: { to: { name: "subject" } } }, [
-              _vm._v("Subject")
+            _c("router-link", { attrs: { to: { name: "shift" } } }, [
+              _vm._v("Shift")
             ])
           ],
           1
         ),
         _vm._v(" "),
-        _c("li", [_vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Subject")])
+        _c("li", [_vm._v(_vm._s(!_vm.id ? "Add" : "Edit") + " Shift")])
       ])
     ]),
     _vm._v(" "),
@@ -283,7 +325,7 @@ var render = function() {
               _c("div", { staticClass: "heading-layout1" }, [
                 _c("div", { staticClass: "item-title" }, [
                   _c("h3", [
-                    _vm._v(_vm._s(!_vm.id ? "Add New" : "Edit") + " Subject")
+                    _vm._v(_vm._s(!_vm.id ? "Add New" : "Edit") + " Shift")
                   ])
                 ])
               ]),
@@ -291,10 +333,11 @@ var render = function() {
               _c(
                 "form",
                 {
+                  staticClass: "new-added-form",
                   on: {
                     submit: function($event) {
                       $event.preventDefault()
-                      _vm.id ? _vm.updateData() : _vm.addData()
+                      _vm.id ? _vm.updateData() : _vm.addSession()
                     }
                   }
                 },
@@ -346,30 +389,123 @@ var render = function() {
                           directives: [
                             {
                               name: "model",
-                              rawName: "v-model",
-                              value: _vm.$v.subjectName.$model,
-                              expression: "$v.subjectName.$model"
+                              rawName: "v-model.trim",
+                              value: _vm.$v.shiftName.$model,
+                              expression: "$v.shiftName.$model",
+                              modifiers: { trim: true }
                             }
                           ],
                           staticClass: "form-control",
                           class: {
-                            "is-invalid": _vm.$v.subjectName.$error
+                            "is-invalid": _vm.$v.shiftName.$error
                           },
                           attrs: {
                             type: "text",
-                            placeholder: "like Hindi, English, Maths etc."
+                            placeholder: "like Morning, Evening etc.",
+                            value: ""
                           },
-                          domProps: { value: _vm.$v.subjectName.$model },
+                          domProps: { value: _vm.$v.shiftName.$model },
                           on: {
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
                               }
                               _vm.$set(
-                                _vm.$v.subjectName,
+                                _vm.$v.shiftName,
+                                "$model",
+                                $event.target.value.trim()
+                              )
+                            },
+                            blur: function($event) {
+                              return _vm.$forceUpdate()
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("b-form-invalid-feedback", [
+                          _vm._v("Please enter required field.")
+                        ])
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Opening Time *")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.$v.openingTime.$model,
+                              expression: "$v.openingTime.$model"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: {
+                            "is-invalid": _vm.$v.openingTime.$error
+                          },
+                          attrs: { type: "time", placeholder: "Opening Time" },
+                          domProps: { value: _vm.$v.openingTime.$model },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.$v.openingTime,
                                 "$model",
                                 $event.target.value
                               )
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("b-form-invalid-feedback", [
+                          _vm._v("Please enter required field.")
+                        ])
+                      ],
+                      1
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "div",
+                      { staticClass: "col-xl-3 col-lg-6 col-12 form-group" },
+                      [
+                        _c("label", [_vm._v("Closing Time *")]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model.trim",
+                              value: _vm.$v.closingTime.$model,
+                              expression: "$v.closingTime.$model",
+                              modifiers: { trim: true }
+                            }
+                          ],
+                          staticClass: "form-control",
+                          class: {
+                            "is-invalid": _vm.$v.closingTime.$error
+                          },
+                          attrs: { type: "time", placeholder: "Closing Time" },
+                          domProps: { value: _vm.$v.closingTime.$model },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.$v.closingTime,
+                                "$model",
+                                $event.target.value.trim()
+                              )
+                            },
+                            blur: function($event) {
+                              return _vm.$forceUpdate()
                             }
                           }
                         }),
@@ -420,17 +556,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/subject/add.vue":
-/*!**************************************************************!*\
-  !*** ./resources/js/components/school-panel/subject/add.vue ***!
-  \**************************************************************/
+/***/ "./resources/js/components/school-panel/shift/add.vue":
+/*!************************************************************!*\
+  !*** ./resources/js/components/school-panel/shift/add.vue ***!
+  \************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _add_vue_vue_type_template_id_72fd0c36___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add.vue?vue&type=template&id=72fd0c36& */ "./resources/js/components/school-panel/subject/add.vue?vue&type=template&id=72fd0c36&");
-/* harmony import */ var _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./add.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/subject/add.vue?vue&type=script&lang=js&");
+/* harmony import */ var _add_vue_vue_type_template_id_75e5d2fb___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./add.vue?vue&type=template&id=75e5d2fb& */ "./resources/js/components/school-panel/shift/add.vue?vue&type=template&id=75e5d2fb&");
+/* harmony import */ var _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./add.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/shift/add.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -441,8 +577,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _add_vue_vue_type_template_id_72fd0c36___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _add_vue_vue_type_template_id_72fd0c36___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _add_vue_vue_type_template_id_75e5d2fb___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _add_vue_vue_type_template_id_75e5d2fb___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -452,38 +588,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/subject/add.vue"
+component.options.__file = "resources/js/components/school-panel/shift/add.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/subject/add.vue?vue&type=script&lang=js&":
-/*!***************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/subject/add.vue?vue&type=script&lang=js& ***!
-  \***************************************************************************************/
+/***/ "./resources/js/components/school-panel/shift/add.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/shift/add.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/add.vue?vue&type=script&lang=js&");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/shift/add.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/subject/add.vue?vue&type=template&id=72fd0c36&":
-/*!*********************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/subject/add.vue?vue&type=template&id=72fd0c36& ***!
-  \*********************************************************************************************/
+/***/ "./resources/js/components/school-panel/shift/add.vue?vue&type=template&id=75e5d2fb&":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/shift/add.vue?vue&type=template&id=75e5d2fb& ***!
+  \*******************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_72fd0c36___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=template&id=72fd0c36& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/subject/add.vue?vue&type=template&id=72fd0c36&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_72fd0c36___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_75e5d2fb___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./add.vue?vue&type=template&id=75e5d2fb& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/shift/add.vue?vue&type=template&id=75e5d2fb&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_75e5d2fb___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_72fd0c36___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_add_vue_vue_type_template_id_75e5d2fb___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

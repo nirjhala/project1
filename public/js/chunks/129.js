@@ -1,17 +1,15 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[129],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _api_script__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../api/script */ "./resources/js/api/script.js");
+/* harmony import */ var _api_script__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../api/script */ "./resources/js/api/script.js");
 //
 //
 //
@@ -114,84 +112,118 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
-      errors: 0,
-      lists: {},
-      allSelected: 0,
-      check: [],
       s: '',
-      loaded: 1
+      limit: 10,
+      checkAll: false,
+      test: {
+        check: [],
+        fields: [{
+          key: 'index',
+          label: 'Sr. No.'
+        }, {
+          key: 'name',
+          sortable: true
+        }, {
+          key: 'duration',
+          sortable: true
+        }, {
+          key: 'date',
+          sortable: true
+        }, 'expire_in', {
+          key: 'total_questions',
+          sortable: true
+        }]
+      },
+      tests: {}
     };
   },
   mounted: function mounted() {
-    this.getRecords();
+    this.fetchTests();
   },
   methods: {
-    searchAfterDebounce: lodash__WEBPACK_IMPORTED_MODULE_0___default.a.debounce(function () {
-      this.getRecords();
+    searchAfterDebounce: _.debounce(function () {
+      this.fetchTests();
     }, 500),
-    checkAll: function checkAll() {
-      var self = this;
-      self.check = [];
+    selectAll: function selectAll() {
+      this.test.check = [];
 
-      if (!self.allSelected) {
-        $.each(self.lists.data, function (i, row) {
-          self.check.push(row.id);
-        });
+      if (!this.checkAll) {
+        for (var index in this.tests.data) {
+          if (!this.tests.data[index].stock) {
+            this.test.check.push(this.tests.data[index].id);
+          }
+        }
       }
     },
-    getRecords: function getRecords(page) {
+    fetchTests: function fetchTests() {
       var _this = this;
 
-      if (typeof page === 'undefined') {
-        page = 1;
-      }
+      var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+      this.tests = {};
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_test"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
+        _this.tests = res.data;
+      });
+    },
+    deleteMultiple: function deleteMultiple() {
+      var _this2 = this;
 
-      this.loaded = 0;
-      Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["view_deduction"])().then(function (res) {
-        _this.lists = res.data;
-        _this.loaded = 1;
-      });
-    },
-    resetSearch: function resetSearch() {
-      this.search = {
-        s: ''
-      };
-      this.getRecords();
-    },
-    deleteRecord: function deleteRecord(id) {
-      var self = this;
-      swal({
-        title: "Are you sure?",
-        text: "Once deleted, you will not be able to recover this record!",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true
-      }).then(function (willDelete) {
-        Object(_api_script__WEBPACK_IMPORTED_MODULE_1__["delete_deduction"])(id).then(function (res) {
-          self.$toast.success(res.data.message);
-          self.getRecords();
+      if (this.test.check.length) {
+        swal({
+          title: "Are you sure?",
+          text: "Once deleted, you will not be able to recover this record!",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true
+        }).then(function (willDelete) {
+          if (willDelete) {
+            Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["multiple_delete_test"])({
+              ids: _this2.test.check
+            }).then(function (res) {
+              _this2.$toast.success(res.data.message);
+
+              _this2.fetchTests(1);
+            });
+          }
         });
-      });
+      } else {
+        swal("Warning", "Please select at least one record to delete.", "warning");
+      }
     }
   },
   watch: {
-    "s": function s() {
+    s: function s() {
       this.searchAfterDebounce();
+    },
+    limit: function limit() {
+      this.fetchTests(1);
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=template&id=4512c27c&":
-/*!*********************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=template&id=4512c27c& ***!
-  \*********************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=template&id=3db82b8e&":
+/*!*************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=template&id=3db82b8e& ***!
+  \*************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -205,10 +237,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    {
-      staticClass: "dashboard-content-one",
-      staticStyle: { "text-transform": "capitialize" }
-    },
+    { staticClass: "dashboard-content-one" },
     [
       _c("div", { staticClass: "breadcrumbs-area" }, [
         _c(
@@ -221,17 +250,17 @@ var render = function() {
                 staticClass: "fw-btn-fill btn-gradient-yellow text-white",
                 attrs: {
                   to: {
-                    name: "AddPayrollDeduction"
+                    name: "AddTest"
                   }
                 }
               },
-              [_vm._v("Add New")]
+              [_vm._v("Add Tests")]
             )
           ],
           1
         ),
         _vm._v(" "),
-        _c("h3", [_vm._v("Deduction")]),
+        _c("h3", [_vm._v("View Tests")]),
         _vm._v(" "),
         _c("ul", [
           _c(
@@ -247,223 +276,392 @@ var render = function() {
           _c(
             "li",
             [
-              _c("router-link", { attrs: { to: { name: "PayrollMaster" } } }, [
-                _vm._v("Payroll Management Master")
-              ])
+              _c(
+                "router-link",
+                { attrs: { to: { name: "OnlineExamMaster" } } },
+                [_vm._v("Online Exam Master")]
+              )
             ],
             1
           ),
           _vm._v(" "),
-          _c("li", [_vm._v("Deduction")])
+          _c("li", [_vm._v("View Tests")])
         ])
       ]),
       _vm._v(" "),
-      _c("form", { attrs: { method: "post" } }, [
-        _c("div", { staticClass: "card height-auto" }, [
-          _c("div", { staticClass: "card-body" }, [
-            !_vm.loaded
-              ? _c("div", { staticClass: "text-center" }, [
-                  _c("img", {
-                    staticStyle: { "max-width": "100%" },
-                    attrs: { src: _vm.baseURL + "img/preloader.gif", alt: "" }
-                  })
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.loaded
-              ? _c("div", [
-                  _vm.lists
-                    ? _c("div", [
-                        _c("div", { staticClass: "table-responsive" }, [
-                          _c(
-                            "table",
-                            {
-                              staticClass:
-                                "table table-bordered display data-table text-nowrap"
+      _c(
+        "b-form-group",
+        [
+          _c("b-input", {
+            attrs: { type: "search", placeholder: "Search ..." },
+            model: {
+              value: _vm.s,
+              callback: function($$v) {
+                _vm.s = typeof $$v === "string" ? $$v.trim() : $$v
+              },
+              expression: "s"
+            }
+          })
+        ],
+        1
+      ),
+      _vm._v(" "),
+      !_vm.tests.data
+        ? _c(
+            "b-card",
+            { staticClass: "text-center h-auto" },
+            [
+              _c("b-spinner", {
+                staticStyle: { width: "48px", height: "48px" },
+                attrs: { label: "Spinning" }
+              })
+            ],
+            1
+          )
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.tests.data
+        ? _c(
+            "div",
+            [
+              !_vm.tests.data.length
+                ? _c("b-card", { staticClass: "h-auto" }, [
+                    _vm._v("\n            No record(s) found.\n        ")
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.tests.data.length
+                ? _c(
+                    "b-card",
+                    {
+                      staticClass: "h-auto",
+                      scopedSlots: _vm._u(
+                        [
+                          {
+                            key: "header",
+                            fn: function() {
+                              return [
+                                _c("div", { staticClass: "float-right" }, [
+                                  _vm._v(
+                                    "\n                    " +
+                                      _vm._s(_vm.tests.from) +
+                                      " - " +
+                                      _vm._s(_vm.tests.to) +
+                                      " of " +
+                                      _vm._s(_vm.tests.total) +
+                                      " record(s) are showing.\n                "
+                                  )
+                                ]),
+                                _vm._v(" "),
+                                _c("a", {
+                                  staticClass: "icon icon-delete text-dark",
+                                  attrs: {
+                                    href: "javascript:",
+                                    title: "Remove Selected"
+                                  },
+                                  on: { click: _vm.deleteMultiple }
+                                }),
+                                _vm._v(" "),
+                                _c(
+                                  "select",
+                                  {
+                                    directives: [
+                                      {
+                                        name: "model",
+                                        rawName: "v-model",
+                                        value: _vm.limit,
+                                        expression: "limit"
+                                      }
+                                    ],
+                                    on: {
+                                      change: function($event) {
+                                        var $$selectedVal = Array.prototype.filter
+                                          .call($event.target.options, function(
+                                            o
+                                          ) {
+                                            return o.selected
+                                          })
+                                          .map(function(o) {
+                                            var val =
+                                              "_value" in o ? o._value : o.value
+                                            return val
+                                          })
+                                        _vm.limit = $event.target.multiple
+                                          ? $$selectedVal
+                                          : $$selectedVal[0]
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("option", { attrs: { value: "10" } }, [
+                                      _vm._v("10")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("option", { attrs: { value: "25" } }, [
+                                      _vm._v("25")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("option", { attrs: { value: "50" } }, [
+                                      _vm._v("50")
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("option", { attrs: { value: "100" } }, [
+                                      _vm._v("100")
+                                    ])
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("span", [_vm._v("Per Page")])
+                              ]
                             },
-                            [
-                              _vm._m(0),
-                              _vm._v(" "),
-                              _vm._l(_vm.lists, function(listItem, gender) {
-                                return [
-                                  _c(
-                                    "tbody",
-                                    { key: gender },
-                                    [
-                                      _c("tr", [
-                                        _c(
-                                          "th",
-                                          {
-                                            staticClass: "bg-dark text-white",
-                                            attrs: { colspan: "8" }
-                                          },
-                                          [_vm._v(_vm._s(gender))]
-                                        )
-                                      ]),
-                                      _vm._v(" "),
-                                      _vm._l(listItem, function(allList, name) {
-                                        return _vm._l(allList, function(
-                                          list,
-                                          j
-                                        ) {
-                                          return _c(
-                                            "tr",
+                            proxy: true
+                          }
+                        ],
+                        null,
+                        false,
+                        1160238804
+                      )
+                    },
+                    [
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "table-responsive" },
+                        [
+                          _c("b-table", {
+                            attrs: {
+                              fields: _vm.test.fields,
+                              items: _vm.tests.data,
+                              striped: "",
+                              bordered: ""
+                            },
+                            scopedSlots: _vm._u(
+                              [
+                                {
+                                  key: "head(index)",
+                                  fn: function(data) {
+                                    return [
+                                      _c("label", [
+                                        _c("input", {
+                                          directives: [
                                             {
-                                              key: gender + "-" + name + "-" + j
+                                              name: "model",
+                                              rawName: "v-model",
+                                              value: _vm.checkAll,
+                                              expression: "checkAll"
+                                            }
+                                          ],
+                                          attrs: {
+                                            type: "checkbox",
+                                            value: "1"
+                                          },
+                                          domProps: {
+                                            checked: Array.isArray(_vm.checkAll)
+                                              ? _vm._i(_vm.checkAll, "1") > -1
+                                              : _vm.checkAll
+                                          },
+                                          on: {
+                                            click: _vm.selectAll,
+                                            change: function($event) {
+                                              var $$a = _vm.checkAll,
+                                                $$el = $event.target,
+                                                $$c = $$el.checked
+                                                  ? true
+                                                  : false
+                                              if (Array.isArray($$a)) {
+                                                var $$v = "1",
+                                                  $$i = _vm._i($$a, $$v)
+                                                if ($$el.checked) {
+                                                  $$i < 0 &&
+                                                    (_vm.checkAll = $$a.concat([
+                                                      $$v
+                                                    ]))
+                                                } else {
+                                                  $$i > -1 &&
+                                                    (_vm.checkAll = $$a
+                                                      .slice(0, $$i)
+                                                      .concat(
+                                                        $$a.slice($$i + 1)
+                                                      ))
+                                                }
+                                              } else {
+                                                _vm.checkAll = $$c
+                                              }
+                                            }
+                                          }
+                                        }),
+                                        _vm._v(
+                                          "\n                            " +
+                                            _vm._s(data.label) +
+                                            "\n                        "
+                                        )
+                                      ])
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "cell(index)",
+                                  fn: function(data) {
+                                    return [
+                                      _c("label", [
+                                        !data.item.stock
+                                          ? _c("input", {
+                                              directives: [
+                                                {
+                                                  name: "model",
+                                                  rawName: "v-model",
+                                                  value: _vm.test.check,
+                                                  expression: "test.check"
+                                                }
+                                              ],
+                                              attrs: { type: "checkbox" },
+                                              domProps: {
+                                                value: data.item.id,
+                                                checked: Array.isArray(
+                                                  _vm.test.check
+                                                )
+                                                  ? _vm._i(
+                                                      _vm.test.check,
+                                                      data.item.id
+                                                    ) > -1
+                                                  : _vm.test.check
+                                              },
+                                              on: {
+                                                change: function($event) {
+                                                  var $$a = _vm.test.check,
+                                                    $$el = $event.target,
+                                                    $$c = $$el.checked
+                                                      ? true
+                                                      : false
+                                                  if (Array.isArray($$a)) {
+                                                    var $$v = data.item.id,
+                                                      $$i = _vm._i($$a, $$v)
+                                                    if ($$el.checked) {
+                                                      $$i < 0 &&
+                                                        _vm.$set(
+                                                          _vm.test,
+                                                          "check",
+                                                          $$a.concat([$$v])
+                                                        )
+                                                    } else {
+                                                      $$i > -1 &&
+                                                        _vm.$set(
+                                                          _vm.test,
+                                                          "check",
+                                                          $$a
+                                                            .slice(0, $$i)
+                                                            .concat(
+                                                              $$a.slice($$i + 1)
+                                                            )
+                                                        )
+                                                    }
+                                                  } else {
+                                                    _vm.$set(
+                                                      _vm.test,
+                                                      "check",
+                                                      $$c
+                                                    )
+                                                  }
+                                                }
+                                              }
+                                            })
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        data.item.stock
+                                          ? _c("span", {
+                                              staticClass: "icon-x-square"
+                                            })
+                                          : _vm._e(),
+                                        _vm._v(
+                                          "\n                            " +
+                                            _vm._s(
+                                              data.index + _vm.tests.from
+                                            ) +
+                                            ".\n                        "
+                                        )
+                                      ])
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "cell(name)",
+                                  fn: function(data) {
+                                    return [
+                                      _c(
+                                        "div",
+                                        [
+                                          _c(
+                                            "router-link",
+                                            {
+                                              attrs: {
+                                                to: {
+                                                  name: "EditTest",
+                                                  params: {
+                                                    id: data.item.id
+                                                  }
+                                                }
+                                              }
                                             },
                                             [
-                                              _c("td", [
-                                                _vm._v(
-                                                  "\n                                                    " +
-                                                    _vm._s(1 + j) +
-                                                    ".\n                                                "
-                                                )
-                                              ]),
-                                              _vm._v(" "),
-                                              j == 0
-                                                ? _c(
-                                                    "td",
-                                                    {
-                                                      attrs: {
-                                                        rowspan: allList.length
-                                                      }
-                                                    },
-                                                    [
-                                                      _vm._v(
-                                                        "\n                                                    " +
-                                                          _vm._s(list.name) +
-                                                          "\n                                                "
-                                                      )
-                                                    ]
-                                                  )
-                                                : _vm._e(),
-                                              _vm._v(" "),
-                                              _c("td", [
-                                                _vm._v(_vm._s(list.from_amount))
-                                              ]),
-                                              _vm._v(" "),
-                                              _c("td", [
-                                                _vm._v(_vm._s(list.to_amount))
-                                              ]),
-                                              _vm._v(" "),
-                                              _c("td", [
-                                                _vm._v(_vm._s(list.type))
-                                              ]),
-                                              _vm._v(" "),
-                                              _c("td", [
-                                                _vm._v(
-                                                  _vm._s(list.percent) + "%"
-                                                )
-                                              ]),
-                                              _vm._v(" "),
-                                              _c("td", [
-                                                _vm._v(_vm._s(list.amount))
-                                              ]),
-                                              _vm._v(" "),
-                                              _c(
-                                                "td",
-                                                [
-                                                  j == allList.length - 2
-                                                    ? _c(
-                                                        "b-button",
-                                                        {
-                                                          attrs: {
-                                                            type: "button",
-                                                            variant: "danger"
-                                                          },
-                                                          on: {
-                                                            click: function(
-                                                              $event
-                                                            ) {
-                                                              return _vm.deleteRecord(
-                                                                list.id
-                                                              )
-                                                            }
-                                                          }
-                                                        },
-                                                        [
-                                                          _c("i", {
-                                                            staticClass:
-                                                              "icon-minus1"
-                                                          }),
-                                                          _vm._v(" Remove")
-                                                        ]
-                                                      )
-                                                    : _vm._e()
-                                                ],
-                                                1
+                                              _c("i", {
+                                                staticClass: "icon-mode_edit"
+                                              }),
+                                              _vm._v(
+                                                " " + _vm._s(data.item.name)
                                               )
                                             ]
                                           )
-                                        })
-                                      })
-                                    ],
-                                    2
-                                  )
-                                ]
-                              })
-                            ],
-                            2
-                          )
-                        ])
-                      ])
-                    : _vm._e()
-                ])
-              : _vm._e()
-          ])
-        ])
-      ])
-    ]
+                                        ],
+                                        1
+                                      )
+                                    ]
+                                  }
+                                }
+                              ],
+                              null,
+                              false,
+                              3993975269
+                            )
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("pagination", {
+                        attrs: { data: _vm.tests, limit: 2 },
+                        on: { "pagination-change-page": _vm.fetchTests }
+                      })
+                    ],
+                    1
+                  )
+                : _vm._e()
+            ],
+            1
+          )
+        : _vm._e()
+    ],
+    1
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [
-          _vm._v(
-            "\n                                            Sr. No.\n                                        "
-          )
-        ]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Name")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("From")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("To")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Type")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Percent")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Upto Amount")]),
-        _vm._v(" "),
-        _c("th")
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/Deduction.vue":
-/*!********************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/Deduction.vue ***!
-  \********************************************************************/
+/***/ "./resources/js/components/school-panel/onlineexam/test/index.vue":
+/*!************************************************************************!*\
+  !*** ./resources/js/components/school-panel/onlineexam/test/index.vue ***!
+  \************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Deduction_vue_vue_type_template_id_4512c27c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Deduction.vue?vue&type=template&id=4512c27c& */ "./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=template&id=4512c27c&");
-/* harmony import */ var _Deduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Deduction.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _index_vue_vue_type_template_id_3db82b8e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=3db82b8e& */ "./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=template&id=3db82b8e&");
+/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -472,9 +670,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _Deduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Deduction_vue_vue_type_template_id_4512c27c___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _Deduction_vue_vue_type_template_id_4512c27c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _index_vue_vue_type_template_id_3db82b8e___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _index_vue_vue_type_template_id_3db82b8e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -484,38 +682,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/payroll/Deduction.vue"
+component.options.__file = "resources/js/components/school-panel/onlineexam/test/index.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=script&lang=js&":
-/*!*********************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=script&lang=js& ***!
-  \*********************************************************************************************/
+/***/ "./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Deduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Deduction.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Deduction_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=template&id=4512c27c&":
-/*!***************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=template&id=4512c27c& ***!
-  \***************************************************************************************************/
+/***/ "./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=template&id=3db82b8e&":
+/*!*******************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=template&id=3db82b8e& ***!
+  \*******************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Deduction_vue_vue_type_template_id_4512c27c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Deduction.vue?vue&type=template&id=4512c27c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/payroll/Deduction.vue?vue&type=template&id=4512c27c&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Deduction_vue_vue_type_template_id_4512c27c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_3db82b8e___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=3db82b8e& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/onlineexam/test/index.vue?vue&type=template&id=3db82b8e&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_3db82b8e___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Deduction_vue_vue_type_template_id_4512c27c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_3db82b8e___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[116],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=script&lang=js&":
-/*!********************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=script&lang=js& ***!
-  \********************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -120,102 +120,64 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       s: '',
-      limit: 10,
+      limit: 100,
       checkAll: false,
-      sale: {
+      stock: {
         check: [],
         fields: [{
           key: 'index',
           label: 'Sr. No.'
         }, {
-          key: 'customer_name',
+          key: 'item.name',
+          label: 'Item Name',
           sortable: true
         }, {
-          key: 'full_invoice_no',
-          label: 'Invoice No.'
+          key: 'qty_in'
         }, {
-          key: 'payment_mode'
+          key: 'qty_out'
         }, {
-          key: 'total_amount',
+          key: 'remarks',
           sortable: true
         }, {
-          key: 'paid_amount',
+          label: 'Date',
+          key: 'created_at',
           sortable: true
-        }, {
-          key: 'action'
         }]
       },
-      sales: {}
+      stocks: {}
     };
   },
   mounted: function mounted() {
-    this.fetchSales();
+    this.fetchReceipts();
   },
   methods: {
     searchAfterDebounce: _.debounce(function () {
-      this.fetchSales();
+      this.fetchReceipts();
     }, 500),
     selectAll: function selectAll() {
-      this.sale.check = [];
+      this.stock.check = [];
 
       if (!this.checkAll) {
-        for (var index in this.sales.data) {
-          if (!this.sales.data[index].stock) {
-            this.sale.check.push(this.sales.data[index].id);
+        for (var index in this.stocks.data) {
+          if (!this.stocks.data[index].stock) {
+            this.stock.check.push(this.stocks.data[index].id);
           }
         }
       }
     },
-    fetchSales: function fetchSales() {
+    fetchReceipts: function fetchReceipts() {
       var _this = this;
 
       var page = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-      this.sales = {};
-      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_sale"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
-        _this.sales = res.data;
+      this.stocks = {};
+      Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["view_stock"])("page=".concat(page, "&limit=").concat(this.limit, "&s=").concat(this.s)).then(function (res) {
+        _this.stocks = res.data;
       });
-    },
-    deleteMultiple: function deleteMultiple() {
-      var _this2 = this;
-
-      if (this.sale.check.length) {
-        swal({
-          title: "Are you sure?",
-          text: "Once deleted, you will not be able to recover this record!",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true
-        }).then(function (willDelete) {
-          if (willDelete) {
-            Object(_api_script__WEBPACK_IMPORTED_MODULE_0__["multiple_delete_sale"])({
-              ids: _this2.sale.check
-            }).then(function (res) {
-              _this2.$toast.success(res.data.message);
-
-              _this2.fetchSales(1);
-            });
-          }
-        });
-      } else {
-        swal("Warning", "Please select at least one record to delete.", "warning");
-      }
     }
   },
   watch: {
@@ -223,17 +185,17 @@ __webpack_require__.r(__webpack_exports__);
       this.searchAfterDebounce();
     },
     limit: function limit() {
-      this.fetchSales(1);
+      this.fetchReceipts(1);
     }
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=template&id=b445c0f4&":
-/*!************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=template&id=b445c0f4& ***!
-  \************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=template&id=f3667a4c&":
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=template&id=f3667a4c& ***!
+  \***************************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -250,27 +212,7 @@ var render = function() {
     { staticClass: "dashboard-content-one" },
     [
       _c("div", { staticClass: "breadcrumbs-area" }, [
-        _c(
-          "div",
-          { staticClass: "float-right" },
-          [
-            _c(
-              "router-link",
-              {
-                staticClass: "fw-btn-fill btn-gradient-yellow text-white",
-                attrs: {
-                  to: {
-                    name: "AddSale"
-                  }
-                }
-              },
-              [_vm._v("Add Sales")]
-            )
-          ],
-          1
-        ),
-        _vm._v(" "),
-        _c("h3", [_vm._v("View Sales")]),
+        _c("h3", [_vm._v("Stock Report")]),
         _vm._v(" "),
         _c("ul", [
           _c(
@@ -295,28 +237,11 @@ var render = function() {
             1
           ),
           _vm._v(" "),
-          _c("li", [_vm._v("View Sales")])
+          _c("li", [_vm._v("Stock Report")])
         ])
       ]),
       _vm._v(" "),
-      _c(
-        "b-form-group",
-        [
-          _c("b-input", {
-            attrs: { type: "search", placeholder: "Search ..." },
-            model: {
-              value: _vm.s,
-              callback: function($$v) {
-                _vm.s = typeof $$v === "string" ? $$v.trim() : $$v
-              },
-              expression: "s"
-            }
-          })
-        ],
-        1
-      ),
-      _vm._v(" "),
-      !_vm.sales.data
+      !_vm.stocks.data
         ? _c(
             "b-card",
             { staticClass: "text-center h-auto" },
@@ -330,17 +255,17 @@ var render = function() {
           )
         : _vm._e(),
       _vm._v(" "),
-      _vm.sales.data
+      _vm.stocks.data
         ? _c(
             "div",
             [
-              !_vm.sales.data.length
+              !_vm.stocks.data.length
                 ? _c("b-card", { staticClass: "h-auto" }, [
                     _vm._v("\n            No record(s) found.\n        ")
                   ])
                 : _vm._e(),
               _vm._v(" "),
-              _vm.sales.data.length
+              _vm.stocks.data.length
                 ? _c(
                     "b-card",
                     {
@@ -354,11 +279,11 @@ var render = function() {
                                 _c("div", { staticClass: "float-right" }, [
                                   _vm._v(
                                     "\n                    " +
-                                      _vm._s(_vm.sales.from) +
+                                      _vm._s(_vm.stocks.from) +
                                       " - " +
-                                      _vm._s(_vm.sales.to) +
+                                      _vm._s(_vm.stocks.to) +
                                       " of " +
-                                      _vm._s(_vm.sales.total) +
+                                      _vm._s(_vm.stocks.total) +
                                       " record(s) are showing.\n                "
                                   )
                                 ]),
@@ -420,7 +345,7 @@ var render = function() {
                         ],
                         null,
                         false,
-                        1142783804
+                        1419024583
                       )
                     },
                     [
@@ -431,8 +356,8 @@ var render = function() {
                         [
                           _c("b-table", {
                             attrs: {
-                              fields: _vm.sale.fields,
-                              items: _vm.sales.data,
+                              fields: _vm.stock.fields,
+                              items: _vm.stocks.data,
                               "foot-clone": true,
                               striped: "",
                               bordered: ""
@@ -447,7 +372,7 @@ var render = function() {
                                         _vm._v(
                                           "\n                            " +
                                             _vm._s(
-                                              data.index + _vm.sales.from
+                                              data.index + _vm.stocks.from
                                             ) +
                                             ".\n                        "
                                         )
@@ -465,7 +390,7 @@ var render = function() {
                                           attrs: {
                                             href:
                                               _vm.baseURL +
-                                              "invoice/sale/" +
+                                              "invoice/stock/" +
                                               data.item.id,
                                             target: "_blank"
                                           }
@@ -476,6 +401,22 @@ var render = function() {
                                           }),
                                           _vm._v(" Print")
                                         ]
+                                      )
+                                    ]
+                                  }
+                                },
+                                {
+                                  key: "cell(created_at)",
+                                  fn: function(data) {
+                                    return [
+                                      _vm._v(
+                                        "\n                        " +
+                                          _vm._s(
+                                            _vm._f("formatDate")(
+                                              data.item.created_at
+                                            )
+                                          ) +
+                                          "\n                    "
                                       )
                                     ]
                                   }
@@ -492,7 +433,7 @@ var render = function() {
                                             {
                                               attrs: {
                                                 to: {
-                                                  name: "EditSale",
+                                                  name: "EditReceipt",
                                                   params: {
                                                     id: data.item.id
                                                   }
@@ -524,7 +465,7 @@ var render = function() {
                               ],
                               null,
                               false,
-                              2324725845
+                              806476923
                             )
                           })
                         ],
@@ -532,8 +473,8 @@ var render = function() {
                       ),
                       _vm._v(" "),
                       _c("pagination", {
-                        attrs: { data: _vm.sales, limit: 2 },
-                        on: { "pagination-change-page": _vm.fetchSales }
+                        attrs: { data: _vm.stocks, limit: 2 },
+                        on: { "pagination-change-page": _vm.fetchReceipts }
                       })
                     ],
                     1
@@ -554,17 +495,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/sale/index.vue":
-/*!***********************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/sale/index.vue ***!
-  \***********************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/reports/Stock.vue":
+/*!**************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/reports/Stock.vue ***!
+  \**************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _index_vue_vue_type_template_id_b445c0f4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./index.vue?vue&type=template&id=b445c0f4& */ "./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=template&id=b445c0f4&");
-/* harmony import */ var _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./index.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=script&lang=js&");
+/* harmony import */ var _Stock_vue_vue_type_template_id_f3667a4c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Stock.vue?vue&type=template&id=f3667a4c& */ "./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=template&id=f3667a4c&");
+/* harmony import */ var _Stock_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Stock.vue?vue&type=script&lang=js& */ "./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -574,9 +515,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _index_vue_vue_type_template_id_b445c0f4___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _index_vue_vue_type_template_id_b445c0f4___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _Stock_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Stock_vue_vue_type_template_id_f3667a4c___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Stock_vue_vue_type_template_id_f3667a4c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -586,38 +527,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/js/components/school-panel/inventory/sale/index.vue"
+component.options.__file = "resources/js/components/school-panel/inventory/reports/Stock.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Stock_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./Stock.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Stock_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=template&id=b445c0f4&":
-/*!******************************************************************************************************!*\
-  !*** ./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=template&id=b445c0f4& ***!
-  \******************************************************************************************************/
+/***/ "./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=template&id=f3667a4c&":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=template&id=f3667a4c& ***!
+  \*********************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_b445c0f4___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./index.vue?vue&type=template&id=b445c0f4& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/sale/index.vue?vue&type=template&id=b445c0f4&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_b445c0f4___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Stock_vue_vue_type_template_id_f3667a4c___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../../node_modules/vue-loader/lib??vue-loader-options!./Stock.vue?vue&type=template&id=f3667a4c& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/school-panel/inventory/reports/Stock.vue?vue&type=template&id=f3667a4c&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Stock_vue_vue_type_template_id_f3667a4c___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_index_vue_vue_type_template_id_b445c0f4___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Stock_vue_vue_type_template_id_f3667a4c___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
