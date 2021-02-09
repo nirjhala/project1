@@ -47,10 +47,20 @@
                         label="Instruction *"
                     >
                         <select
+                            v-model="$v.record.instruction_id.$model"
                             class="form-control"
+                            :class="{
+                                'is-invalid': $v.record.instruction_id.$error
+                            }"
                         >
                             <option value="">Select Instruction</option>
+                            <option
+                                :value="id"
+                                v-for="(name, id) in instructions"
+                                :key="id"
+                            >{{ name }}</option>
                         </select>
+                        <b-form-invalid-feedback>Please select instruction</b-form-invalid-feedback>
                     </b-form-group>
                     <b-form-group
                         class="col-sm-4"
