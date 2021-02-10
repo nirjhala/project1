@@ -107,6 +107,27 @@
                                 ><i class="icon-mode_edit"></i> {{ data.item.name }}</router-link>
                             </div>
                         </template>
+                        <template #cell(questions)="data">
+                            <div>
+                                <router-link
+                                    :to="{
+                                        name: 'AddTestQuestion',
+                                        params: {
+                                            test_id: data.item.id
+                                        }
+                                    }"
+                                >Add</router-link> |
+                                
+                                <router-link
+                                    :to="{
+                                        name: 'ViewTestQuestion',
+                                        params: {
+                                            test_id: data.item.id
+                                        }
+                                    }"
+                                >View ({{data.item.test_questions_count}})</router-link>
+                            </div>
+                        </template>
                     </b-table>
                 </div>
                 <pagination :data="tests" :limit="2" @pagination-change-page="fetchTests"></pagination>
@@ -145,6 +166,9 @@ export default {
                     {
                         key: 'total_questions',
                         sortable: true
+                    },
+                    {
+                        key: 'questions'
                     }
                 ]
             },

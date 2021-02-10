@@ -126,6 +126,27 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -150,6 +171,8 @@ __webpack_require__.r(__webpack_exports__);
         }, 'expire_in', {
           key: 'total_questions',
           sortable: true
+        }, {
+          key: 'questions'
         }]
       },
       tests: {}
@@ -616,11 +639,64 @@ var render = function() {
                                       )
                                     ]
                                   }
+                                },
+                                {
+                                  key: "cell(questions)",
+                                  fn: function(data) {
+                                    return [
+                                      _c(
+                                        "div",
+                                        [
+                                          _c(
+                                            "router-link",
+                                            {
+                                              attrs: {
+                                                to: {
+                                                  name: "AddTestQuestion",
+                                                  params: {
+                                                    test_id: data.item.id
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            [_vm._v("Add")]
+                                          ),
+                                          _vm._v(
+                                            " |\n                            \n                            "
+                                          ),
+                                          _c(
+                                            "router-link",
+                                            {
+                                              attrs: {
+                                                to: {
+                                                  name: "ViewTestQuestion",
+                                                  params: {
+                                                    test_id: data.item.id
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _vm._v(
+                                                "View (" +
+                                                  _vm._s(
+                                                    data.item
+                                                      .test_questions_count
+                                                  ) +
+                                                  ")"
+                                              )
+                                            ]
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    ]
+                                  }
                                 }
                               ],
                               null,
                               false,
-                              3993975269
+                              2519021979
                             )
                           })
                         ],
