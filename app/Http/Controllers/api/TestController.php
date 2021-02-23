@@ -103,13 +103,45 @@ class TestController extends Controller
         $data['user'] = User::with(['studentData', 'media'])->find($user_id);
         $data['test'] = Test::with(['subject', 'instruction', 'test_questions', 'test_users'])->findOrFail($test_id);
 
-        if (!empty($data['test']->test_users))
-        {
-            foreach($data['test']->test_users as $key => $user)
-            {
-                
-            }
-        }
+        $data['students'] = [];
+        // if (!empty($data['test']->test_users))
+        // {
+        //     foreach($data['test']->test_users as $key => $user)
+        //     {
+        //         $question = TestQuestion::find($user->pivot->question_id);
+
+        //         $data['students'] = [
+        //             'id'            => $user->id,
+        //             'name'          => $user->name,
+        //             'father_name'   => $user->studentData->father_name,
+        //             'mother_name'   => $user->studentData->mother_name
+        //         ];
+        //     }
+        // }
+        $data['students'] = \DB::table('users AS u')
+            ->join('students AS s', 'u.id', 's.uid')
+            ->join('users AS f', 's.father', 'f.id')
+            ->join('users AS m', 's.mother', 'm.id')
+            ->whereRaw(
+                'sch_u.id IN (SELECT user_id FROM sch_test_results WHERE test_id = ?)',
+                [$test_id]
+            )
+            ->select(
+                'u.id',
+                'u.name',
+                's.roll_no',
+                'f.name AS father_name',
+                'm.name AS mother_name',
+                \DB::raw("(SELECT SUM(CASE WHEN tr.answer = q.answer THEN tq.marks ELSE -tq.negative_marks END) FROM sch_questions AS q INNER JOIN sch_test_questions AS tq ON q.id = tq.question_id INNER JOIN sch_test_results AS tr ON q.id = tr.question_id WHERE tr.test_id = {$test_id} AND tq.test_id = {$test_id}) AS total_marks"),
+                \DB::raw("(SELECT SUM(CASE WHEN tr.answer = q.answer THEN 1 ELSE 0 END) FROM sch_questions AS q INNER JOIN sch_test_questions AS tq ON q.id = tq.question_id INNER JOIN sch_test_results AS tr ON q.id = tr.question_id WHERE tr.test_id = {$test_id} AND tq.test_id = {$test_id}) AS total_correct"),
+                \DB::raw("(SELECT SUM(CASE WHEN tr.answer = q.answer THEN 0 ELSE 1 END) FROM sch_questions AS q INNER JOIN sch_test_questions AS tq ON q.id = tq.question_id INNER JOIN sch_test_results AS tr ON q.id = tr.question_id WHERE tr.test_id = {$test_id} AND tq.test_id = {$test_id}) AS total_incorrect"),
+                \DB::raw("(SELECT COUNT(*) FROM sch_test_questions WHERE test_id = {$test_id}) AS total_questions")
+            )
+            ->orderBy('total_marks', 'DESC')
+            ->orderBy('name')
+            ->orderBy('father_name')
+            ->orderBy('mother_name')
+            ->get();
 
         return response()->json($data);
     }
