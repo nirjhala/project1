@@ -7,7 +7,7 @@ export const routes = [
      * ##########################################
     **/
     {
-        fullPath: global_params.registerUrl+'get-started',
+        fullPath: global_params.registerUrl + 'get-started',
         path: '/get-started',
         name: 'get-started',
         component: () => import('./components/GetStarted')
@@ -66,6 +66,11 @@ export const routes = [
         path: '/conference-class',
         name: 'VideoClass',
         component: () => import('./components/school-panel/video_class')
+    },
+    {
+        path: '/online-exam/start/:testId',
+        name: 'StudentOnlineExam',
+        component: () => import('./components/student-panel/online-exam/Index')
     },
     /**
      * ##########################################
@@ -1069,6 +1074,26 @@ export const routes = [
                 name: 'EditTest',
                 component: () => import('./components/school-panel/onlineexam/test/add')
             },
+            {
+                path: 'online-exam/test-question/:test_id',
+                name: 'ViewTestQuestion',
+                component: () => import('./components/school-panel/onlineexam/test-question/index')
+            },
+            {
+                path: 'online-exam/test-question/add/:test_id',
+                name: 'AddTestQuestion',
+                component: () => import('./components/school-panel/onlineexam/test-question/add')
+            },
+            {
+                path: 'online-exam/test-result',
+                name: 'ViewResult',
+                component: () => import('./components/school-panel/onlineexam/test-result/index')
+            },
+            {
+                path: 'online-exam/test-result/:test_id',
+                name: 'ViewTestResult',
+                component: () => import('./components/school-panel/onlineexam/test-result/result')
+            },
             /**
              * ##########################################
              * Routes for Time Table
@@ -1287,6 +1312,11 @@ export const routes = [
                 name: 'edit-complain',
                 component: () => import('./components/student-panel/complain/add'),
                 meta: { requireAuth: true, role: ['Student'] }
+            },
+            {
+                path: '/online-exam/master',
+                name: 'StudentOnlineExamMaster',
+                component: () => import('./components/student-panel/online-exam/Master')
             },
             /** 
              * Routes for Teacher Panel

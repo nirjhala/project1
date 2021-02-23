@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['domain' => '{school:weburl}.localhost', 'namespace' => 'api'], function () {
+Route::group(['domain' => '{school:weburl}.suncitytechno.com', 'namespace' => 'api'], function () {
     Route::post('user-login', 'UserController@userLogin');
     Route::post('forgot-password', 'UserController@forgotPassword');
     Route::post('recover-password', 'UserController@recoverPassword');
@@ -42,7 +42,7 @@ Route::group(['domain' => '{school:weburl}.localhost', 'namespace' => 'api'], fu
     Route::apiResource('web-exam-type', 'ExamTypeController', ['only' => 'index']);
 });
 
-Route::group(['domain' => 'acc.localhost'], function () {
+Route::group(['domain' => 'acc.suncitytechno.com'], function () {
     Route::group(['namespace' => 'api'], function () {
         Route::post('get-started', 'RegisterController@getStarted');
         Route::post('resend-otp', 'RegisterController@sendOtp');
@@ -54,7 +54,7 @@ Route::group(['domain' => 'acc.localhost'], function () {
 });
 
 Route::group([
-    'domain' => '{school:weburl}.localhost', 
+    'domain' => '{school:weburl}.suncitytechno.com', 
     'namespace' => 'api', 
     'middleware' => 'auth:api'
 ], function () {
@@ -409,6 +409,10 @@ Route::group([
     Route::apiResource('question', 'QuestionController');
     Route::post('instruction/remove', 'InstructionController@remove');
     Route::apiResource('instruction', 'InstructionController');
+    Route::get('student-test', 'TestController@student');
     Route::post('test/remove', 'TestController@remove');
     Route::apiResource('test', 'TestController');
+    Route::post('test-question/remove', 'TestQuestionController@remove');
+    Route::apiResource('test-question', 'TestQuestionController');
+    Route::apiResource('test-result', 'TestResultController', ['only' => ['store']]);
 });

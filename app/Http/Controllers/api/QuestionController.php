@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Model\Question;
+use App\Model\Test;
 use App\Model\School;
 use Illuminate\Http\Request;
 
@@ -16,24 +17,47 @@ class QuestionController extends Controller
      */
     public function index(Request $request, School $school)
     {
-        $limit = $request->limit ?: 10;
-        $query = Question::where('user_id', $school->uid);
-
-        if (!empty($request->s)) {
-            $s = $request->s;
-            $query->where(function ($q) use ($s) {
-                $q->where('question', 'LIKE', "%{$s}%")
-                ->orWhere('suggestion', 'LIKE', "%{$s}%")
-                ->orWhere('option1', 'LIKE', "%{$s}%")
-                ->orWhere('option2', 'LIKE', "%{$s}%")
-                ->orWhere('option3', 'LIKE', "%{$s}%")
-                ->orWhere('option4', 'LIKE', "%{$s}%");
-            });
+        if ($request->test_id && $request->que_type && $request->que_type == 'assigned') {
+            $test = Test::with('test_questions')->findOrFail($request->test_id);
+            return response()->json($test->test_questions);
+        } else {
+            $limit = $request->limit ?: 10;
+            $query = Question::where('user_id', $school->uid);
+    
+            if (!empty($request->s)) {
+                $s = $request->s;
+                $query->where(function ($q) use ($s) {
+                    $q->where('question', 'LIKE', "%{$s}%")
+                    ->orWhere('suggestion', 'LIKE', "%{$s}%")
+                    ->orWhere('option1', 'LIKE', "%{$s}%")
+                    ->orWhere('option2', 'LIKE', "%{$s}%")
+                    ->orWhere('option3', 'LIKE', "%{$s}%")
+                    ->orWhere('option4', 'LIKE', "%{$s}%");
+                });
+            }
+    
+            if ($request->test_id && $request->que_type && $request->que_type == 'unassigned') {
+                $testId = $request->test_id;
+                $query->whereDoesntHave('test', function ($q) use ($testId) {
+                    $q->where('test_id', $testId);
+                });
+            }
+    
+            // if ($request->test_id && $request->que_type && $request->que_type == 'assigned') {
+            //     $testId = $request->test_id;
+            //     $query->whereHas('test', function ($q) use ($testId) {
+            //         $q->where('test_id', $testId);
+            //     });
+            // }
+    
+            if ($request->type && $request->type == 'all') {
+                $questions = $query->orderBy('question')->pluck('question', 'id');
+            } else {
+                $questions = $query->paginate($limit);
+            }
+    
+            return response()->json($questions);
         }
-
-        $questions = $query->paginate($limit);
-
-        return response()->json($questions);
     }
 
     /**

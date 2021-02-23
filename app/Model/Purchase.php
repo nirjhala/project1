@@ -11,7 +11,7 @@ class Purchase extends Model
 
     public function getSupplierNameAttribute()
     {
-        return $this->supplier->organization_name.' \n '.$this->supplier->name;
+        return $this->supplier ? $this->supplier->organization_name.' \n '.$this->supplier->name : null;
     }
 
     public function getNetAmountAttribute()

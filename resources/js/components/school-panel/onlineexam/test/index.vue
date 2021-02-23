@@ -116,16 +116,7 @@
                                             test_id: data.item.id
                                         }
                                     }"
-                                >Add</router-link> |
-                                
-                                <router-link
-                                    :to="{
-                                        name: 'ViewTestQuestion',
-                                        params: {
-                                            test_id: data.item.id
-                                        }
-                                    }"
-                                >View ({{data.item.test_questions_count}})</router-link>
+                                >Add / View ({{ data.item.test_questions_count }})</router-link>
                             </div>
                         </template>
                     </b-table>

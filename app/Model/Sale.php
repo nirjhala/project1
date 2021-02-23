@@ -11,7 +11,7 @@ class Sale extends Model
 
     public function getCustomerNameAttribute()
     {
-        return $this->customer->name;
+        return $this->customer ? $this->customer->name : null;
     }
 
     public function getNetAmountAttribute()

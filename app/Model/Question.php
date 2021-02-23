@@ -9,4 +9,9 @@ class Question extends Model
 {
     use SoftDeletes;
     protected $guarded = [];
+
+    public function test()
+    {
+        return $this->hasMany(TestQuestion::class);
+    }
 }

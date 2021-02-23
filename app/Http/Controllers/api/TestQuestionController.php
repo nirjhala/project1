@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
+use App\Http\Controllers\Controller;
 use App\Model\TestQuestion;
+use App\Model\Test;
 use Illuminate\Http\Request;
 
 class TestQuestionController extends Controller
@@ -25,7 +27,18 @@ class TestQuestionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'test_id'   => 'required|numeric',
+            'ids'       => 'required|array'
+        ]);
+
+        $test = Test::findOrFail($request->test_id);
+        $test->test_questions()->sync($request->ids, false);
+
+        return response()->json([
+            'message'   => 'Assigned to test '.$test->name,
+            'data'      => $test
+        ]);
     }
 
     /**
@@ -60,5 +73,19 @@ class TestQuestionController extends Controller
     public function destroy(TestQuestion $testQuestion)
     {
         //
+    }
+
+    public function remove(Request $request)
+    {
+        $request->validate([
+            'test_id'   => 'required|numeric',
+            'ids'       => 'required|array'
+        ]);
+        
+        TestQuestion::whereIn('question_id', $request->ids)->where('test_id', $request->test_id)->delete();
+
+        return response()->json([
+            'message'   => 'Selected record(s) have been deleted.'
+        ]);
     }
 }

@@ -3,7 +3,7 @@ let instance = axios.create({
     json: true
 })
 export default {
-    async execute (method, resource, data = {}, auth = true, files = false) {
+    async execute(method, resource, data = {}, auth = true, files = false) {
         let headers = {
             'Accept': 'application/json',
             'Authorization': null
@@ -26,28 +26,28 @@ export default {
     /**
      * Session APIs
      */
-    getAllSessions (query = '', auth = true) {
+    getAllSessions(query = '', auth = true) {
         return this.execute('get', `session/all/?${query}`, null, auth)
     },
     /**
      * Admission APIs
      */
-    addAdmissionEnquiry (data, auth = true) {
+    addAdmissionEnquiry(data, auth = true) {
         return this.execute('post', 'admission-enquiry', data, auth)
     },
-    admissionEnquiry (page, search, auth = true) {
+    admissionEnquiry(page, search, auth = true) {
         return this.execute('get', 'admission-enquiry/?page=' + page + '&s=' + search, null, auth)
     },
-    deleteAdmissionEnquiry (data, auth = true) {
+    deleteAdmissionEnquiry(data, auth = true) {
         return this.execute('post', 'admission-enquiry/remove', data, auth)
     },
 
     /**
      * User APIs
      */
-    getUsers (page, search, role, custom_field = {}) {
+    getUsers(page, search, role, custom_field = {}) {
         // search.custom_field = JSON.stringify(search.custom_field)
-        let searchQuery     = new URLSearchParams(search).toString()
+        let searchQuery = new URLSearchParams(search).toString()
         // let searchQuery2    = new URLSearchParams(custom_field).toString()
         searchQuery += `&page=${page}&role=${role}`
 
@@ -56,206 +56,206 @@ export default {
         }
         return this.execute('get', `user/?${searchQuery}`)
     },
-    deleteUsers (data) {
+    deleteUsers(data) {
         return this.execute('post', 'user/remove', data)
     },
-    userInfo (id) {
+    userInfo(id) {
         return this.execute('get', `user/${id}`)
     },
     /**
      * Students APIs
      */
-    getStudents () {
+    getStudents() {
         return this.execute('get', 'student/all')
     },
-    studentInfo (id) {
+    studentInfo(id) {
         return this.execute('get', `student/${id}`)
     },
-    studentFees (id) {
+    studentFees(id) {
         return this.execute('get', `student/fees-info/${id}`)
     },
     /**
      * Events APIs
      */
-    addEvent (data) {
+    addEvent(data) {
         return this.execute('post', 'event', data);
     },
-    updateEvent (id, data) {
+    updateEvent(id, data) {
         return this.execute('post', `event/${id}`, data);
     },
-    getEvents (page, search) {
+    getEvents(page, search) {
         return this.execute('get', `event/?page=${page}&s=${search}`);
     },
-    getAllEvents () {
+    getAllEvents() {
         return this.execute('get', `event/all`)
     },
-    eventInfo (id) {
+    eventInfo(id) {
         return this.execute('get', `event/${id}`);
     },
-    deleteEvents (data) {
+    deleteEvents(data) {
         return this.execute('post', 'event/remove', data)
     },
     /**
      * News APIs
      */
-    addNews (data) {
+    addNews(data) {
         return this.execute('post', 'news', data);
     },
-    updateNews (id, data) {
+    updateNews(id, data) {
         return this.execute('post', `news/${id}`, data);
     },
-    getNews (page, search) {
+    getNews(page, search) {
         return this.execute('get', `news/?page=${page}&s=${search}`);
     },
-    getAllNews () {
+    getAllNews() {
         return this.execute('get', `news/all`)
     },
-    newsInfo (id) {
+    newsInfo(id) {
         return this.execute('get', `news/${id}`);
     },
-    deleteNews (data) {
+    deleteNews(data) {
         return this.execute('post', 'news/remove', data)
     },
     /**
      * Notice APIs
      */
-    addNotice (data) {
+    addNotice(data) {
         return this.execute('post', 'notice', data, true, true);
     },
-    updateNotice (id, data) {
+    updateNotice(id, data) {
         return this.execute('post', `notice/${id}`, data);
     },
-    getNotice (page, search) {
+    getNotice(page, search) {
         return this.execute('get', `notice/?page=${page}&s=${search}`);
     },
-    getAllNotice () {
+    getAllNotice() {
         return this.execute('get', `notice/all`)
     },
-    noticeInfo (id) {
+    noticeInfo(id) {
         return this.execute('get', `notice/${id}`);
     },
-    deleteNotice (data) {
+    deleteNotice(data) {
         return this.execute('post', 'notice/remove', data)
     },
     /**
      * Gallery APIs
      */
-    addGallery (data) {
+    addGallery(data) {
         return this.execute('post', 'gallery', data);
     },
-    updateGallery (id, data) {
+    updateGallery(id, data) {
         return this.execute('post', `gallery/${id}`, data);
     },
-    getGallery (page, search) {
+    getGallery(page, search) {
         return this.execute('get', `gallery/?page=${page}&s=${search}`);
     },
-    getAllGallery () {
+    getAllGallery() {
         return this.execute('get', `gallery/all`)
     },
-    galleryInfo (id) {
+    galleryInfo(id) {
         return this.execute('get', `gallery/${id}`);
     },
-    deleteGallery (data) {
+    deleteGallery(data) {
         return this.execute('post', 'gallery/remove', data)
     },
     /**
      * Holiday APIs
      */
-    addHoliday (data) {
+    addHoliday(data) {
         return this.execute('post', 'holiday', data);
     },
-    updateHoliday (id, data) {
+    updateHoliday(id, data) {
         return this.execute('post', `holiday/${id}`, data);
     },
-    getHolidays (page, search) {
+    getHolidays(page, search) {
         return this.execute('get', `holiday/?page=${page}&s=${search}`);
     },
-    getAllHolidays () {
+    getAllHolidays() {
         return this.execute('get', `holiday/all`)
     },
-    holidayInfo (id) {
+    holidayInfo(id) {
         return this.execute('get', `holiday/${id}`);
     },
-    deleteHolidays (data) {
+    deleteHolidays(data) {
         return this.execute('post', 'holiday/remove', data)
     },
     /**
      * Templates
      */
-    getAllPageTemplate () {
+    getAllPageTemplate() {
         return this.execute('get', 'page-template/all')
     },
     /**
      * Page
      */
-    addPage (data) {
+    addPage(data) {
         return this.execute('post', 'page', data)
     },
-    updatePage (id, data) {
+    updatePage(id, data) {
         return this.execute('post', `page/${id}`, data)
     },
-    PageDetails (id = null) {
+    PageDetails(id = null) {
         return this.execute('get', `page/${id}`)
     },
-    getPages (page, search) {
+    getPages(page, search) {
         return this.execute('get', `page/?s=${search}&page=${page}`)
     },
-    getAllPages () {
+    getAllPages() {
         return this.execute('get', 'page/all')
     },
     /**
      * Menu
      */
-    fetchMenu () {
+    fetchMenu() {
         return this.execute('get', `menu`)
     },
-    insertMenu (data) {
+    insertMenu(data) {
         return this.execute('post', 'menu', data)
     },
-    deleteMenu (id) {
+    deleteMenu(id) {
         return this.execute('DELETE', `menu/${id}`)
     },
     /**
      * Sections
      */
-    fetchAllSections () {
+    fetchAllSections() {
         return this.execute('get', `section/all`)
     },
     /**
      * Subjects
      */
-    fetchSubjectBySection (section_id) {
+    fetchSubjectBySection(section_id) {
         return this.execute('get', `subject/by-section/${section_id}`)
     },
     /**
      * Assignments
      */
-    addAssignment (data) {
+    addAssignment(data) {
         return this.execute('post', 'assignment', data)
     },
-    AssignmentDetails (id) {
+    AssignmentDetails(id) {
         return this.execute('get', `assignment/${id}`)
     },
-    fetchAssignments (page, search) {
+    fetchAssignments(page, search) {
         return this.execute('get', `assignment/?s=${search}&page=${page}`)
     },
-    fetchAllotStudents (id) {
+    fetchAllotStudents(id) {
         return this.execute('get', `assignment-students/${id}`)
     },
-    addAssignmentStudent (id, user_ids) {
+    addAssignmentStudent(id, user_ids) {
         return this.execute('post', `assignment-students/${id}`, { 'user_ids': user_ids, 'action': 'add' })
     },
-    deleteAssignmentStudent (id, user_ids) {
+    deleteAssignmentStudent(id, user_ids) {
         return this.execute('post', `assignment-students/${id}`, { 'user_ids': user_ids, 'action': 'delete' })
     },
     /**
      * Website data
      */
-    fetchFrontMenues () {
+    fetchFrontMenues() {
         return this.execute('get', 'web-menu', {}, false)
     },
-    fetchPageInfo (slug) {
-        return this.execute('get', `web-page/${slug}`, {}, false )
+    fetchPageInfo(slug) {
+        return this.execute('get', `web-page/${slug}`, {}, false)
     }
 }
 
@@ -264,7 +264,7 @@ const execute = (method, resource, data = {}, auth = true) => {
         'Accept': 'application/json',
         'Authorization': null
     }
-    if(auth) {
+    if (auth) {
         let token = localStorage.getItem('token')
         headers.Authorization = 'Bearer ' + token
     }
@@ -332,7 +332,7 @@ export const view_all_classes = (query) => {
     return execute('get', `get-all-classes/?${query}`)
 }
 
-export const view_custom_fields =  (role, query = '') => {
+export const view_custom_fields = (role, query = '') => {
     return execute('get', `custom-field/?role=${role}&${query}`)
 }
 
@@ -924,6 +924,32 @@ export const show_test = (id) => {
 }
 export const multiple_delete_test = (ids) => {
     return execute('post', `test/remove`, ids)
+}
+// For Student Panel
+export const view_student_test = (query) => {
+    return execute('get', `student-test/?${query}`)
+}
+
+/**
+ * Online Exam - Test Questions
+ * @param {*} data 
+ */
+export const add_test_question = (data) => {
+    return execute('post', `test-question`, data)
+}
+export const view_test_question = (query = '') => {
+    return execute('get', `test-question/?${query}`)
+}
+export const multiple_delete_test_question = (ids) => {
+    return execute('post', `test-question/remove`, ids)
+}
+
+/**
+ * Online Exam - Test Result
+ * @param {*} data 
+ */
+export const add_test_result = (data) => {
+    return execute('post', `test-result`, data)
 }
 
 /**

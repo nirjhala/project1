@@ -18,6 +18,12 @@
                 <router-link :to="{ name: 'student-timetable' }" class="nav-link"><i class="icon-calendar"></i> <span>Time Table</span></router-link>
             </li>
             <li class="nav-item" v-if="role == 'Student'">
+                <router-link 
+                    :to="{ name: 'StudentOnlineExamMaster'}" 
+                    class="nav-link"
+                ><i class="icon-mouse"></i> <span>Online Exam</span></router-link>
+            </li>
+            <li class="nav-item" v-if="role == 'Student'">
                 <router-link :to="{ name: 'student_attendence' }" class="nav-link"><i class="icon-user-check1"></i> <span>Attendence</span></router-link>
             </li>
             <li class="nav-item sidebar-nav-item" v-if="role == 'Student'">
