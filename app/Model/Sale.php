@@ -28,7 +28,7 @@ class Sale extends Model
 
     public function getFullInvoiceNoAttribute()
     {
-        return sprintf("%s/%04d", $this->session->session_name, $this->invoice_no);
+        return $this->session ? sprintf("%s/%04d", $this->session->session_name, $this->invoice_no) : $this->invoice_no;
     }
 
     public function items() {
