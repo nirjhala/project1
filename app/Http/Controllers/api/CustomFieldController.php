@@ -48,7 +48,7 @@ class CustomFieldController extends Controller
                 {
                     if($cf->relative_table == 'subjects')
                     {
-                        $customFields[$key]->options = Subject::where('school', $school->uid)->where('deleted', 'N')->pluck('name', 'id');
+                        $customFields[$key]->options = Subject::where('school', $school->uid)->pluck('name', 'id');
                     } 
                     else if($cf->relative_table == 'religions')
                     {

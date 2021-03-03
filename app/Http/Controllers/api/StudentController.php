@@ -37,7 +37,7 @@ class StudentController extends Controller
      * @param  \Illuminate\Http\Request   $request 
      * @return \Illuminate\Http\Response 
      */  
-    public function store(Request $request)  
+    public function store(Request $request, School $school)  
     {
         $rules = [
             'user'          => 'required|array',
@@ -62,6 +62,12 @@ class StudentController extends Controller
             // Save to User Table
             $user = new User;
             $user->fill($request->user);
+
+            if(!empty($request->user['password']))
+                $user->password = \Hash::make($request->user['password']);
+            
+            $user->role = 4;
+            $user->school = $school->uid;
             $user->save();
 
             // Save to User's relation Student Table
@@ -211,11 +217,22 @@ class StudentController extends Controller
         return response()->json($re, $responseCode);
     }
 
-    public function getData(Request $request)
+    public function getData(Request $request, School $school)
     {
-        $data = User::with(['media', 'cityData', 'cityData.stateName', 'roleName', 'studentData.sectionName', 'studentData.sectionName.cls'])->whereHas("roleName", function ($q) {
+        $data = User::with([
+            'media', 
+            'cityData', 
+            'cityData.stateName', 
+            'roleName', 
+            'studentData.sectionName', 
+            'studentData.sectionName.cls'
+        ])
+        ->whereHas("roleName", function ($q) {
             $q->where('name', 'Student');
-        })->where("school", auth()->user()->school)->latest()->paginate(20);
+        })
+        ->where("school", $school->uid)
+        ->latest()
+        ->paginate(20);
 
         if ($data->isEmpty()) {
             $re = [
@@ -240,9 +257,17 @@ class StudentController extends Controller
         return response()->json($re, 200);
     }
 
-    public function all(Request $request)
-    {
-        $lists = Student::with(['user', 'father_info', 'mother_info', 'SectionName', 'SectionName.cls'])->has('user')->get();
+    public function all(Request $request, School $school) {
+        $lists = Student::with([
+            'user', 
+            'father_info', 
+            'mother_info', 
+            'SectionName', 
+            'SectionName.cls'
+        ])
+        ->whereHas('user', function ($q) use ($school) {
+            $q->where('school', $school->uid);
+        })->get();
         return response()->json( $lists );
     }
 

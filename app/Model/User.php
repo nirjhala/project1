@@ -76,7 +76,7 @@ class User extends Model
     }
     public function roleName()
     {
-        return $this->hasOne('App\Model\Role', 'id', 'role');
+        return $this->hasOne(Role::class, 'id', 'role');
     }
     public function guardian_info() {
         return $this->hasOne('App\Model\Guardian', 'uid', 'id');

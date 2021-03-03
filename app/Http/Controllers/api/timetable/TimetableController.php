@@ -229,13 +229,13 @@ class TimetableController extends Controller
     {
         $user = auth()->user();
 
-        $departments    = Department::where('dept_school', $user->school)->where('dept_is_deleted', 'N')->get()->toArray();
-        $shifts         = Shift::where('shift_school', $user->school)->where('shift_is_deleted', 'N')->get()->toArray();
-        $subjects       = Subject::where('school', $user->school)->where('deleted', 'N')->get()->toArray();
+        $departments    = Department::where('dept_school', $user->school)->get()->toArray();
+        $shifts         = Shift::where('shift_school', $user->school)->get()->toArray();
+        $subjects       = Subject::where('school', $user->school)->get()->toArray();
 
         $teachers       = User::where('school', $user->school)->whereHas('roleName', function ($q) {
             $q->where('name', 'Teacher');
-        })->where('deleted', 'N')->get()->toArray();
+        })->get()->toArray();
 
         $weekday        = Weekday::where('school', $user->school)->first();
         $allDays        = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];

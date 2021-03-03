@@ -24,6 +24,7 @@
     </div>
 
     {{ Html::script('js/jquery-3.3.1.min.js') }}
+    {{ Html::script('js/validation.js') }}
     {{ Html::script('js/app.js') }}
 </body>
 </html>

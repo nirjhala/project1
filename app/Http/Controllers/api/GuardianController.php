@@ -66,7 +66,6 @@ class GuardianController extends Controller
                 'required',
                 Rule::unique('users')
                     ->where('login', $input['login'])
-                    ->where('deleted', 'N')
                     ->where('school', auth()->user()->school)
             ],
             'password'      => 'required|string',
@@ -88,7 +87,7 @@ class GuardianController extends Controller
         $obj->save();
         $obj->guardian_info()->updateOrCreate( ['relation' => $input['type']] );
 
-        $query = User::has('roleName')->where('deleted', 'N');
+        $query = User::has('roleName');
 
         $query->whereHas('roleName', function($q) {
             $q->where('name', 'LIKE', 'Parents');

@@ -1,11 +1,11 @@
 export const global_params = {
     http: 'http://',
-    suffixUrl: '.localhost/school-management/',
+    suffixUrl: '.dossierbox.com/',
     baseURL: '/school-management/',
     apiBaseUrl: '/school-management/api/',
-    fullApiUrl: 'http://localhost/school-management/api/',
-    registerUrl: 'http://acc.localhost/school-management/',
+    fullApiUrl: 'http://dossierbox.com/api/',
+    registerUrl: 'http://acc.dossierbox.com/',
     landingBase: 'http://localhost/school-landing/',
-    siteUrl: 'http://localhost/school-management/',
+    siteUrl: 'http://dossierbox.com/',
     onlineClassURL: 'http://localhost:3000/'
 }
