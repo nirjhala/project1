@@ -222,6 +222,21 @@ export const routes = [
                 component: () => import('./components/school-panel/school/notice/add')
             },
             {
+                path: 'school/slider',
+                name: 'Slider',
+                component: () => import('./components/school-panel/school/slider/view')
+            },
+            {
+                path: 'school/slider/add',
+                name: 'AddSlider',
+                component: () => import('./components/school-panel/school/slider/add')
+            },
+            {
+                path: 'school/slider/edit/:id',
+                name: 'EditSlider',
+                component: () => import('./components/school-panel/school/slider/add')
+            },
+            {
                 path: 'school/gallery',
                 name: 'ViewGallery',
                 component: () => import('./components/school-panel/school/gallery/view')
@@ -620,6 +635,36 @@ export const routes = [
                 name: 'StudentOneClick',
                 component: () => import('./components/school-panel/student/oneclick'),
                 meta: { requireAuth: true, role: ['School'] }
+            },
+            {
+                path: 'student/profile-update',
+                name: 'StudentProfileUpdate',
+                component: () => import('./components/school-panel/student/profileUpdate')
+            },
+            {
+                path: 'student/photo-update',
+                name: 'StudentPhotoUpdate',
+                component: () => import('./components/school-panel/student/photoUpdate')
+            },
+            {
+                path: 'student/sms-contact-update',
+                name: 'StudentSMSContactUpdate',
+                component: () => import('./components/school-panel/student/smsContactUpdate')
+            },
+            {
+                path: 'student/id-cards',
+                name: 'StudentIdCard',
+                component: () => import('./components/school-panel/student/idcard')
+            },
+            {
+                path: 'student/roll-no',
+                name: 'StudentRollNoUpdate',
+                component: () => import('./components/school-panel/student/rollnoUpdate')
+            },
+            {
+                path: 'student/promote',
+                name: 'StudentPromotion',
+                component: () => import('./components/school-panel/student/promote')
             },
             /**
              * ##########################################

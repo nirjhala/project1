@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['domain' => '{school:weburl}.suncitytechno.com', 'namespace' => 'api'], function () {
+Route::group(['domain' => '{school:weburl}.'.env('DOMAIN'), 'namespace' => 'api'], function () {
     Route::post('user-login', 'UserController@userLogin');
     Route::post('forgot-password', 'UserController@forgotPassword');
     Route::post('recover-password', 'UserController@recoverPassword');
@@ -42,7 +42,7 @@ Route::group(['domain' => '{school:weburl}.suncitytechno.com', 'namespace' => 'a
     Route::apiResource('web-exam-type', 'ExamTypeController', ['only' => 'index']);
 });
 
-Route::group(['domain' => 'acc.suncitytechno.com'], function () {
+Route::group(['domain' => 'acc.'.env('DOMAIN')], function () {
     Route::group(['namespace' => 'api'], function () {
         Route::post('get-started', 'RegisterController@getStarted');
         Route::post('resend-otp', 'RegisterController@sendOtp');
@@ -54,14 +54,15 @@ Route::group(['domain' => 'acc.suncitytechno.com'], function () {
 });
 
 Route::group([
-    'domain' => '{school:weburl}.suncitytechno.com', 
+    'domain' => '{school:weburl}.'.env('DOMAIN'), 
     'namespace' => 'api', 
     'middleware' => 'auth:api'
 ], function () {
 
+    Route::get('logout', 'UserController@logout');
     Route::get('custom-field', 'CustomFieldController@index');
 
-    Route::get('logout', 'UserController@logout');
+    Route::get('admin-dashboard', 'DashboardController@index');
 
     Route::post('add-session', 'SessionController@add');
     Route::post('update-session', 'SessionController@updateData');
@@ -133,6 +134,7 @@ Route::group([
 
     Route::post('user/remove', 'UserController@remove');
     Route::get('teacher', 'UserController@teachers');
+    Route::get('profile', 'UserController@profile');
     Route::apiResource('user', 'UserController');
 
     Route::apiResource('certificate', 'CertificateController');
@@ -169,6 +171,9 @@ Route::group([
 
     Route::post('notice/remove', 'NoticeController@remove');
     Route::apiResource('notice', 'NoticeController');
+
+    Route::post('slider/remove', 'SliderController@remove');
+    Route::apiResource('slider', 'SliderController');
 
     Route::post('gallery/remove', 'GalleryController@remove');
     Route::apiResource('gallery', 'GalleryController');
@@ -209,7 +214,7 @@ Route::group([
     Route::post('get-cities-by-state', 'CityController@getListByState');
     Route::post('get-pincodes-by-city', 'PincodeController@getListByCity');
     Route::get('state/all', 'StateController@getAllList');
-    Route::get('state', 'StateController@all');
+    Route::get('state', 'StateController@index');
     Route::get('city', 'CityController@index');
 
     Route::post('add-media', 'MediaController@add');
@@ -264,7 +269,12 @@ Route::group([
 
     Route::get('student/all', 'StudentController@all');
     Route::get('student/fees-info/{uid}', 'FeesController@student_by_id');
+    Route::post('update-photo', 'StudentController@updatePhoto');
+    Route::post('update-sms-contact', 'StudentController@updateSmsContact');
+    Route::post('update-roll-no', 'StudentController@updateRollNo');
     Route::apiResource('student', 'StudentController');
+    
+    Route::apiResource('student-promote', 'StudentPromoteController');
 
     Route::apiResource('fee-payment', 'FeePaymentController', ['only' => ['store', 'index']]);
 

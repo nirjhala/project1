@@ -15,14 +15,16 @@ class StateController extends Controller {
 
         return response()->json( $data, 200 );
     }
-    public function all(Request $request)
+    public function index(Request $request)
     {
         $query  = State::query();
         if(!empty($request->country_id))
         {
             $query->where('country', $request->country_id);
         }
+        
         $states = $query->orderBy('name', 'ASC')->pluck('name', 'id');
+
 
         return response()->json($states);
     }

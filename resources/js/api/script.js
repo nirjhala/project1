@@ -1,5 +1,5 @@
 let instance = axios.create({
-    baseURL: '/school-management/api/',
+    baseURL: '/api/',
     json: true
 })
 export default {
@@ -136,6 +136,24 @@ export default {
     },
     deleteNotice(data) {
         return this.execute('post', 'notice/remove', data)
+    },
+    /**
+     * Slider APIs
+     */
+    addSlider(data) {
+        return this.execute('post', 'slider', data, true, true);
+    },
+    updateSlider(id, data) {
+        return this.execute('post', `slider/${id}`, data);
+    },
+    getSlider(page, search) {
+        return this.execute('get', `slider/?page=${page}&s=${search}`);
+    },
+    sliderInfo(id) {
+        return this.execute('get', `slider/${id}`);
+    },
+    deleteSlider(data) {
+        return this.execute('post', 'slider/remove', data)
     },
     /**
      * Gallery APIs

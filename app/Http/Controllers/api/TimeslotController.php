@@ -129,9 +129,18 @@ class TimeslotController extends Controller
         return response()->json($re, 200);
     }
 
-    public function getData()
+    public function getData(Request $request, School $school)
     {
-        $data = Timeslot::with(['shift'])->latest()->paginate(20);
+        $limit = $request->limit ?: 10;
+        $query = Timeslot::with('shift')->where('school', $school->uid);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%'.$request->s.'%');
+            });
+        }
+
+        $data = $query->latest()->paginate($limit);
 
         if ($data->isEmpty()) {
             foreach ($data as $i => $d) {

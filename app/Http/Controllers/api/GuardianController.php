@@ -87,7 +87,7 @@ class GuardianController extends Controller
         $obj->save();
         $obj->guardian_info()->updateOrCreate( ['relation' => $input['type']] );
 
-        $query = User::has('roleName');
+        $query = User::with('guardian_info')->has('roleName');
 
         $query->whereHas('roleName', function($q) {
             $q->where('name', 'LIKE', 'Parents');

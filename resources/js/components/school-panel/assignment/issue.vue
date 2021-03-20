@@ -24,7 +24,7 @@
                 <div class="card height-auto">
                     <div class="card-body">
                         <div class="text-center" v-if="!loaded">
-                            <img :src="'img/preloader.gif'" alt="" style="max-width: 100%;">
+                            <b-spinner></b-spinner>
                         </div>
                         <div v-if="loaded">
                             <form class="new-added-form" enctype="multipart/form-data" @submit.prevent=" form.id ? updateData() : addData()">

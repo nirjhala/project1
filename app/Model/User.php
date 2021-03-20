@@ -64,7 +64,7 @@ class User extends Model
     }
     public function media()
     {
-        return $this->hasOne('App\Model\Media', 'id', 'image');
+        return $this->hasOne(Media::class, 'id', 'image');
     }
     public function pincodeData()
     {

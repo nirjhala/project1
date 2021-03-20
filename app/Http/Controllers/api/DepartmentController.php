@@ -111,25 +111,40 @@ class DepartmentController extends Controller
 
         return response()->json($re, 200);
     }
-    public function getData()
+    public function getData(Request $request, School $school)
     {
-        $data = Department::withCount(['classes'])
-        ->where('dept_school', auth()->user()->school)
-        ->latest()
-        ->paginate(20);
 
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
+        $query = Department::withCount(['classes'])->where('dept_school', $school->uid);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('dept_name', 'LIKE', '%'.$request->s.'%');
+            });
         }
+
+        if($request->type && $request->type == 'all')
+        {
+            $data = $query->orderBy('dept_name')->pluck('dept_name', 'id');
+            $re = $data;
+        }
+        else
+        {
+            $data = $query->latest()->paginate(20);
+            if ($data->isEmpty()) {
+                $re = [
+                    'status'    => false,
+                    'message'   => 'No record(s) found.',
+                    'data'      => []
+                ];
+            } else {
+                $re = [
+                    'status'    => true,
+                    'message'   => $data->count().' record(s) found.',
+                    'data'      => $data,
+                ];
+            }
+        }
+
 
         return response()->json($re, 200);
     }

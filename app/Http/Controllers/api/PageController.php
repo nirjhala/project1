@@ -28,11 +28,12 @@ class PageController extends Controller
         }
         $page = Page::query();
         if(!empty(request('s'))) {
+
             $s = trim( request('s') );
 
             $page->where('title', 'LIKE', '%'.$s.'%');
         }
-        $pages = $page->latest()->paginate($limit);
+        $pages = $page->orderBy('id', 'DESC')->paginate($limit);
         
         return response()->json($pages);
     }

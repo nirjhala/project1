@@ -1,17 +1,17 @@
-(function($) {
+(function ($) {
     "use strict";
 
     /*-------------------------------------
         Sidebar Toggle Menu
       -------------------------------------*/
-    $(document).on('click', '.sidebar-nav-item .nav-link', function(e) {
+    $(document).on('click', '.sidebar-nav-item .nav-link', function (e) {
         if (!$(this).parents('#wrapper').hasClass('sidebar-collapsed')) {
             var animationSpeed = 300,
                 subMenuSelector = '.sub-group-menu',
                 $this = $(this),
                 checkElement = $this.next();
             if (checkElement.is(subMenuSelector) && checkElement.is(':visible')) {
-                checkElement.slideUp(animationSpeed, function() {
+                checkElement.slideUp(animationSpeed, function () {
                     checkElement.removeClass('menu-open');
                 });
                 checkElement.parent(".sidebar-nav-item").removeClass("active");
@@ -20,7 +20,7 @@
                 var ul = parent.find('ul:visible').slideUp(animationSpeed);
                 ul.removeClass('menu-open');
                 var parent_li = $this.parent("li");
-                checkElement.slideDown(animationSpeed, function() {
+                checkElement.slideDown(animationSpeed, function () {
                     checkElement.addClass('menu-open');
                     parent.find('.sidebar-nav-item.active').removeClass('active');
                     parent_li.addClass('active');
@@ -39,8 +39,8 @@
     /*-------------------------------------
         Sidebar Menu Control
       -------------------------------------*/
-    $(".sidebar-toggle").on("click", function() {
-        window.setTimeout(function() {
+    $(".sidebar-toggle").on("click", function () {
+        window.setTimeout(function () {
             $("#wrapper").toggleClass("sidebar-collapsed");
         }, 500);
     });
@@ -48,7 +48,7 @@
     /*-------------------------------------
         Sidebar Menu Control Mobile
       -------------------------------------*/
-    $(".sidebar-toggle-mobile").on("click", function() {
+    $(".sidebar-toggle-mobile").on("click", function () {
         $("#wrapper").toggleClass("sidebar-collapsed-mobile");
         if ($("#wrapper").hasClass("sidebar-collapsed")) {
             $("#wrapper").removeClass("sidebar-collapsed");
@@ -68,7 +68,7 @@
     /*-------------------------------------
         jquery Scollup activation code
       -------------------------------------*/
-    $("#preloader").fadeOut("slow", function() {
+    $("#preloader").fadeOut("slow", function () {
         $(this).remove();
     });
 
@@ -83,7 +83,7 @@
         return pass;
 
     }
-    $(function() {
+    $(function () {
         /*-------------------------------------
               Data Table init
           -------------------------------------*/
@@ -104,11 +104,11 @@
         /*-------------------------------------
               All Checkbox Checked
           -------------------------------------*/
-        $(document).on("click", ".checkAll", function() {
+        $(document).on("click", ".checkAll", function () {
             $(this).closest('.table').find('input:checkbox').prop('checked', this.checked);
         });
 
-        $(document).on("click", ".check", function() {
+        $(document).on("click", ".check", function () {
             var parent = $(this).closest('.table');
             if (parent.find('.check:checked').length == parent.find('.check').length) {
                 parent.find('.checkAll').prop('checked', true);
@@ -120,7 +120,7 @@
         /*-------------------------------------
               Auto generate password
           -------------------------------------*/
-        $(document).on('click', '.passwordToggle', function() {
+        $(document).on('click', '.passwordToggle', function () {
             let inp = $(this).closest('.form-group').find('input');
             if (inp.attr('type') == "password") {
                 inp.attr('type', 'text');
@@ -130,18 +130,18 @@
             $(this).toggleClass('fa-eye fa-eye-slash');
         });
 
-        $(document).on('click', '.genPassBtn', function() {
+        $(document).on('click', '.genPassBtn', function () {
             let password = wpiGenerateRandomNumber(10);
             $('#generatedPassword').val(password);
             $('#generatePasswordModal').modal('show');
             $('#copyConfirm').prop('checked', false).trigger('change');
         });
 
-        $(document).on('click change', '#copyConfirm', function() {
-            let btn     = $(this).closest('.modal-dialog').find('.btnReflectPassword'),
+        $(document).on('click change', '#copyConfirm', function () {
+            let btn = $(this).closest('.modal-dialog').find('.btnReflectPassword'),
                 checked = $(this).prop('checked');
 
-            if(checked) {
+            if (checked) {
                 btn.removeAttr('disabled');
             } else {
                 btn.attr('disabled', 'disabled');
@@ -149,13 +149,13 @@
         });
 
         // $(document).on('click', '.btnReflectPassword', function() {
-            // $('#userPassword').val( $('#generatedPassword').val() );
-            // $('#generatePasswordModal').modal('hide');
+        // $('#userPassword').val( $('#generatedPassword').val() );
+        // $('#generatePasswordModal').modal('hide');
         // });
 
-        $(document).on('click', '.uploadImageBtn', function() {
-            $('#imageTarget').val( $(this).data('image') );
-            $('#fieldTarget').val( $(this).data('field') )
+        $(document).on('click', '.uploadImageBtn', function () {
+            $('#imageTarget').val($(this).data('image'));
+            $('#fieldTarget').val($(this).data('field'))
             $('#mediaModal').modal('show');
         });
 
@@ -207,82 +207,82 @@
               Calender initiate
           -------------------------------------*/
         if ($.fn.fullCalendar !== undefined) {
-          $('#fc-calender').fullCalendar({
-            header: {
-              center: 'basicDay,basicWeek,month',
-              left: 'title',
-              right: 'prev,next',
-            },
-            fixedWeekCount: false,
-            navLinks: true, // can click day/week names to navigate views
-            editable: true,
-            eventLimit: true, // allow "more" link when too many events
-            aspectRatio: 1.8,
-            events: [{
-                title: 'All Day Event',
-                start: '2019-04-01'
-              },
+            $('#fc-calender').fullCalendar({
+                header: {
+                    center: 'basicDay,basicWeek,month',
+                    left: 'title',
+                    right: 'prev,next',
+                },
+                fixedWeekCount: false,
+                navLinks: true, // can click day/week names to navigate views
+                editable: true,
+                eventLimit: true, // allow "more" link when too many events
+                aspectRatio: 1.8,
+                events: [{
+                    title: 'All Day Event',
+                    start: '2019-04-01'
+                },
 
-              {
-                title: 'Meeting',
-                start: '2019-04-12T14:30:00'
-              },
-              {
-                title: 'Happy Hour',
-                start: '2019-04-15T17:30:00'
-              },
-              {
-                title: 'Birthday Party',
-                start: '2019-04-20T07:00:00'
-              }
-            ]
-          });
+                {
+                    title: 'Meeting',
+                    start: '2019-04-12T14:30:00'
+                },
+                {
+                    title: 'Happy Hour',
+                    start: '2019-04-15T17:30:00'
+                },
+                {
+                    title: 'Birthday Party',
+                    start: '2019-04-20T07:00:00'
+                }
+                ]
+            });
         }
     });
 
-    $(document).on('click', '.wizard-next-btn', function() {
+    $(document).on('click', '.wizard-next-btn', function () {
         let parent = $(this).closest('.wizard-tab'),
             target = $(this).data('target'),
-            sel    = $(target);
+            sel = $(target);
 
         let is_valid = parent.is_valid();
 
-        if(is_valid) {
+        if (is_valid) {
             $(".wizard-tab").not(sel).removeClass('active');
             $(sel).addClass('active');
 
-            $(".register-wizard-steps ul li").not("[data-tab='"+target+"']").removeClass('active');
+            $(".register-wizard-steps ul li").not("[data-tab='" + target + "']").removeClass('active');
 
-            $("[data-tab='"+target+"']").addClass('active');
+            $("[data-tab='" + target + "']").addClass('active');
         }
     });
 
-    $(document).on('click', '.wizardBtn', function() {
+    $(document).on('click', '.wizardBtn', function () {
         let parent = $(this).closest('.step-wizard-panel'),
             target = $(this).data('target'),
-            sel    = $(target);
+            sel = $(target);
 
         let is_valid = parent.is_valid();
 
-        if(is_valid) {
+        if (is_valid) {
             $(".step-wizard-panel").not(sel).removeClass('active');
             $(sel).addClass('active');
 
             $(".step-wizard-tabs ul li").removeClass('current visited');
 
-            $("[data-tab='"+target+"']").addClass('current');
-            $("[data-tab='"+target+"']").prevAll().addClass('visited');
+            $("[data-tab='" + target + "']").addClass('current');
+            $("[data-tab='" + target + "']").prevAll().addClass('visited');
         }
     });
 
-    $(document).on('click', "a[href^='#']", function(e) {
+    $(document).on('click', "a[href^='#']", function (e) {
         e.preventDefault();
     });
 
     /*-------------------------------------
         Vector Map
     -------------------------------------*/
-        if ($.fn.vectorMap !== undefined) {
+    if ($.fn.vectorMap !== undefined) {
         $('#world-map').vectorMap({
             map: 'world_mill',
             zoomButtons: false,
@@ -320,31 +320,31 @@
         var lineChartData = {
             labels: ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", ""],
             datasets: [{
-                    data: [0, 5e4, 1e4, 5e4, 14e3, 7e4, 5e4, 75e3, 5e4],
-                    backgroundColor: '#ff0000',
-                    borderColor: '#ff0000',
-                    borderWidth: 1,
-                    pointRadius: 0,
-                    pointBackgroundColor: '#ff0000',
-                    pointBorderColor: '#ffffff',
-                    pointHoverRadius: 6,
-                    pointHoverBorderWidth: 3,
-                    fill: 'origin',
-                    label: "Total Collection"
-                },
-                {
-                    data: [0, 3e4, 2e4, 6e4, 7e4, 5e4, 5e4, 9e4, 8e4],
-                    backgroundColor: '#417dfc',
-                    borderColor: '#417dfc',
-                    borderWidth: 1,
-                    pointRadius: 0,
-                    pointBackgroundColor: '#304ffe',
-                    pointBorderColor: '#ffffff',
-                    pointHoverRadius: 6,
-                    pointHoverBorderWidth: 3,
-                    fill: 'origin',
-                    label: "Fees Collection"
-                }
+                data: [0, 5e4, 1e4, 5e4, 14e3, 7e4, 5e4, 75e3, 5e4],
+                backgroundColor: '#ff0000',
+                borderColor: '#ff0000',
+                borderWidth: 1,
+                pointRadius: 0,
+                pointBackgroundColor: '#ff0000',
+                pointBorderColor: '#ffffff',
+                pointHoverRadius: 6,
+                pointHoverBorderWidth: 3,
+                fill: 'origin',
+                label: "Total Collection"
+            },
+            {
+                data: [0, 3e4, 2e4, 6e4, 7e4, 5e4, 5e4, 9e4, 8e4],
+                backgroundColor: '#417dfc',
+                borderColor: '#417dfc',
+                borderWidth: 1,
+                pointRadius: 0,
+                pointBackgroundColor: '#304ffe',
+                pointBorderColor: '#ffffff',
+                pointHoverRadius: 6,
+                pointHoverBorderWidth: 3,
+                fill: 'origin',
+                label: "Fees Collection"
+            }
             ]
         };
         var lineChartOptions = {
@@ -380,15 +380,15 @@
                         fontSize: 16,
                         stepSize: 25000,
                         padding: 20,
-                        callback: function(value) {
+                        callback: function (value) {
                             var ranges = [{
-                                    divider: 1e6,
-                                    suffix: 'M'
-                                },
-                                {
-                                    divider: 1e3,
-                                    suffix: 'k'
-                                }
+                                divider: 1e6,
+                                suffix: 'M'
+                            },
+                            {
+                                divider: 1e3,
+                                suffix: 'k'
+                            }
                             ];
 
                             function formatNumber(n) {
@@ -446,7 +446,7 @@
                 backgroundColor: ["#40dfcd", "#417dfc", "#ffaa01"],
                 data: [125000, 100000, 75000, 50000, 150000],
                 label: "Expenses (millions)"
-            }, ]
+            },]
         };
         var barChartOptions = {
             responsive: true,
@@ -480,15 +480,15 @@
                         stepSize: 25000,
                         padding: 20,
                         beginAtZero: true,
-                        callback: function(value) {
+                        callback: function (value) {
                             var ranges = [{
-                                    divider: 1e6,
-                                    suffix: 'M'
-                                },
-                                {
-                                    divider: 1e3,
-                                    suffix: 'k'
-                                }
+                                divider: 1e6,
+                                suffix: 'M'
+                            },
+                            {
+                                divider: 1e3,
+                                suffix: 'k'
+                            }
                             ];
 
                             function formatNumber(n) {
@@ -538,7 +538,7 @@
                 backgroundColor: ["#304ffe", "#ffa601"],
                 data: [45000, 105000],
                 label: "Total Students"
-            }, ]
+            },]
         };
         var doughnutChartOptions = {
             responsive: true,
@@ -579,22 +579,22 @@
             eventLimit: true, // allow "more" link when too many events
             aspectRatio: 1.8,
             events: [{
-                    title: 'All Day Event',
-                    start: '2019-04-01'
-                },
+                title: 'All Day Event',
+                start: '2019-04-01'
+            },
 
-                {
-                    title: 'Meeting',
-                    start: '2019-04-12T14:30:00'
-                },
-                {
-                    title: 'Happy Hour',
-                    start: '2019-04-15T17:30:00'
-                },
-                {
-                    title: 'Birthday Party',
-                    start: '2019-04-20T07:00:00'
-                }
+            {
+                title: 'Meeting',
+                start: '2019-04-12T14:30:00'
+            },
+            {
+                title: 'Happy Hour',
+                start: '2019-04-15T17:30:00'
+            },
+            {
+                title: 'Birthday Party',
+                start: '2019-04-20T07:00:00'
+            }
             ]
         });
     }

@@ -120,25 +120,41 @@ class ShiftController extends Controller
 
         return response()->json($re, 200);
     }
-    public function getData()
+    public function getData(Request $request, School $school)
     {
-        $data = Shift::withCount(['timeslots'])->latest()->paginate(20);
+        $limit = $request->limit ?: 10;
+        $query = Shift::withCount(['timeslots'])->where('shift_school', $school->uid);
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('shift_name', 'LIKE', '%'.$request->s.'%')
+                  ->orWhere('shift_opening_time', 'LIKE', '%'.$request->s.'%')
+                  ->orWhere('shift_closing_time', 'LIKE', '%'.$request->s.'%');
+            });
+        }
 
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            foreach ($data as $i => $d) {
-                $data[$i]->shift_opening_time = date('h:i A', strtotime($d->shift_opening_time));
-                $data[$i]->shift_closing_time = date('h:i A', strtotime($d->shift_closing_time));
+        if($request->type && $request->type == 'all')
+        {
+            $re = $query->orderBy('shift_name')->get();
+        }
+        else
+        {
+            $data = $query->latest()->paginate($limit);
+            if ($data->isEmpty()) {
+                $re = [
+                    'status'    => false,
+                    'message'   => 'No record(s) found.'
+                ];
+            } else {
+                foreach ($data as $i => $d) {
+                    $data[$i]->shift_opening_time = date('h:i A', strtotime($d->shift_opening_time));
+                    $data[$i]->shift_closing_time = date('h:i A', strtotime($d->shift_closing_time));
+                }
+                $re = [
+                    'status'    => true,
+                    'message'   => $data->count().' record(s) found.',
+                    'data'      => $data,
+                ];
             }
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
         }
 
         return response()->json($re, 200);

@@ -169,9 +169,24 @@ class SectionController extends Controller
 
         return response()->json($re, 200);
     }
-    public function getData()
+    public function getData(Request $request, School $school)
     {
-        $data = Section::with(['cls', 'cls.dept'])->has('cls')->where('school', auth()->user()->school)->latest()->paginate(20);
+        $limit = $request->limit ?: 10;
+        $query = Section::with(['cls', 'cls.dept'])->has('cls')->where('school', $school->uid);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%'.$request->s.'%')
+                  ->orWhereHas('cls', function ($cq) use ($request) {
+                      $cq->where('name', 'LIKE', $request->s);
+                  })
+                  ->orWhereHas('cls.dept', function ($cq) use ($request) {
+                      $cq->where('dept_name', 'LIKE', '%'.$request->s.'%');
+                  });
+            });
+        }
+
+        $data = $query->latest()->paginate($limit);
 
         if ($data->isEmpty()) {
             $re = [

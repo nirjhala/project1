@@ -90,9 +90,17 @@ class HostelController extends Controller
         }
         return response()->json($re, $responseCode);
     }
-    public function getData()
+    public function getData(Request $request, School $school)
     {
-        $data = Hostel::with(['city_name', 'city_name.stateName'])->latest()->paginate(20);
+        $limit = $request->limit ?: 10;
+        $query = Hostel::with(['city_name', 'city_name.stateName'])->where('school', $school->uid);
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%'.$request->s.'%');
+            });
+        }
+        $data = $query->latest()->paginate($limit);
+
         if ($data->isEmpty()) {
             $re = [
                 'status'    => false,

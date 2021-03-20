@@ -42,24 +42,43 @@ class AdmitCardController extends Controller
     public function index(Request $request, School $school)
     {
         $request->validate([
-            'exam_type_id'  => 'required|numeric',
+            // 'exam_type_id'  => 'required|numeric',
             'section_id'    => 'required|numeric'
         ]);
 
-        $admit_cards = User::with([
-                'studentData', 
-                'studentData.father_info', 
-                'studentData.sectionName', 
-                'studentData.sectionName.cls'
-            ])->where('school', $school->uid)
-            ->whereHas('studentData', function ($q) use ($request) {
-                $q->where('section', $request->section_id)->whereHas('sectionName.admit_card', function ($query) use ($request) {
+        $query = User::with([
+            'studentData', 
+            'studentData.father_info', 
+            'studentData.sectionName', 
+            'studentData.sectionName.cls',
+            'media'
+        ])
+        ->where('school', $school->uid)
+        ->whereHas('studentData', function ($q) use ($request) {
+            $q->where('section', $request->section_id);
+            if(!empty($request->exam_type_id))
+            {
+                $q->whereHas('sectionName.admit_card', function ($query) use ($request) {
                     $query->where('exam_type_id', $request->exam_type_id);
                 });
-            })
-            ->orderBy('fname')
-            ->orderBy('lname')
-            ->get();
+            }
+        });
+
+        if(!empty($request->s))
+        {
+            $s = trim($request->s);
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'LIKE', "%{$s}%")
+                  ->orWhereHas('studentData', function ($q2) use ($s) {
+                    $q2->where('roll_no', 'LIKE', "{$s}");
+                  });
+            });
+        }
+
+        $admit_cards = $query
+        ->orderBy('fname')
+        ->orderBy('lname')
+        ->get();
 
         if(!empty($request->subject_id) && !$admit_cards->isEmpty())
         {

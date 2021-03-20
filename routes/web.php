@@ -30,6 +30,13 @@ Route::get('get-barcode', function () {
     return '<img src="' . $imageSrc . '" alt="barcode"   />';
 });
 
-Route::get('/{any}', function () {
-    return view('layouts.master');
-})->where('any', '.*');
+Route::group(['domain' => '{school:weburl}.'.env('DOMAIN'), 'namespace' => 'api'], function () {
+    Route::get('/{any}', function () {
+        return view('layouts.master');
+    })->where('any', '.*');
+});
+
+Route::get('/', 'WebController@index');
+Route::get('/request-demo', 'WebController@request_demo');
+Route::get('/pricing', 'WebController@pricing');
+Route::get('/about-us', 'WebController@about_us');

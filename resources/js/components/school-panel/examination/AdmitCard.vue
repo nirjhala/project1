@@ -70,7 +70,7 @@
                         </b-form-group>
                     </b-row>
                     <div class="text-center" v-if="!loaded">
-                        <img :src="baseURL + 'img/preloader.gif'" alt="" style="max-width: 100%;">
+                        <b-spinner></b-spinner>
                     </div>
                     <div v-if="loaded">
                         <div v-if="lists.length">

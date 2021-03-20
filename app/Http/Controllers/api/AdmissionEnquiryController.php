@@ -42,10 +42,10 @@ class AdmissionEnquiryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, School $subdomain)
+    public function store(Request $request, School $school)
     {
         $input = $request->record;
-        $input['school_id'] = $subdomain->uid;
+        $input['school_id'] = $school->uid;
         $ad_enq = AdmissionEnquiry::create($input);
         return response()->json( $ad_enq, 200 );
     }

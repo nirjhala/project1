@@ -16,7 +16,7 @@
     <div class="card height-auto" v-if="!loaded">
         <div class="card-body">
             <div class="text-center">
-                <img src="img/preloader.gif" alt="" style="max-width: 100%;">
+                <b-spinner></b-spinner>
             </div>
         </div>
     </div>

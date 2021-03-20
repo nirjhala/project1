@@ -39,7 +39,7 @@
         <div class="card height-auto" v-if="section">
             <div class="card-body">
                 <div class="text-center" v-if="!loaded">
-                    <img src="img/preloader.gif" alt="" style="max-width: 100%;">
+                    <b-spinner></b-spinner>
                 </div>
                 <div v-if="loaded">
                     <div id="timetable">

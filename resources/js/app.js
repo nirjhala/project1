@@ -6,7 +6,7 @@
 
 require('./bootstrap');
 
-window.Vue       = require('vue')
+window.Vue = require('vue')
 
 import VueRouter from 'vue-router'
 import VueGlobalVariable from 'vue-global-var'
@@ -28,17 +28,17 @@ Vue.use(VueRouter)
 
 Vue.use(require('vue-resource'))
 Vue.use(VueToast, {
-  position: 'top',
-  dismissible: true
+    position: 'top',
+    dismissible: true
 })
 
-Vue.filter('formatDate', function(value) {
+Vue.filter('formatDate', function (value) {
     if (value) {
         return moment(String(value)).format('MMMM DD, YYYY hh:mm A')
     }
 })
 
-Vue.filter('formatDateOnly', function(value) {
+Vue.filter('formatDateOnly', function (value) {
     if (value) {
         return moment(String(value)).format('DD MMMM YYYY')
     }
@@ -68,19 +68,19 @@ Vue.component('app-component', require('./App.vue').default);
  */
 const router = new VueRouter({
     mode: 'history',
-    base: 'school-management',
+    // base: 'school-management',
     routes
 });
 
 router.beforeEach((to, from, next) => {
-    let token    = localStorage.getItem('token'),
+    let token = localStorage.getItem('token'),
         userInfo = localStorage.getItem('user_info')
     userInfo = JSON.parse(userInfo)
-    
+
     if (to.meta.requireAuth) {
         if (!token || !userInfo) {
             next("/login")
-        } else if(to.meta.role && !to.meta.role.includes(userInfo.role_name.name)) {
+        } else if (to.meta.role && !to.meta.role.includes(userInfo.role_name.name)) {
             next('/505-forbidden')
         } else {
             next()

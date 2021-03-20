@@ -118,12 +118,21 @@ class SessionController extends Controller
         return response()->json($re, 200);
     }
 
-    public function getData()
+    public function getData(Request $request, School $school)
     {
         $user       = auth()->user();
-        $school_id  = $user->school;
 
-        $data = Session::where('session_school', $school_id)->latest()->paginate(20);
+        $query = Session::where('session_school', $school->uid);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('session_name', 'LIKE', '%'.$request->s.'%')
+                  ->orWhere('session_start_year', 'LIKE', '%'.$request->s.'%')
+                  ->orWhere('session_start_month', 'LIKE', '%'.$request->s.'%');
+            });
+        }
+
+        $data = $query->latest()->paginate(20);
 
         foreach ($data as $i => $d) {
             $data[$i]->session_start_month = date("F", mktime(0, 0, 0, $d->session_start_month, 10));

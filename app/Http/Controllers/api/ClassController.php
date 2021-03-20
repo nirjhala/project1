@@ -118,27 +118,49 @@ class ClassController extends Controller
 
         return response()->json($re, 200);
     }
-    public function getData()
+    public function getData(Request $request, School $school)
     {
-        $data = ClassModel::withCount(['sections' => function ($q) {
-            $q;
-        }])
-        ->with('dept')
-        ->where('school', auth()->user()->school)
-        
-        ->latest()->paginate(20);
 
-        if ($data->isEmpty()) {
-            $re = [
-                'status'    => false,
-                'message'   => 'No record(s) found.'
-            ];
-        } else {
-            $re = [
-                'status'    => true,
-                'message'   => $data->count().' record(s) found.',
-                'data'      => $data,
-            ];
+        $query = ClassModel::withCount(['sections'])
+        ->with('dept')
+        ->withCount(['sections'])
+        ->where('school', $school->uid);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%'.$request->s.'%');
+                $q->orWhereHas('dept', function ($dq) use ($request) {
+                    $dq->where('dept_name', 'LIKE', '%'.$request->s.'%');
+                });
+            });
+        }
+
+        if (!empty($request->department)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('department', '=', $request->department);
+            });
+        }
+
+        if($request->type && $request->type == 'all')
+        {
+            $re = $query->orderBy('name')->get()->append('full_class')->pluck('full_class', 'id');
+        }
+        else
+        {
+            $data = $query->latest()->paginate(20);
+    
+            if ($data->isEmpty()) {
+                $re = [
+                    'status'    => false,
+                    'message'   => 'No record(s) found.'
+                ];
+            } else {
+                $re = [
+                    'status'    => true,
+                    'message'   => $data->count().' record(s) found.',
+                    'data'      => $data,
+                ];
+            }
         }
 
         return response()->json($re, 200);

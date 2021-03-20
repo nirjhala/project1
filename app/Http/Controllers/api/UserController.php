@@ -22,6 +22,30 @@ use App\Model\School;
 
 class UserController extends Controller
 {
+    public function profile(Request $request, $subdomain)
+    {
+        $info = User::with(['media', 'pincodeData', 'cityData', 'documents', 'custom_fields'])->findOrFail($request->user()->id);
+
+        $info->picture = !empty($info->media->image) ? url('uploads/thumb/'.$info->media->image) : url('img/figure/admin.jpg');
+        $info->dob     = date("d M Y", strtotime($info->dob));
+
+        if(!empty($info->custom_fields)) {
+            foreach($info->custom_fields as $key => $cf) {
+                if($cf->type == 'relation') {
+                    $relationInfo = \DB::table($cf->relative_table)->find($cf->pivot->value);
+                    $info->custom_fields[$key]->valueText = !empty($relationInfo->name) ? $relationInfo->name : '';
+                } else {
+                    $info->custom_fields[$key]->valueText = $cf->pivot->value;
+                }
+            }
+        }
+
+        $re = [
+            'status'    => true,
+            'data'      => $info
+        ];
+        return response()->json($re);
+    }
     public function teachers(Request $request, School $school)
     {
         $query = User::where('school', $school->uid)->whereHas('roleName', function ($q) {
@@ -144,7 +168,7 @@ class UserController extends Controller
             'status'    => true,
             'data'      => $info
         ];
-        return response()->json($re, 200);
+        return response()->json($re);
     }
     public function userLogin(Request $request, $schoolName)
     {

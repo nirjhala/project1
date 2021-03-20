@@ -118,9 +118,19 @@ class RouteController extends Controller
 
         return response()->json($re, $responseCode);
     }
-    public function getData(Request $request)
+    public function getData(Request $request, School $school)
     {
-        $data = Routes::with(['points', 'vehicleInfo', 'vehicleInfo.driverName'])->where('school', auth()->user()->school)->latest()->paginate(20);
+        $limit = $request->limit ?: 10;
+        $query = Routes::with(['vehicleInfo', 'vehicleInfo.driverName'])->where('school', $school->uid);
+
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'LIKE', '%'.$request->s.'%')
+                  ->orWhere('start_point', 'LIKE', '%'.$request->s.'%');
+            });
+        }
+
+        $data = $query->latest()->paginate($limit);
 
         if ($data->isEmpty()) {
             $re = [
@@ -135,7 +145,7 @@ class RouteController extends Controller
             ];
         }
 
-        return response()->json($re, 200);
+        return response()->json($re);
     }
     public function getAllList()
     {

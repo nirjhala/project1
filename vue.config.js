@@ -1,3 +1,3 @@
 module.exports = {
-    baseUrl: '/school-management/'
+    // baseUrl: '/school-management/'
 }

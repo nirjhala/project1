@@ -380,8 +380,8 @@
 import "../../../public/css/normalize.css";
 import "../../../public/css/main.css";
 import "../../../public/css/all.min.css";
-import "../../../public/css/fullcalendar.min.css";
-import "../../../public/css/bootstrap.min.css";
+// import "../../../public/css/fullcalendar.min.css";
+// import "../../../public/css/bootstrap.min.css";
 import "../../../public/css/animate.min.css";
 import "../../../public/css/style.css";
 import "../../../public/admin/css/style.min.css";
@@ -401,11 +401,11 @@ export default {
     return {
       routerKey: 0,
       images: [],
-      logo_src: baseURL + "img/logo.png",
-      profile_picture: baseURL + "img/figure/admin.jpg",
+      logo_src: baseURL + "/img/logo.png",
+      profile_picture: baseURL + "/img/figure/admin.jpg",
       media_image: "",
       media_image_url: "",
-      media_src: baseURL + "img/default.jpg",
+      media_src: baseURL + "/img/default.jpg",
       imageTarget: "",
       fieldTarget: "",
       user_info: JSON.parse(localStorage.getItem("user_info")),
@@ -435,7 +435,7 @@ export default {
     }
     if (this.user_info.school_data && this.user_info.school_data.logo) {
       this.logo_src =
-        this.baseURL + "img/profiles/" + this.user_info.school_data.logo;
+        this.baseURL + "/img/profiles/" + this.user_info.school_data.logo;
     }
 
     this.auth = token;
@@ -512,18 +512,21 @@ export default {
       this.routerKey += 1;
     },
     okClicked() {
-      let target = $("#imageTarget").val(),
-        image = $(".media_check:checked").data("src"),
+      let image = $(".media_check:checked").data("src"),
         id = $(".media_check:checked").val(),
+        target = $("#imageTarget").val(),
         target_field = $("#fieldTarget").val();
 
       this.media_src = image;
-
       this.media_image = id;
+
+      $(target).attr("src", image);
+      $(target_field).val(id)[0].dispatchEvent(new Event("input"));
 
       $("#mediaModal").modal("hide");
     },
     getMedia() {
+      let token = localStorage.getItem("token");
       if (token != undefined && token != "") {
         let instance = axios.create({
           baseURL: this.apiBaseUrl,
@@ -532,31 +535,39 @@ export default {
             Accept: "application/json",
           },
         });
-        instance.get("view-media").then((res) => {
-          this.images = res.data;
-        });
+        instance
+          .get("view-media")
+          .then((res) => {
+            this.images = res.data;
+          })
+          .catch((err) => {
+            if (err.response.status === 401) {
+              localStorage.removeItem("token");
+              localStorage.removeItem("user_info");
+
+              this.auth = false;
+              this.$router.push({
+                name: "login",
+              });
+            }
+          });
       }
     },
     loadJs() {
       this.js_load++;
       if (this.js_load == 1) {
         let src_urls = [
-          "plugins.js",
           "jquery.counterup.min.js",
-          "moment.min.js",
           "jquery.waypoints.min.js",
           "jquery.scrollUp.min.js",
           "sweetalert.min.js",
-          "fullcalendar.min.js",
-          "Chart.min.js",
-          "validation.min.js",
           "main.js",
         ];
         let scriptTag;
         src_urls.forEach((row, i) => {
           scriptTag = document.createElement("script");
           scriptTag.defer = "defer";
-          scriptTag.src = `${this.baseURL}js/${row}`;
+          scriptTag.src = `${this.baseURL}/js/${row}`;
           document.body.appendChild(scriptTag);
         });
       }
@@ -565,16 +576,6 @@ export default {
 };
 </script>
 <style>
-/* @import '../../../public/css/flaticon.css'; */
-/* @import "../../../public/css/normalize.css";
-@import "../../../public/css/main.css";
-@import "../../../public/css/all.min.css";
-@import "../../../public/css/fullcalendar.min.css";
-@import "../../../public/css/bootstrap.min.css";
-@import "../../../public/css/animate.min.css";
-@import "../../../public/css/style.css";
-@import "../../../public/admin/css/style.min.css";
-@import "../../../public/icomoon/style.min.css"; */
 .bounce-enter-active {
   animation: bounce-in 0.5s;
 }

@@ -23,6 +23,79 @@ use App\Model\Role;
 
 class StudentController extends Controller
 {
+    public function updatePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|array'
+        ]);
+
+        $photoArr = array_filter($request->photo);
+
+        if(!empty($photoArr))
+        {
+            foreach($photoArr as $id => $image)
+            {
+                if(!empty($image))
+                {
+                    User::where('id', $id)->update(['image' => $image]);
+                }
+            }
+
+            return response()->json([
+                'message'   => 'Success! Photos updated successfully.'
+            ]);
+        }
+
+    }
+
+    public function updateSmsContact(Request $request)
+    {
+        $request->validate([
+            'sms_contact' => 'required|array'
+        ]);
+
+        $sms_contactArr = array_filter($request->sms_contact);
+
+        if(!empty($sms_contactArr))
+        {
+            foreach($sms_contactArr as $id => $sms_mobile)
+            {
+                if(!empty($sms_mobile))
+                {
+                    User::where('id', $id)->update(['sms_mobile' => $sms_mobile]);
+                }
+            }
+
+            return response()->json([
+                'message'   => 'Success! SMS Contact updated successfully.'
+            ]);
+        }
+    }
+
+    public function updateRollNo(Request $request)
+    {
+        $request->validate([
+            'roll_no' => 'required|array'
+        ]);
+
+        $roll_noArr = array_filter($request->roll_no);
+
+        if(!empty($roll_noArr))
+        {
+            foreach($roll_noArr as $id => $roll_no)
+            {
+                if(!empty($roll_no))
+                {
+                    Student::where('uid', $id)->update(['roll_no' => $roll_no]);
+                }
+            }
+
+            return response()->json([
+                'message'   => 'Success! Roll No. updated successfully.'
+            ]);
+        }
+    }
+
     /** 
      * Display a listing of the resource. 
      * @return \Illuminate\Http\Response 
@@ -266,7 +339,10 @@ class StudentController extends Controller
             'SectionName.cls'
         ])
         ->whereHas('user', function ($q) use ($school) {
-            $q->where('school', $school->uid);
+            $q->where('school', $school->uid)
+            ->whereHas("roleName", function ($q1) {
+                $q1->where('name', 'Student');
+            });
         })->get();
         return response()->json( $lists );
     }
@@ -445,7 +521,7 @@ class StudentController extends Controller
     }
     public function info(Request $request, $weburl)
     {
-        $info = User::with(['cityData', 'cityData.stateName', 'studentData', 'studentData.sectionName', 'studentData.father_info', 'studentData.mother_info', 'studentData.guardian_info', 'studentData.SectionName', 'studentData.SectionName.cls', 'studentData.religion_info', 'media'])->findOrFail( auth()->user()->id );
+        $info = User::with(['cityData', 'cityData.stateName', 'studentData', 'studentData.sectionName', 'studentData.father_info', 'studentData.mother_info', 'studentData.guardian_info', 'studentData.SectionName', 'studentData.SectionName.cls', 'studentData.religion_info', 'media', 'documents', 'custom_fields'])->findOrFail( auth()->user()->id );
 
         $info->picture = !empty($info->media->image) ? url('uploads/thumb/'.$info->media->image) : url('img/figure/admin.jpg');
         $info->dob     = date("d M Y", strtotime($info->dob));

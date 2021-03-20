@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 use Route;
 use App\Model\Vehicle;
+use App\Model\School;
 
 class VehicleController extends Controller
 {
@@ -113,22 +114,34 @@ class VehicleController extends Controller
 
         return response()->json($data, 200);
     }
-    public function getData(Request $request)
+    public function getData(Request $request, School $school)
     {
-        $data = Vehicle::with(['driverName'])
-            ->withCount('routes')
-            ->where('school', auth()->user()->school)
-            ->latest()
-            ->paginate(20);
+        $limit = $request->limit ?: 10;
+        $query = Vehicle::with('driverName')->withCount('routes')->where('school', $school->uid);
 
-        
-        $re = [
-            'status'    => true,
-            'message'   => $data->count().' record(s) found.',
-            'data'      => $data,
-        ];
+        if (!empty($request->s)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('vehicle_no', 'LIKE', '%'.$request->s.'%')
+                  ->orWhere('vehicle_rc', 'LIKE', '%'.$request->s.'%');
+            });
+        }
 
-        return response()->json($re, 200);
+        if($request->type && $request->type == 'all')
+        {
+            $re = $query->orderBy('vehicle_no')->pluck('vehicle_no', 'id');
+        }
+        else
+        {
+            $data = $query->latest()->paginate($limit);
+            
+            $re = [
+                'status'    => true,
+                'message'   => $data->count().' record(s) found.',
+                'data'      => $data,
+            ];
+        }
+
+        return response()->json($re);
     }
     public function searchData(Request $request, $schoolName)
     {
