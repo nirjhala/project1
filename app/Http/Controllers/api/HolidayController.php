@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\api;
+
 use Illuminate\Routing\Controller;
 
 use App\Model\Holiday;
@@ -21,12 +22,12 @@ class HolidayController extends Controller
     public function index(Request $request, School $school)
     {
         $query = Holiday::query();
-        if(!empty($request->s)) {
+        if (!empty($request->s)) {
             $s = trim($request->s);
-            $query->where(function($q) use ($s) {
-                $q->where('title', 'LIKE', '%'.$s.'%')
-                  ->orWhere('date', 'LIKE', '%'.$s.'%')
-                  ->orWhere('description', 'LIKE', '%'.$s.'%');
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'LIKE', '%' . $s . '%')
+                    ->orWhere('date', 'LIKE', '%' . $s . '%')
+                    ->orWhere('description', 'LIKE', '%' . $s . '%');
             });
         }
         $lists = $query->where('school_id', $school->uid)->paginate(30);
@@ -34,19 +35,20 @@ class HolidayController extends Controller
         return response()->json($lists);
     }
 
-    public function all(Request $request, School $school) {
-        $data       = Weekday::where('school', auth()->user()->school);
+    public function all(Request $request, School $school)
+    {
+        $data       = Weekday::where('school', $school->uid);
         $weekday    = $data->count() ? $data->first()->toArray() : [];
 
-        $session    = date('n') > 3 ? date('Y').'-'.(date('y') + 1) : (date('Y') - 1).'-'.date('y');
+        $session    = date('n') > 3 ? date('Y') . '-' . (date('y') + 1) : (date('Y') - 1) . '-' . date('y');
         $startYear  = substr($session, 0, 4);
-        $session_exists = Session::where('session_start_year', $startYear)->where('session_school', auth()->user()->school)->where('session_is_deleted', 'N');
-        if($session_exists->count() == 0) {
+        $session_exists = Session::where('session_start_year', $startYear)->where('session_school', $school->uid)->where('session_is_deleted', 'N');
+        if ($session_exists->count() == 0) {
             $sess = Session::create([
                 'session_name'          => $session,
                 'session_start_year'    => $startYear,
                 'session_start_month'   => 4,
-                'session_school'        => auth()->user()->school
+                'session_school'        => $school->uid
             ]);
         } else {
             $sess = $session_exists->first();
@@ -57,15 +59,15 @@ class HolidayController extends Controller
         $startDate = "{$year}-{$month}-01";
 
         $dataArr = [];
-        for( $i = 0; $i < 12; $i++ ) {
+        for ($i = 0; $i < 12; $i++) {
             $firstDate = date("Y-m-d", strtotime("+{$i} months", strtotime($startDate)));
             $totalMonthDays = date('t', strtotime($firstDate)); // Returns total no. of days in month
             $firstWeek = date('w', strtotime($firstDate)); // Returns total no. of days in month
 
-            $currentTime = strtotime( date("Y-m-d") );
+            $currentTime = strtotime(date("Y-m-d"));
 
             $daysArr = [];
-            for( $j = 0; $j < $totalMonthDays; $j++ ) {
+            for ($j = 0; $j < $totalMonthDays; $j++) {
                 $dateTime = strtotime($firstDate . " + {$j} days");
                 $date = date("d", $dateTime);
 
@@ -73,13 +75,13 @@ class HolidayController extends Controller
                 $holiday = "";
 
                 $holidayArr = [];
-                if($weekday[date('l', $dateTime)] == 'N') {
+                if ($weekday[date('l', $dateTime)] == 'N') {
                     $holidayArr[] = date('l', $dateTime);
                 }
-                
+
                 $holidays = Holiday::where('school_id', $school->uid)->where('date', date('Y-m-d', $dateTime))->select('title', 'date')->get();
-                if(!$holidays->isEmpty()) {
-                    foreach($holidays as $h) {
+                if (!$holidays->isEmpty()) {
+                    foreach ($holidays as $h) {
                         $holidayArr[] = $h->title;
                     }
                 }
@@ -102,7 +104,7 @@ class HolidayController extends Controller
                 "weekdays"      => $weekday
             ];
         }
-        return response()->json( $dataArr );
+        return response()->json($dataArr);
     }
 
     /**
@@ -120,7 +122,7 @@ class HolidayController extends Controller
             'title'     => [
                 'required',
                 'string',
-                Rule::unique('holidays')->where(function($q) use ($user, $input) {
+                Rule::unique('holidays')->where(function ($q) use ($user, $input) {
                     return $q->where('school_id', $user->school);
                 })
             ],
@@ -173,7 +175,7 @@ class HolidayController extends Controller
             'title' => [
                 'required',
                 'string',
-                Rule::unique('holidays')->where(function($q) use ($school, $holiday) {
+                Rule::unique('holidays')->where(function ($q) use ($school, $holiday) {
                     return $q->where('school_id', $school->uid)->where('id', '!=', $holiday->id);
                 })
             ],

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['domain' => '{school:weburl}.'.env('DOMAIN'), 'namespace' => 'api'], function () {
+Route::group(['domain' => '{school:weburl}.' . env('DOMAIN'), 'namespace' => 'api'], function () {
     Route::post('user-login', 'UserController@userLogin');
     Route::post('forgot-password', 'UserController@forgotPassword');
     Route::post('recover-password', 'UserController@recoverPassword');
@@ -35,14 +35,16 @@ Route::group(['domain' => '{school:weburl}.'.env('DOMAIN'), 'namespace' => 'api'
     Route::get('web-notice/{notice:slug}', 'NoticeController@show');
 
     Route::post('search-admit-card', 'AdmitCardController@search');
-
+    Route::get('holiday-calendar', 'HolidayController@all');
+    Route::get('event-calendar', 'EventController@all');
     Route::apiResource('web-news', 'NewsController', ['only' => ['index', 'show']]);
     Route::apiResource('web-event', 'EventController', ['only' => ['index', 'show']]);
+    Route::apiResource('web-holiday', 'HolidayController', ['only' => ['index', 'show']]);
     Route::apiResource('web-gallery', 'GalleryController', ['only' => ['index']]);
     Route::apiResource('web-exam-type', 'ExamTypeController', ['only' => 'index']);
 });
 
-Route::group(['domain' => 'acc.'.env('DOMAIN')], function () {
+Route::group(['domain' => 'acc.' . env('DOMAIN')], function () {
     Route::group(['namespace' => 'api'], function () {
         Route::post('get-started', 'RegisterController@getStarted');
         Route::post('resend-otp', 'RegisterController@sendOtp');
@@ -54,8 +56,8 @@ Route::group(['domain' => 'acc.'.env('DOMAIN')], function () {
 });
 
 Route::group([
-    'domain' => '{school:weburl}.'.env('DOMAIN'), 
-    'namespace' => 'api', 
+    'domain' => '{school:weburl}.' . env('DOMAIN'),
+    'namespace' => 'api',
     'middleware' => 'auth:api'
 ], function () {
 
@@ -145,7 +147,7 @@ Route::group([
 
     Route::post('pay-grade/remove', 'PayGradeController@remove');
     Route::apiResource('pay-grade', 'PayGradeController');
-    
+
     Route::get('employee-info/{id}', 'EmployeePromotionController@employee_info');
     Route::post('employee-promotion/remove', 'EmployeePromotionController@remove');
     Route::apiResource('employee-promotion', 'EmployeePromotionController');
@@ -202,7 +204,7 @@ Route::group([
     Route::get('get-teachers', 'UserController@getTeachers');
     Route::get('get-staffs', 'UserController@getStaffs');
 
-    Route::group(['prefix' => 'parent'], function() {
+    Route::group(['prefix' => 'parent'], function () {
         Route::get('/', 'GuardianController@index');
         Route::post('/add', 'GuardianController@add');
     });
@@ -273,7 +275,7 @@ Route::group([
     Route::post('update-sms-contact', 'StudentController@updateSmsContact');
     Route::post('update-roll-no', 'StudentController@updateRollNo');
     Route::apiResource('student', 'StudentController');
-    
+
     Route::apiResource('student-promote', 'StudentPromoteController');
 
     Route::apiResource('fee-payment', 'FeePaymentController', ['only' => ['store', 'index']]);
@@ -286,7 +288,7 @@ Route::group([
      * Fee Installment - Class wise
      * Fee Structure
      * Fee Due Report
-    **/
+     **/
     Route::apiResource('fees-type', 'FeeTypeController');
     Route::post('fees-type/remove', 'FeeTypeController@remove');
     Route::get('get-all-fees-type', 'FeeTypeController@getAllList');
@@ -324,7 +326,7 @@ Route::group([
         Route::post('general-settings', 'ProfileController@generalSetting');
         Route::post('change-password', 'ProfileController@ChangePassword');
     });
-    
+
     Route::apiResource('fee-setting', 'FeeSettingController', ['only' => ['index', 'update']]);
 
     Route::group(['namespace' => 'lms'], function () {
@@ -347,7 +349,7 @@ Route::group([
             Route::post('/remove', 'LibraryPassController@removeData');
         });
 
-        Route::group(['prefix' => 'book'], function() {
+        Route::group(['prefix' => 'book'], function () {
             Route::get('/', 'BookController@getData');
             Route::post('/add', 'BookController@addData');
             Route::post('/edit/{book}', 'BookController@editData');
@@ -389,9 +391,9 @@ Route::group([
     // Route::post('delete-admit-card', 'AdmitCardController@remove');
     Route::get('admit-card-subject/{examTypeId}/{sectionId}', 'AdmitCardController@fetch_subjects');
     Route::apiResource('admit-card', 'AdmitCardController');
-    
+
     Route::apiResource('marksheet', 'MarksheetController');
-    
+
     Route::apiResource('gst-rate', 'GstRateController', ['only' => 'index']);
     Route::post('item/remove', 'ItemController@remove');
     Route::apiResource('item', 'ItemController');
@@ -414,7 +416,7 @@ Route::group([
     Route::get('report/cash-book', 'ReportController@cashbook');
     Route::get('report/bank-book', 'ReportController@bankbook');
     Route::get('report/ledger/{user}', 'ReportController@ledger');
-    
+
     Route::post('question/remove', 'QuestionController@remove');
     Route::apiResource('question', 'QuestionController');
     Route::post('instruction/remove', 'InstructionController@remove');

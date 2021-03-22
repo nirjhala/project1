@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api;
 
 use App\Http\Controllers\Controller;
 use App\Model\StudentPromote;
+use App\Model\Student;
 use Illuminate\Http\Request;
 
 class StudentPromoteController extends Controller
@@ -39,7 +40,10 @@ class StudentPromoteController extends Controller
             $studentPromote->to_section = $request->to_section_id;
             $studentPromote->remarks = $request->remarks;
             $studentPromote->save();
+
+            Student::where('uid', $user_id)->update(['section' => $request->to_section_id]);
         }
+
 
         return response()->json(['message' => 'Success!! Selected Student promoted done.']);
     }

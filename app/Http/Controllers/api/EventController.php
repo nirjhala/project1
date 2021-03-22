@@ -21,21 +21,21 @@ class EventController extends Controller
     public function index(Request $request, School $school)
     {
         $query = Event::with(['media']);
-        if(!empty($request->s)) {
+        if (!empty($request->s)) {
             $s = trim($request->s);
-            $query->where(function($q) use ($s) {
-                $q->where('name', 'LIKE', '%'.$s.'%')
-                  ->orWhere('slug', 'LIKE', '%'.$s.'%')
-                  ->orWhere('dates_text', 'LIKE', '%'.$s.'%')
-                  ->orWhere('classes', 'LIKE', '%'.$s.'%')
-                  ->orWhere('short_description', 'LIKE', '%'.$s.'%');
+            $query->where(function ($q) use ($s) {
+                $q->where('name', 'LIKE', '%' . $s . '%')
+                    ->orWhere('slug', 'LIKE', '%' . $s . '%')
+                    ->orWhere('dates_text', 'LIKE', '%' . $s . '%')
+                    ->orWhere('classes', 'LIKE', '%' . $s . '%')
+                    ->orWhere('short_description', 'LIKE', '%' . $s . '%');
             });
         }
         $lists = $query->where('school_id', $school->uid)->paginate(30);
 
-        if(!$lists->isEmpty()) {
-            foreach($lists as $key => $list) {
-                if(!empty($list->media->image)) {
+        if (!$lists->isEmpty()) {
+            foreach ($lists as $key => $list) {
+                if (!empty($list->media->image)) {
                     $lists[$key]->thumb_image = url("uploads/thumb/{$list->media->image}");
                 }
             }
@@ -44,19 +44,20 @@ class EventController extends Controller
         return response()->json($lists);
     }
 
-    public function all(Request $request, School $school) {
-        $data       = Weekday::where('school', auth()->user()->school);
+    public function all(Request $request, School $school)
+    {
+        $data       = Weekday::where('school', $school->uid);
         $weekday    = $data->count() ? $data->first()->toArray() : [];
 
-        $session    = date('n') > 3 ? date('Y').'-'.(date('y') + 1) : (date('Y') - 1).'-'.date('y');
+        $session    = date('n') > 3 ? date('Y') . '-' . (date('y') + 1) : (date('Y') - 1) . '-' . date('y');
         $startYear  = substr($session, 0, 4);
-        $session_exists = Session::where('session_start_year', $startYear)->where('session_school', auth()->user()->school)->where('session_is_deleted', 'N');
-        if($session_exists->count() == 0) {
+        $session_exists = Session::where('session_start_year', $startYear)->where('session_school', $school->uid)->where('session_is_deleted', 'N');
+        if ($session_exists->count() == 0) {
             $sess = Session::create([
                 'session_name'          => $session,
                 'session_start_year'    => $startYear,
                 'session_start_month'   => 4,
-                'session_school'        => auth()->user()->school
+                'session_school'        => $school->uid
             ]);
         } else {
             $sess = $session_exists->first();
@@ -67,16 +68,16 @@ class EventController extends Controller
         $startDate = "{$year}-{$month}-01";
 
         $dataArr = [];
-        for( $i = 0; $i < 12; $i++ ) {
+        for ($i = 0; $i < 12; $i++) {
             $firstDate = date("Y-m-d", strtotime("+{$i} months", strtotime($startDate)));
             $totalMonthDays = date('t', strtotime($firstDate)); // Returns total no. of days in month
             $firstWeek = date('w', strtotime($firstDate)); // Returns total no. of days in month
 
-            $currentTime = strtotime( date("Y-m-d") );
+            $currentTime = strtotime(date("Y-m-d"));
 
             $daysArr = [];
             $events = Event::where('school_id', $school->uid)->select('name AS title', 'dates', 'type')->get();
-            for( $j = 0; $j < $totalMonthDays; $j++ ) {
+            for ($j = 0; $j < $totalMonthDays; $j++) {
                 $dateTime = strtotime($firstDate . " + {$j} days");
                 $date = date("d", $dateTime);
 
@@ -86,24 +87,24 @@ class EventController extends Controller
                 // if($weekday[date('l', $dateTime)] == 'N') {
                 //     $eventArr[] = date('l', $dateTime);
                 // }
-                
-                if(!$events->isEmpty()) {
-                    foreach($events as $h) {
+
+                if (!$events->isEmpty()) {
+                    foreach ($events as $h) {
                         $dates = !empty($h->dates) && is_array($h->dates) ? $h->dates : [];
-                        if($h->type == "date-range" && count($dates) == 2) {
+                        if ($h->type == "date-range" && count($dates) == 2) {
                             $cdate = $dates[0];
                             $endDate = $dates[1];
                             $dates = [];
                             $datediff = strtotime($endDate) - strtotime($cdate);
                             $dayDiff = round($datediff / (60 * 60 * 24));
-                            while ( $dayDiff >= 0 ) {
+                            while ($dayDiff >= 0) {
                                 $dates[] = $cdate;
                                 $cdate = date("Y-m-d", strtotime($cdate . " + 1 days"));
                                 $datediff = strtotime($endDate) - strtotime($cdate);
                                 $dayDiff = round($datediff / (60 * 60 * 24));
                             }
                         }
-                        if(in_array(date('Y-m-d', $dateTime), $dates)) {
+                        if (in_array(date('Y-m-d', $dateTime), $dates)) {
                             $eventArr[] = $h->title;
                         }
                     }
@@ -127,7 +128,7 @@ class EventController extends Controller
                 "weekdays"      => $weekday
             ];
         }
-        return response()->json( $dataArr );
+        return response()->json($dataArr);
     }
 
     /**
@@ -146,7 +147,7 @@ class EventController extends Controller
             'slug'     => [
                 'required',
                 'string',
-                Rule::unique('events')->where(function($q) use ($user, $input) {
+                Rule::unique('events')->where(function ($q) use ($user, $input) {
                     return $q->where('school_id', $user->school);
                 })
             ],
@@ -180,7 +181,7 @@ class EventController extends Controller
     public function show(School $school, $event)
     {
         $query = Event::with('media')->where('school_id', $school->uid);
-        if(is_numeric($event)) {
+        if (is_numeric($event)) {
             $query->where('id', $event);
         } else {
             $query->where('slug', $event);
@@ -204,7 +205,7 @@ class EventController extends Controller
             'slug'     => [
                 'required',
                 'string',
-                Rule::unique('events')->where(function($q) use ($school, $event) {
+                Rule::unique('events')->where(function ($q) use ($school, $event) {
                     return $q->where('school_id', $school->uid)->where('id', '!=', $event->id);
                 })
             ],
