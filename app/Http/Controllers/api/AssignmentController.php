@@ -20,11 +20,11 @@ class AssignmentController extends Controller
     public function index(Request $request, School $school)
     {
         $query = Assignment::where('school_id', $school->uid);
-        if(!empty($request->s)) {
+        if (!empty($request->s)) {
             $s = trim($request->s);
-            $query->where(function($q) use ($s) {
+            $query->where(function ($q) use ($s) {
                 $q->where('name', 'LIKE', "%{$s}%")
-                  ->orWhere('description', 'LIKE', "%{$s}%");
+                    ->orWhere('description', 'LIKE', "%{$s}%");
             });
         }
         $assignments = $query->paginate(10);
@@ -62,7 +62,7 @@ class AssignmentController extends Controller
             $input['form']['school_id'] = $school->uid;
             $assignment = Assignment::create($input['form']);
 
-            if($request->hasFile('attachement')) {
+            if ($request->hasFile('attachement')) {
                 $file = $request->file('attachement');
 
                 $assignment->attachment = $file->store('assignments', 'public');
@@ -97,9 +97,34 @@ class AssignmentController extends Controller
      * @param  \App\Model\Assignment  $assignment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Assignment $assignment)
+    public function update(Request $request, School $school, $assignment_id)
     {
-        //
+        $request->validate([
+            'form'              => 'required|array',
+            'form.name'         => 'required|string',
+            'form.section_id'   => 'required|numeric',
+        ]);
+
+        $input = $request->form;
+
+        $assignment = Assignment::findOrFail($assignment_id);
+
+        $input['user_id']   = auth()->user()->id;
+        $input['school_id'] = $school->uid;
+        unset($input['attachment_full_url']);
+        $assignment->update($input);
+
+        if ($request->hasFile('attachement')) {
+            $file = $request->file('attachement');
+
+            $assignment->attachment = $file->store('assignments', 'public');
+            $assignment->save();
+        }
+
+        return response([
+            'message'   => 'Assignment updated.',
+            'data'      => $assignment
+        ]);
     }
 
     /**

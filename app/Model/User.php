@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Model;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,34 +8,39 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class User extends Model
 {
     use SoftDeletes;
-    protected $appends = ['full_address', 'salary'];
+
+    protected $appends = ['full_address', 'salary', 'user_role'];
     protected $guarded = [];
     protected $hidden  = [
-        'password', 
+        'password',
         'remember_token',
     ];
 
     public function getFullAddressAttribute()
     {
         $address = $this->address1;
-        if(!empty($this->address2)) {
-            $address .= ', '.$this->address2;
+        if (!empty($this->address2)) {
+            $address .= ', ' . $this->address2;
         }
-        if(!empty($this->city_id)) {
-            $address .= ', '.$this->cityData->stateName->name;
-            $address .= ' '.$this->cityData->name;
+        if (!empty($this->city_id)) {
+            $address .= ', ' . $this->cityData->stateName->name;
+            $address .= ' ' . $this->cityData->name;
         }
-        if(!empty($this->pin_code)) {
-            $address .= ' '.$this->pin_code;
+        if (!empty($this->pin_code)) {
+            $address .= ' ' . $this->pin_code;
         }
 
         return $address;
     }
 
+    public function getUserRoleAttribute()
+    {
+        return $this->roleName->name;
+    }
+
     public function getSalaryAttribute()
     {
-        if($this->roleName && ($this->roleName->name == 'Teacher' || $this->roleName->name == 'Staff'))
-        {
+        if ($this->roleName && ($this->roleName->name == 'Teacher' || $this->roleName->name == 'Staff')) {
             return @$this->emp_promotion->new_salary ?: null;
         }
         return null;
@@ -78,7 +84,8 @@ class User extends Model
     {
         return $this->hasOne(Role::class, 'id', 'role');
     }
-    public function guardian_info() {
+    public function guardian_info()
+    {
         return $this->hasOne('App\Model\Guardian', 'uid', 'id');
     }
     public function attd()

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\api;
 
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +16,7 @@ use Illuminate\Validation\Rule;
 
 // Load Models
 use App\Model\User;
+use App\User as AuthUser;
 use App\Model\Student;
 use App\Model\Role;
 use App\Model\Setting;
@@ -22,16 +24,29 @@ use App\Model\School;
 
 class UserController extends Controller
 {
+    public function login_as($school, AuthUser $user)
+    {
+        $teacher = User::findOrFail(auth()->user()->id);
+
+        if ($teacher->user_role && $teacher->user_role == 'Parents') {
+            $token  = $user->createToken('schoolApp')->accessToken;
+            $user   = User::findOrFail($user->id);
+
+            return response()->json(['token' => $token, 'user' => $user]);
+        } else {
+            return response()->json(["error" => 'Unauthenticated.', 'data' => $teacher], 401);
+        }
+    }
     public function profile(Request $request, $subdomain)
     {
         $info = User::with(['media', 'pincodeData', 'cityData', 'documents', 'custom_fields'])->findOrFail($request->user()->id);
 
-        $info->picture = !empty($info->media->image) ? url('uploads/thumb/'.$info->media->image) : url('img/figure/admin.jpg');
+        $info->picture = !empty($info->media->image) ? url('uploads/thumb/' . $info->media->image) : url('img/figure/admin.jpg');
         $info->dob     = date("d M Y", strtotime($info->dob));
 
-        if(!empty($info->custom_fields)) {
-            foreach($info->custom_fields as $key => $cf) {
-                if($cf->type == 'relation') {
+        if (!empty($info->custom_fields)) {
+            foreach ($info->custom_fields as $key => $cf) {
+                if ($cf->type == 'relation') {
                     $relationInfo = \DB::table($cf->relative_table)->find($cf->pivot->value);
                     $info->custom_fields[$key]->valueText = !empty($relationInfo->name) ? $relationInfo->name : '';
                 } else {
@@ -52,16 +67,14 @@ class UserController extends Controller
             $q->where('name', 'Teacher');
         });
 
-        if(!empty($request->class_id))
-        {
-            $query->whereHas('teacher_timetable', function ($q) use($request) {
+        if (!empty($request->class_id)) {
+            $query->whereHas('teacher_timetable', function ($q) use ($request) {
                 $q->whereHas('section_info', function ($q1) use ($request) {
                     $q1->where('class', $request->class_id);
                 });
             });
         }
-        if (!empty($request->subject_id))
-        {
+        if (!empty($request->subject_id)) {
             $query->whereHas('teacher_timetable', function ($q) use ($request) {
                 $q->where('subject', $request->subject_id);
             });
@@ -82,37 +95,32 @@ class UserController extends Controller
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'LIKE', '%'.$request->s.'%')
-                ->orWhere('mobile', 'LIKE', '%'.$request->s.'%');
+                $q->where('name', 'LIKE', '%' . $request->s . '%')
+                    ->orWhere('mobile', 'LIKE', '%' . $request->s . '%');
             });
         }
-        if(!empty($request->role)) {
+        if (!empty($request->role)) {
             $query->whereHas('roleName', function ($q) use ($request) {
                 $q->where('name', $request->role);
             });
         }
-        if(!empty($request->state_id))
-        {
+        if (!empty($request->state_id)) {
             $query->whereHas('cityData', function ($q) use ($request) {
                 $q->where('state', $request->state_id);
             });
         }
-        if(!empty($request->city_id))
-        {
+        if (!empty($request->city_id)) {
             $query->where('city_id', $request->city_id);
         }
-        if(!empty($request->gender))
-        {
+        if (!empty($request->gender)) {
             $query->where('gender', $request->gender);
         }
 
-        if(!empty($request->custom_field))
-        {
+        if (!empty($request->custom_field)) {
             // $request->custom_field = json_decode($request->custom_field);
 
-            foreach($request->custom_field as $cf_id => $cf) {
-                if(!empty($cf))
-                {
+            foreach ($request->custom_field as $cf_id => $cf) {
+                if (!empty($cf)) {
                     $query->whereHas('direct_custom_fields', function ($q) use ($cf, $cf_id) {
                         $q->where('value', $cf)->where('custom_field_id', $cf_id);
                     });
@@ -120,26 +128,23 @@ class UserController extends Controller
             }
         }
 
-        if(empty($request->type) || $request->type != 'all')
-        {
+        if (empty($request->type) || $request->type != 'all') {
             $data = $query->latest()->paginate(20);
-    
+
             if (!$data->isEmpty()) {
                 foreach ($data as $i => $d) {
                     if (!empty($data[$i]->media)) {
-                        $data[$i]->media->large_image   = !empty($d->media->image) ? url('uploads/large/'.$d->media->image) : url('img/default.jpg');
-                        $data[$i]->media->medium_image  = !empty($d->media->image) ? url('uploads/medium/'.$d->media->image) : url('img/default.jpg');
-                        $data[$i]->media->thumb_image   = !empty($d->media->image) ? url('uploads/thumb/'.$d->media->image) : url('img/default.jpg');
+                        $data[$i]->media->large_image   = !empty($d->media->image) ? url('uploads/large/' . $d->media->image) : url('img/default.jpg');
+                        $data[$i]->media->medium_image  = !empty($d->media->image) ? url('uploads/medium/' . $d->media->image) : url('img/default.jpg');
+                        $data[$i]->media->thumb_image   = !empty($d->media->image) ? url('uploads/thumb/' . $d->media->image) : url('img/default.jpg');
                     }
                     $data[$i]->children_count = 0;
-                    if(!empty($request->role) && $request->role == 'Parents') {
+                    if (!empty($request->role) && $request->role == 'Parents') {
                         $data[$i]->children_count = Student::where('father', $d->id)->orWhere('mother', $d->id)->orWhere('guardian', $d->id)->has('user')->count();
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             $query->select(
                 \DB::raw("CONCAT(name, ' (', mobile, ')') AS name"),
                 'id'
@@ -153,9 +158,9 @@ class UserController extends Controller
     {
         $info = User::with(['media', 'pincodeData', 'cityData', 'documents', 'custom_fields'])->findOrFail($id);
 
-        if(!empty($info->custom_fields)) {
-            foreach($info->custom_fields as $key => $cf) {
-                if($cf->type == 'relation') {
+        if (!empty($info->custom_fields)) {
+            foreach ($info->custom_fields as $key => $cf) {
+                if ($cf->type == 'relation') {
                     $relationInfo = \DB::table($cf->relative_table)->find($cf->pivot->value);
                     $info->custom_fields[$key]->valueText = !empty($relationInfo->name) ? $relationInfo->name : '';
                 } else {
@@ -199,7 +204,7 @@ class UserController extends Controller
                 $user   = Auth::user();
                 $token  = $user->createToken('schoolApp')->accessToken;
                 $user   = User::with(['roleName', 'media', 'schoolData'])->findOrFail($user->id)->toArray();
-                $user['picture'] = !empty($user['media']['image']) ? url('uploads/thumb/'.$user['media']['image']) : url('img/figure/admin.jpg');
+                $user['picture'] = !empty($user['media']['image']) ? url('uploads/thumb/' . $user['media']['image']) : url('img/figure/admin.jpg');
 
                 $re = [
                     'status'    => true,
@@ -262,7 +267,7 @@ class UserController extends Controller
             $sms        = file_get_contents($smsApiUrl);
             $re = [
                 'status'    => true,
-                'message'   => 'OTP sent to your mobile no. '.$user->mobile,
+                'message'   => 'OTP sent to your mobile no. ' . $user->mobile,
                 'otp'       => $otp_code,
                 'login'     => $user->login,
                 'mobile_no' => $user->mobile
@@ -324,7 +329,7 @@ class UserController extends Controller
             $user->title         = $input['title'];
             $user->fname         = $input['fname'];
             $user->lname         = $input['lname'];
-            $user->name          = trim($input['title'].' '.$input['fname'].' '.$input['lname']);
+            $user->name          = trim($input['title'] . ' ' . $input['fname'] . ' ' . $input['lname']);
             $user->email         = $input['email'];
             $user->mobile        = $input['mobile'];
             $user->dob           = $input['dob'];
@@ -339,14 +344,13 @@ class UserController extends Controller
             $user->save();
 
             $customFields = [];
-            if(!empty($request->custom_field)) {
-                foreach($request->custom_field as $id => $cf)
-                {
+            if (!empty($request->custom_field)) {
+                foreach ($request->custom_field as $id => $cf) {
                     $customFields[$id] = [
                         'value' => $cf
                     ];
                 }
-    
+
                 $user->custom_fields()->sync($customFields);
             }
 
@@ -363,7 +367,7 @@ class UserController extends Controller
     {
         $input      = $request->all();
         $rules = [
-            'login'     => 'required|unique:users,id,'.$user->id,
+            'login'     => 'required|unique:users,id,' . $user->id,
             'fname'     => 'required|alpha',
             'title'     => 'required',
             'gender'    => 'required',
@@ -380,7 +384,7 @@ class UserController extends Controller
             $responseCode = 200;
         } else {
             $role = Role::where('name', 'LIKE', $input['role'])->firstOrFail();
-            
+
             $user->login         = $input['login'];
             if (!empty($input['password'])) {
                 $user->password      = Hash::make($input['password']);
@@ -388,7 +392,7 @@ class UserController extends Controller
             $user->title         = $input['title'];
             $user->fname         = $input['fname'];
             $user->lname         = $input['lname'];
-            $user->name          = trim($input['title'].' '.$input['fname'].' '.$input['lname']);
+            $user->name          = trim($input['title'] . ' ' . $input['fname'] . ' ' . $input['lname']);
             $user->email         = $input['email'];
             $user->mobile        = $input['mobile'];
             $user->dob           = $input['dob'];
@@ -403,14 +407,13 @@ class UserController extends Controller
             $user->save();
 
             $customFields = [];
-            if(!empty($request->custom_field)) {
-                foreach($request->custom_field as $id => $cf)
-                {
+            if (!empty($request->custom_field)) {
+                foreach ($request->custom_field as $id => $cf) {
                     $customFields[$id] = [
                         'value' => $cf
                     ];
                 }
-    
+
                 $user->custom_fields()->sync($customFields);
             }
 
@@ -448,14 +451,14 @@ class UserController extends Controller
     public function getTeachers()
     {
         $data = User::with(['media', 'cityData', 'cityData.stateName', 'roleName', 'parent_school', 'parent_school.schoolData'])
-        ->whereHas('roleName', function ($q) {
-            $q->where('name', 'LIKE', 'Teacher');
-        })->where("school", auth()->user()->school)->get();
+            ->whereHas('roleName', function ($q) {
+                $q->where('name', 'LIKE', 'Teacher');
+            })->where("school", auth()->user()->school)->get();
 
         if (!$data->isEmpty()) {
             foreach ($data as $i => $d) {
                 if (!empty($d->media->image)) {
-                    $data[$i]->picture   = url('uploads/thumb/'.$d->media->image);
+                    $data[$i]->picture   = url('uploads/thumb/' . $d->media->image);
                 }
 
                 if (!empty($d->parent_school->schoolData->student_id_instructions) && !is_array($d->parent_school->schoolData->student_id_instructions)) {
@@ -477,8 +480,8 @@ class UserController extends Controller
                 }
                 $data[$i]->full_address  = $fullAddress;
 
-                $data[$i]->barcode 		 = strtoupper(sprintf("%05d", $d->id));
-                $data[$i]->barcode_image = 'data:image/png;base64,'.DNS1D::getBarcodePNG($data[$i]->barcode, 'C39', 1, 30);
+                $data[$i]->barcode          = strtoupper(sprintf("%05d", $d->id));
+                $data[$i]->barcode_image = 'data:image/png;base64,' . DNS1D::getBarcodePNG($data[$i]->barcode, 'C39', 1, 30);
             }
         }
 
@@ -487,14 +490,14 @@ class UserController extends Controller
     public function getStaffs()
     {
         $data = User::with(['media', 'cityData', 'cityData.stateName', 'roleName', 'parent_school', 'parent_school.schoolData'])
-        ->whereHas('roleName', function ($q) {
-            $q->where('name', 'LIKE', 'Staff');
-        })->where("school", auth()->user()->school)->get();
+            ->whereHas('roleName', function ($q) {
+                $q->where('name', 'LIKE', 'Staff');
+            })->where("school", auth()->user()->school)->get();
 
         if (!$data->isEmpty()) {
             foreach ($data as $i => $d) {
                 if (!empty($d->media->image)) {
-                    $data[$i]->picture   = url('uploads/thumb/'.$d->media->image);
+                    $data[$i]->picture   = url('uploads/thumb/' . $d->media->image);
                 }
                 if (!empty($d->parent_school->schoolData->student_id_instructions)) {
                     $data[$i]->parent_school->schoolData->student_id_instructions = explode("\n", $d->parent_school->schoolData->student_id_instructions);
@@ -516,8 +519,8 @@ class UserController extends Controller
 
                 $data[$i]->full_address  = $fullAddress;
 
-                $data[$i]->barcode 		   = strtoupper(sprintf("%05d", $d->id));
-                $data[$i]->barcode_image = 'data:image/png;base64,'.DNS1D::getBarcodePNG($data[$i]->barcode, 'C39', 1, 30);
+                $data[$i]->barcode            = strtoupper(sprintf("%05d", $d->id));
+                $data[$i]->barcode_image = 'data:image/png;base64,' . DNS1D::getBarcodePNG($data[$i]->barcode, 'C39', 1, 30);
             }
         }
 

@@ -28,12 +28,12 @@ class VehicleController extends Controller
         $rules = [
             'driver'        => 'required|numeric',
             'type'          => 'required',
-            'vehicle_no'    => 'required|unique:vehicles,vehicle_no,NULL,id,school,'.auth()->user()->school,
+            'vehicle_no'    => 'required|unique:vehicles,vehicle_no,NULL,id,school,' . auth()->user()->school,
             'vehicle_rc'    => 'required'
         ];
 
         $input                  = $request->all();
-        $input['vehicle_no']    = str_replace([" ","-","(",")"], "", $input['vehicle_no']);
+        $input['vehicle_no']    = str_replace([" ", "-", "(", ")"], "", $input['vehicle_no']);
 
         $validator  = Validator::make($input, $rules);
 
@@ -65,13 +65,12 @@ class VehicleController extends Controller
     }
     public function updateData(Request $request)
     {
-        $schoolName = Route::input('subdomain');
         $input      = $request->all();
 
         $rules = [
             'driver'        => 'required|numeric',
             'type'          => 'required',
-            'vehicle_no'    => 'required|unique:vehicles,vehicle_no,'.$input['id'].',id,school,'.auth()->user()->school,
+            'vehicle_no'    => 'required|unique:vehicles,vehicle_no,' . $input['id'] . ',id,school,' . auth()->user()->school,
             'vehicle_rc'    => 'required'
         ];
 
@@ -107,7 +106,7 @@ class VehicleController extends Controller
     public function getAllList(Request $request, $weburl)
     {
         $query = Vehicle::where('school', auth()->user()->school);
-        if(!empty($request->type) && $request->type == 'exclude-routes') {
+        if (!empty($request->type) && $request->type == 'exclude-routes') {
             $query->whereDoesntHave('routes');
         }
         $data = $query->latest()->get();
@@ -119,24 +118,25 @@ class VehicleController extends Controller
         $limit = $request->limit ?: 10;
         $query = Vehicle::with('driverName')->withCount('routes')->where('school', $school->uid);
 
+        if (auth()->user()->user_role == 'Driver') {
+            $query->where('driver', auth()->user()->id);
+        }
+
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
-                $q->where('vehicle_no', 'LIKE', '%'.$request->s.'%')
-                  ->orWhere('vehicle_rc', 'LIKE', '%'.$request->s.'%');
+                $q->where('vehicle_no', 'LIKE', '%' . $request->s . '%')
+                    ->orWhere('vehicle_rc', 'LIKE', '%' . $request->s . '%');
             });
         }
 
-        if($request->type && $request->type == 'all')
-        {
+        if ($request->type && $request->type == 'all') {
             $re = $query->orderBy('vehicle_no')->pluck('vehicle_no', 'id');
-        }
-        else
-        {
+        } else {
             $data = $query->latest()->paginate($limit);
-            
+
             $re = [
                 'status'    => true,
-                'message'   => $data->count().' record(s) found.',
+                'message'   => $data->count() . ' record(s) found.',
                 'data'      => $data,
             ];
         }
@@ -149,8 +149,8 @@ class VehicleController extends Controller
 
         if (!empty($request->s)) {
             $query->where(function ($q) use ($request) {
-                $q->where('vehicle_no', 'LIKE', '%'.$request->s.'%')
-                  ->orWhere('vehicle_rc', 'LIKE', '%'.$request->s.'%');
+                $q->where('vehicle_no', 'LIKE', '%' . $request->s . '%')
+                    ->orWhere('vehicle_rc', 'LIKE', '%' . $request->s . '%');
             });
         }
 
@@ -164,7 +164,7 @@ class VehicleController extends Controller
         } else {
             $re = [
                 'status'    => true,
-                'message'   => $data->count().' record(s) found.',
+                'message'   => $data->count() . ' record(s) found.',
                 'data'      => $data,
             ];
         }

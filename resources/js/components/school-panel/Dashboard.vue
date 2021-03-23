@@ -114,69 +114,65 @@
     <!-- Dashboard summery End Here -->
     <!-- Dashboard Content Start Here -->
     <div class="row gutters-20">
-      <div class="col-12 col-xl-8 col-6-xxxl">
-        <div class="card dashboard-card-one pd-b-20">
-          <div class="card-body">
-            <div class="heading-layout1">
-              <div class="item-title">
-                <h3>Earnings</h3>
-              </div>
-              <div class="dropdown">
-                <a
-                  class="dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-expanded="false"
-                  >...</a
-                >
-
-                <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-times text-orange-red"></i>Close</a
-                  >
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-cogs text-dark-pastel-green"></i>Edit</a
-                  >
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-redo-alt text-orange-peel"></i>Refresh</a
-                  >
+      <div class="col-12 col-xl-9 col-9-xxxl">
+        <div class="row">
+          <div class="col-12 col-xl-6 col-6-xxxl">
+            <div class="card dashboard-card-one pd-b-20">
+              <div class="card-body">
+                <div class="heading-layout1">
+                  <div class="item-title">
+                    <h3>Earnings</h3>
+                  </div>
+                </div>
+                <div class="earning-report">
+                  <div class="item-content">
+                    <div class="single-item pseudo-bg-blue">
+                      <h4>Total Collections</h4>
+                      <span>{{ dashboard_data.count.total_sales_paid }}</span>
+                    </div>
+                    <div class="single-item pseudo-bg-red">
+                      <h4>Fees Collection</h4>
+                      <span>{{ dashboard_data.count.fees_collection }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="earning-chart-wrap">
+                  <!-- <canvas id="earning-line-chart" width="660" height="320"></canvas> -->
+                  <line-chart
+                    :chartData="lineChartData"
+                    :options="lineChartOptions"
+                  ></line-chart>
                 </div>
               </div>
             </div>
-            <div class="earning-report">
-              <div class="item-content">
-                <div class="single-item pseudo-bg-blue">
-                  <h4>Total Collections</h4>
-                  <span>75,000</span>
+          </div>
+          <div class="col-12 col-xl-6 col-6-xxxl">
+            <div class="card dashboard-card-one pd-b-20">
+              <div class="card-body">
+                <div class="heading-layout1">
+                  <div class="item-title">
+                    <h3>Earnings</h3>
+                  </div>
                 </div>
-                <div class="single-item pseudo-bg-red">
-                  <h4>Fees Collection</h4>
-                  <span>15,000</span>
+                <div class="earning-report">
+                  <div class="item-content">
+                    <div class="single-item pseudo-bg-blue">
+                      <h4>Total Collections</h4>
+                      <span>{{ dashboard_data.count.total_sales_paid }}</span>
+                    </div>
+                    <div class="single-item pseudo-bg-red">
+                      <h4>Fees Collection</h4>
+                      <span>{{ dashboard_data.count.fees_collection }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="earning-chart-wrap">
+                  <Bar-chart
+                    :chartData="lineChartData"
+                    :options="lineChartOptions"
+                  ></Bar-chart>
                 </div>
               </div>
-              <!-- <div class="dropdown">
-                <a
-                  class="date-dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-expanded="false"
-                  >Jan 20, 2019</a
-                >
-                <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="#">Jan 20, 2019</a>
-                  <a class="dropdown-item" href="#">Jan 20, 2021</a>
-                  <a class="dropdown-item" href="#">Jan 20, 2020</a>
-                </div>
-              </div> -->
-            </div>
-            <div class="earning-chart-wrap">
-              <!-- <canvas id="earning-line-chart" width="660" height="320"></canvas> -->
-              <line-chart
-                :chartData="lineChartData"
-                :options="lineChartOptions"
-              ></line-chart>
             </div>
           </div>
         </div>
@@ -231,35 +227,13 @@
           </div>
         </div>
       </div> -->
-      <div class="col-12 col-xl-6 col-6-xxxl">
+      <div class="col-12 col-xl-3 col-3-xxxl">
         <div class="card dashboard-card-three pd-b-20">
           <div class="card-body">
             <div class="heading-layout1">
               <div class="item-title">
                 <h3>Students</h3>
               </div>
-              <!-- <div class="dropdown">
-                <a
-                  class="dropdown-toggle"
-                  href="#"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-expanded="false"
-                  >...</a
-                >
-
-                <div class="dropdown-menu dropdown-menu-right">
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-times text-orange-red"></i>Close</a
-                  >
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-cogs text-dark-pastel-green"></i>Edit</a
-                  >
-                  <a class="dropdown-item" href="#"
-                    ><i class="fas fa-redo-alt text-orange-peel"></i>Refresh</a
-                  >
-                </div>
-              </div> -->
             </div>
             <div class="doughnut-chart-wrap">
               <doughnut
@@ -270,11 +244,15 @@
             <div class="student-report">
               <div class="student-count pseudo-bg-blue">
                 <h4 class="item-title">Female Students</h4>
-                <div class="item-number">45,000</div>
+                <div class="item-number">
+                  {{ dashboard_data.count.female_students }}
+                </div>
               </div>
               <div class="student-count pseudo-bg-yellow">
                 <h4 class="item-title">Male Students</h4>
-                <div class="item-number">1,05,000</div>
+                <div class="item-number">
+                  {{ dashboard_data.count.male_students }}
+                </div>
               </div>
             </div>
           </div>
@@ -500,23 +478,44 @@
     <!-- Dashboard Content End Here -->
   </div>
 </template>
+<style>
+canvas {
+  height: 320px;
+}
+</style>
 <script type="text/javascript">
 import { dashboard } from "../../api/dashboard";
 import LineChart from "./common/LineChart";
+import BarChart from "./common/BarChart";
 import Doughnut from "./common/Doughnut";
 export default {
   components: {
     LineChart,
+    BarChart,
     Doughnut,
   },
   data() {
     return {
       dashboard_data: {},
       lineChartData: {
-        labels: ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun", ""],
+        labels: [
+          "",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+          "Jan",
+          "Feb",
+          "Mar",
+        ],
         datasets: [
           {
-            data: [0, 5e4, 1e4, 5e4, 14e3, 7e4, 5e4, 75e3, 5e4],
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             backgroundColor: "#ff0000",
             borderColor: "#ff0000",
             borderWidth: 1,
@@ -529,7 +528,7 @@ export default {
             label: "Total Collection",
           },
           {
-            data: [0, 3e4, 2e4, 6e4, 7e4, 5e4, 5e4, 9e4, 8e4],
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             backgroundColor: "#417dfc",
             borderColor: "#417dfc",
             borderWidth: 1,
@@ -635,7 +634,7 @@ export default {
         datasets: [
           {
             backgroundColor: ["#304ffe", "#ffa601"],
-            data: [45000, 105000],
+            data: [0, 0],
             label: "Total Students",
           },
         ],
@@ -1008,6 +1007,16 @@ export default {
     getData() {
       dashboard().then((res) => {
         this.dashboard_data = res.data;
+
+        // Doubhnut Chart
+        this.doughnutChartData.datasets[0].data[0] =
+          res.data.count.female_students;
+        this.doughnutChartData.datasets[0].data[1] =
+          res.data.count.male_students;
+
+        // Line Chart
+        this.lineChartData.datasets[0].data = res.data.count.total_graph;
+        this.lineChartData.datasets[1].data = res.data.count.fees_graph;
       });
     },
   },

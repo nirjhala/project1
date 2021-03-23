@@ -62,6 +62,7 @@ Route::group([
 ], function () {
 
     Route::get('logout', 'UserController@logout');
+    Route::get('login-as-student/{user}', 'UserController@login_as');
     Route::get('custom-field', 'CustomFieldController@index');
 
     Route::get('admin-dashboard', 'DashboardController@index');

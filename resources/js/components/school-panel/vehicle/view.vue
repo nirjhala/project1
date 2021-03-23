@@ -1,16 +1,7 @@
 <template>
   <div class="dashboard-content-one">
     <!-- Breadcubs Area Start Here -->
-    <breadcrumbs
-      :items="b_items"
-      :title="title"
-      :btn="{
-        target: {
-          name: 'add-vehicle',
-        },
-        label: 'Add New Vehicle',
-      }"
-    />
+    <breadcrumbs :items="b_items" :title="title" :btn="add_btn_target" />
     <!-- Breadcubs Area End Here -->
 
     <div class="mg-b-20">
@@ -42,6 +33,7 @@
                 class="btn btn-link text-dark removeBtn"
                 data-toggle="tooltip"
                 title="Remove"
+                v-if="user.user_role == 'School'"
               >
                 <i class="fa fa-trash fa-2x"></i>
               </button>
@@ -61,7 +53,7 @@
               <table class="table display data-table text-nowrap">
                 <thead>
                   <tr>
-                    <th>
+                    <th v-if="user.user_role == 'School'">
                       <div class="form-check">
                         <input
                           type="checkbox"
@@ -73,14 +65,14 @@
                       </div>
                     </th>
                     <th>Vehicle No.</th>
-                    <th>Driver</th>
+                    <th v-if="user.user_role == 'School'">Driver</th>
                     <th>Type</th>
                     <th>RC</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(list, i) in lists.data" :key="i">
-                    <td>
+                    <td v-if="user.user_role == 'School'">
                       <div class="form-check" v-if="list.routes_count == 0">
                         <input
                           v-model="check"
@@ -116,7 +108,7 @@
                         <small>({{ list.routes_count }} Routes)</small>
                       </div>
                     </td>
-                    <td>
+                    <td v-if="user.user_role == 'School'">
                       {{ list.driver_name ? list.driver_name.name : "N/A" }}
                     </td>
                     <td>{{ list.type }}</td>
@@ -144,23 +136,12 @@ export default {
   components: {
     Breadcrumbs,
   },
+  props: {
+    user: Object,
+  },
   data() {
     return {
       title: "View Vehicle",
-      b_items: [
-        {
-          target: {
-            name: "dashboard",
-          },
-          title: "Dashboard",
-        },
-        {
-          target: {
-            name: "master",
-          },
-          title: "Master",
-        },
-      ],
       errors: 0,
       lists: {},
       allSelected: 0,
@@ -168,6 +149,43 @@ export default {
       s: "",
       loaded: 0,
     };
+  },
+  computed: {
+    add_btn_target() {
+      return this.user.user_role != "School"
+        ? null
+        : {
+            target: {
+              name: "add-vehicle",
+            },
+            label: "Add New Vehicle",
+          };
+    },
+    b_items() {
+      return this.user.user_role == "School"
+        ? [
+            {
+              target: {
+                name: "dashboard",
+              },
+              title: "Dashboard",
+            },
+            {
+              target: {
+                name: "master",
+              },
+              title: "Master",
+            },
+          ]
+        : [
+            {
+              target: {
+                name: "dashboard",
+              },
+              title: "Dashboard",
+            },
+          ];
+    },
   },
   mounted() {
     this.getRecords();

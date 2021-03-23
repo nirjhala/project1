@@ -530,7 +530,7 @@ export const routes = [
                 path: 'vehicle',
                 name: 'vehicle',
                 component: () => import('./components/school-panel/vehicle/view'),
-                meta: { requireAuth: true, role: ['School'] }
+                meta: { requireAuth: true, role: ['School', 'Driver'] }
             },
             {
                 path: 'add-vehicle',
@@ -1344,13 +1344,13 @@ export const routes = [
                 path: 'complain',
                 name: 'view-complain',
                 component: () => import('./components/student-panel/complain/index'),
-                meta: { requireAuth: true, role: ['School', 'Student'] }
+                meta: { requireAuth: true, role: ['School', 'Student', 'Parents'] }
             },
             {
                 path: 'complain/add',
                 name: 'add-complain',
                 component: () => import('./components/student-panel/complain/add'),
-                meta: { requireAuth: true, role: ['Student'] }
+                meta: { requireAuth: true, role: ['Student', 'Parents'] }
             },
             {
                 path: 'complain/edit/:id',

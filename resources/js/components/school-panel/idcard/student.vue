@@ -339,25 +339,32 @@ export default {
 
     if (user_info.school_data && user_info.school_data.logo) {
       this.logo_src =
-        this.baseURL + "img/profiles/" + user_info.school_data.logo;
+        this.baseURL + "/img/profiles/" + user_info.school_data.logo;
     }
   },
   methods: {
     printIdCards() {
       let divToPrint = document.getElementById("divToPrint");
 
-      let newWin = window.open("", "Time-Table", "width=800,height=600");
+      let newWin = window.open("", "Time-Table");
 
       newWin.document.open();
       let html = `
             <html>
                 <head>
-                    <title>ID-CARD</title>
                     <style>
                     body {
                         margin:0;
                         font-family: sans-serif;
                         background: #ebebeb;
+                    }
+                    body {
+                      display: none;
+                    }
+                    @media print {
+                      body {
+                        display: block;
+                      }
                     }
                     @page {
                         size: A4 landscape;
@@ -365,15 +372,16 @@ export default {
                     }
                     </style>
                 </head>
-                <body onload="window.print()">${divToPrint.innerHTML}</body>
+                <body>${divToPrint.innerHTML}</body>
             </html>`;
       newWin.document.write(html);
 
       newWin.document.close();
 
-      setTimeout(function () {
+      newWin.onload = function () {
+        newWin.print();
         newWin.close();
-      }, 10);
+      };
     },
     getDepts() {
       let instance = axios.create({

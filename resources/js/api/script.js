@@ -251,6 +251,9 @@ export default {
     addAssignment(data) {
         return this.execute('post', 'assignment', data)
     },
+    updateAssignment(id, data) {
+        return this.execute('post', `assignment/${id}`, data)
+    },
     AssignmentDetails(id) {
         return this.execute('get', `assignment/${id}`)
     },
@@ -981,4 +984,11 @@ export const view_state = (query) => {
 }
 export const view_city = (query) => {
     return execute('get', `city/?${query}`)
+}
+
+/**
+ * Login as - auth
+ */
+export const login_as_student = (id) => {
+    return execute('get', `login-as-student/${id}`)
 }

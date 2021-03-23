@@ -35,6 +35,7 @@
                   : 'margin: 0px 5px; width: calc(20% - 10px);'
               "
               v-for="(s, i) in staffs"
+              :key="i"
             >
               <div v-if="i % 6 == 0" style="page-break-before: always"></div>
               <div
@@ -232,8 +233,9 @@
                   "
                 >
                   <li
-                    v-for="ins in s.parent_school.school_data
+                    v-for="(ins, i) in s.parent_school.school_data
                       .staff_id_instructions"
+                    :key="i"
                   >
                     {{ ins }}.
                   </li>
@@ -301,7 +303,7 @@ export default {
 
     if (user_info.school_data && user_info.school_data.logo) {
       this.logo_src =
-        this.baseURL + "img/profiles/" + user_info.school_data.logo;
+        this.baseURL + "/img/profiles/" + user_info.school_data.logo;
     }
   },
   methods: {

@@ -45,7 +45,7 @@
           class="header-main-menu collapse navbar-collapse"
           id="mobile-navbar"
         >
-          <ul class="navbar-nav">
+          <!-- <ul class="navbar-nav">
             <li class="navbar-item header-search-bar">
               <div class="input-group stylish-input-group">
                 <span class="input-group-addon">
@@ -60,9 +60,9 @@
                 />
               </div>
             </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="navbar-item dropdown header-message">
+          </ul> -->
+          <ul class="navbar-nav ml-auto">
+            <!-- <li class="navbar-item dropdown header-message">
               <a
                 class="navbar-nav-link dropdown-toggle"
                 href="#"
@@ -150,7 +150,7 @@
                   </div>
                 </div>
               </div>
-            </li>
+            </li> -->
             <li class="navbar-item dropdown header-notification">
               <a
                 class="navbar-nav-link dropdown-toggle"
@@ -263,6 +263,7 @@
         <Sidebar />
         <!-- <transition name="bounce"> -->
         <router-view
+          :user="user_info"
           :auth="auth"
           :image="media_image"
           :image_src="media_src"
